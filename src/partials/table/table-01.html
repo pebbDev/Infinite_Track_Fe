@@ -1,21 +1,34 @@
 <div
-  class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6"
+  class="border-stroke shadow-default dark:border-strokedark dark:bg-boxdark rounded-sm border bg-white px-5 py-6 sm:px-7.5"
 >
+  <!-- Main Title -->
+  <h4 class="mb-6 text-lg font-medium text-black dark:text-white">
+    Data Absensi Karyawan Harian
+  </h4>
+
+  <!-- Top Controls Row -->
   <div
-    class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between"
+    class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
   >
-    <div>
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-        Recent Orders
-      </h3>
+    <!-- Show Entries -->
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-black dark:text-white">Show</span>
+      <select
+        class="border-stroke dark:border-strokedark dark:bg-form-input focus:border-primary active:border-primary dark:bg-form-input relative z-20 inline-flex appearance-none rounded border bg-white px-4 py-1 text-black transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] dark:text-white"
+      >
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <span class="text-sm text-black dark:text-white">entries</span>
     </div>
 
-    <div class="flex items-center gap-3">
-      <button
-        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-      >
+    <!-- Search -->
+    <div class="relative">
+      <span class="absolute top-1/2 left-4.5 z-10 -translate-y-1/2">
         <svg
-          class="stroke-current fill-white dark:fill-gray-800"
+          class="fill-black dark:fill-white"
           width="20"
           height="20"
           viewBox="0 0 20 20"
@@ -23,319 +36,618 @@
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M2.29004 5.90393H17.7067"
-            stroke=""
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M9.16666 3.33332C5.945 3.33332 3.33332 5.945 3.33332 9.16666C3.33332 12.3883 5.945 15 9.16666 15C12.3883 15 15 12.3883 15 9.16666C15 5.945 12.3883 3.33332 9.16666 3.33332ZM1.66666 9.16666C1.66666 5.02452 5.02452 1.66666 9.16666 1.66666C13.3088 1.66666 16.6667 5.02452 16.6667 9.16666C16.6667 13.3088 13.3088 16.6667 9.16666 16.6667C5.02452 16.6667 1.66666 13.3088 1.66666 9.16666Z"
+            fill="currentColor"
           />
           <path
-            d="M17.7075 14.0961H2.29085"
-            stroke=""
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M12.0826 3.33331C13.5024 3.33331 14.6534 4.48431 14.6534 5.90414C14.6534 7.32398 13.5024 8.47498 12.0826 8.47498C10.6627 8.47498 9.51172 7.32398 9.51172 5.90415C9.51172 4.48432 10.6627 3.33331 12.0826 3.33331Z"
-            fill=""
-            stroke=""
-            stroke-width="1.5"
-          />
-          <path
-            d="M7.91745 11.525C6.49762 11.525 5.34662 12.676 5.34662 14.0959C5.34661 15.5157 6.49762 16.6667 7.91745 16.6667C9.33728 16.6667 10.4883 15.5157 10.4883 14.0959C10.4883 12.676 9.33728 11.525 7.91745 11.525Z"
-            fill=""
-            stroke=""
-            stroke-width="1.5"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M13.2857 13.2857C13.6112 12.9603 14.1388 12.9603 14.4643 13.2857L18.0893 16.9107C18.4147 17.2362 18.4147 17.7638 18.0893 18.0893C17.7638 18.4147 17.2362 18.4147 16.9107 18.0893L13.2857 14.4643C12.9603 14.1388 12.9603 13.6112 13.2857 13.2857Z"
+            fill="currentColor"
           />
         </svg>
-
-        Filter
-      </button>
-
-      <button
-        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-      >
-        See all
-      </button>
+      </span>
+      <input
+        type="text"
+        placeholder="Search..."
+        class="border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary w-full rounded border-[1.5px] bg-transparent px-11 py-2 text-black transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] sm:w-60 xl:w-75 dark:text-white"
+      />
     </div>
   </div>
 
-  <div class="w-full overflow-x-auto">
-    <table class="min-w-full">
-      <!-- table header start -->
+  <!-- Table Wrapper -->
+  <div class="max-w-full overflow-x-auto">
+    <table class="w-full table-auto">
+      <!-- Table Header -->
       <thead>
-        <tr class="border-gray-100 border-y dark:border-gray-800">
-          <th class="py-3">
-            <div class="flex items-center">
-              <p
-                class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
-              >
-                Products
-              </p>
-            </div>
+        <tr
+          class="bg-gray-2 dark:bg-meta-4 border-b border-gray-100 text-left dark:border-gray-800"
+        >
+          <th
+            class="min-w-[100px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            User Id
           </th>
-          <th class="py-3">
-            <div class="flex items-center">
-              <p
-                class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
-              >
-                Category
-              </p>
-            </div>
-          </th class="py-3">
-          <th class="py-3">
-            <div class="flex items-center">
-              <p
-                class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
-              >
-                Price
-              </p>
-            </div>
+          <th
+            class="min-w-[320px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Full Name
           </th>
-          <th class="py-3">
-            <div class="flex items-center col-span-2">
-              <p
-                class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
-              >
-                Status
-              </p>
-            </div>
+          <th
+            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Time In
+          </th>
+          <th
+            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Time Out
+          </th>
+          <th
+            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Work Hour
+          </th>
+          <th
+            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Kordinat
+          </th>
+          <th
+            class="min-w-[100px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Status
+          </th>
+          <th
+            class="min-w-[200px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Information
+          </th>
+          <th
+            class="min-w-[100px] px-4 py-4 text-left font-medium text-black dark:text-white"
+          >
+            Action
           </th>
         </tr>
       </thead>
-      <!-- table header end -->
 
-      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+      <!-- Table Body -->
+      <tbody>
+        <!-- Row 1 -->
         <tr>
-          <td class="py-3">
-            <div class="flex items-center">
-              <div class="flex items-center gap-3">
-                <div class="h-[50px] w-[50px] overflow-hidden rounded-md">
-                  <img src="./images/product/product-01.jpg" alt="Product" />
-                </div>
-                <div>
-                  <p
-                    class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
-                  >
-                    Macbook pro 13”
-                  </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">
-                    2 Variants
-                  </span>
-                </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">EMP001</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100"
+              >
+                <span class="text-theme-xs font-medium text-blue-600">AS</span>
+              </div>
+              <div>
+                <p class="text-theme-sm font-medium text-black dark:text-white">
+                  Ahmad Suryana
+                </p>
+                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
+                  >Manager IT</span
+                >
               </div>
             </div>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                Laptop
-              </p>
-            </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">08:00 AM</p>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                $2399.00
-              </p>
-            </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">17:30 PM</p>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p
-                class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500"
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">9j 30m</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+            >
+              View
+            </button>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-success-50 text-success-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(3, 152, 85, 0.1); color: #039855"
+            >
+              On Time
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-brand-50 text-brand-500 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6"
+            >
+              Work From Office
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Delivered
-              </p>
-            </div>
-          </td>
-        </tr>
-        <!-- table item -->
-        <tr>
-          <td class="py-3">
-            <div class="flex items-center">
-              <div class="flex items-center gap-3">
-                <div class="h-[50px] w-[50px] overflow-hidden rounded-md">
-                  <img src="./images/product/product-02.jpg" alt="Product" />
-                </div>
-                <div>
-                  <p
-                    class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
-                  >
-                    Apple Watch Ultra
-                  </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">
-                    1 Variants
-                  </span>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                Watch
-              </p>
-            </div>
-          </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                $879.00
-              </p>
-            </div>
-          </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p
-                class="rounded-full bg-warning-50 px-2 py-0.5 text-theme-xs font-medium text-warning-600 dark:bg-warning-500/15 dark:text-orange-400"
-              >
-                Pending
-              </p>
-            </div>
-          </td>
-        </tr>
-
-        <!-- table item -->
-        <tr>
-          <td class="py-3">
-            <div class="flex items-center">
-              <div class="flex items-center gap-3">
-                <div class="h-[50px] w-[50px] overflow-hidden rounded-md">
-                  <img src="./images/product/product-03.jpg" alt="Product" />
-                </div>
-                <div>
-                  <p
-                    class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
-                  >
-                    iPhone 15 Pro Max
-                  </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">
-                    2 Variants
-                  </span>
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                SmartPhone
-              </p>
-            </div>
-          </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                $1869.00
-              </p>
-            </div>
-          </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p
-                class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500"
-              >
-                Delivered
-              </p>
-            </div>
+                <path
+                  d="M3 6H5H21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
           </td>
         </tr>
 
-        <!-- table item -->
+        <!-- Row 2 -->
         <tr>
-          <td class="py-3">
-            <div class="flex items-center">
-              <div class="flex items-center gap-3">
-                <div class="h-[50px] w-[50px] overflow-hidden rounded-md">
-                  <img src="./images/product/product-04.jpg" alt="Product" />
-                </div>
-                <div>
-                  <p
-                    class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
-                  >
-                    iPad Pro 3rd Gen
-                  </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">
-                    2 Variants
-                  </span>
-                </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">EMP002</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100"
+              >
+                <span class="text-theme-xs font-medium text-green-600">SP</span>
+              </div>
+              <div>
+                <p class="text-theme-sm font-medium text-black dark:text-white">
+                  Siti Permata
+                </p>
+                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
+                  >HR Specialist</span
+                >
               </div>
             </div>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                Electronics
-              </p>
-            </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">08:17 AM</p>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                $1699.00
-              </p>
-            </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">16:28 PM</p>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p
-                class="rounded-full bg-error-50 px-2 py-0.5 text-theme-xs font-medium text-error-600 dark:bg-error-500/15 dark:text-error-500"
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">8j 11m</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+            >
+              View
+            </button>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-error-50 text-error-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(216, 0, 39, 0.1); color: #d80027"
+            >
+              Late
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-blue-light-50 text-blue-light-500 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9"
+            >
+              Work From Home
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Canceled
-              </p>
-            </div>
+                <path
+                  d="M3 6H5H21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
           </td>
         </tr>
 
-        <!-- table item -->
+        <!-- Row 3 -->
         <tr>
-          <td class="py-3">
-            <div class="flex items-center">
-              <div class="flex items-center gap-3">
-                <div class="h-[50px] w-[50px] overflow-hidden rounded-md">
-                  <img src="./images/product/product-05.jpg" alt="Product" />
-                </div>
-                <div>
-                  <p
-                    class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
-                  >
-                    Airpods Pro 2nd Gen
-                  </p>
-                  <span class="text-gray-500 text-theme-xs dark:text-gray-400">
-                    1 Variants
-                  </span>
-                </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">EMP003</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100"
+              >
+                <span class="text-theme-xs font-medium text-purple-600"
+                  >RD</span
+                >
+              </div>
+              <div>
+                <p class="text-theme-sm font-medium text-black dark:text-white">
+                  Rizki Darmawan
+                </p>
+                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
+                  >Software Developer</span
+                >
               </div>
             </div>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                Accessories
-              </p>
-            </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">-</p>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                $240.00
-              </p>
-            </div>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">-</p>
           </td>
-          <td class="py-3">
-            <div class="flex items-center">
-              <p
-                class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500"
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">0j 0m</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="text-theme-xs inline-flex cursor-not-allowed items-center justify-center rounded border border-gray-300 px-3 py-1 font-medium text-gray-400"
+              disabled
+            >
+              View
+            </button>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="text-theme-xs inline-flex rounded-full bg-gray-100 px-3 py-1 font-medium text-gray-700"
+              style="background-color: #f3f4f6; color: #4c4c4c"
+            >
+              Alpha
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-warning-50 text-warning-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(251, 146, 60, 0.1); color: #f59e0b"
+            >
+              Work From Anywhere
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Delivered
-              </p>
-            </div>
+                <path
+                  d="M3 6H5H21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
           </td>
         </tr>
-        <!-- table body end -->
+
+        <!-- Row 4 -->
+        <tr>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">EMP004</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100"
+              >
+                <span class="text-theme-xs font-medium text-orange-600"
+                  >LN</span
+                >
+              </div>
+              <div>
+                <p class="text-theme-sm font-medium text-black dark:text-white">
+                  Lestari Ningsih
+                </p>
+                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
+                  >Marketing Executive</span
+                >
+              </div>
+            </div>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">07:45 AM</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">17:15 PM</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">9j 30m</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+            >
+              View
+            </button>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-success-50 text-success-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(3, 152, 85, 0.1); color: #039855"
+            >
+              On Time
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-warning-50 text-warning-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(251, 146, 60, 0.1); color: #f59e0b"
+            >
+              Work From Anywhere
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 6H5H21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </td>
+        </tr>
+
+        <!-- Row 5 -->
+        <tr>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">EMP005</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"
+              >
+                <span class="text-theme-xs font-medium text-red-600">BP</span>
+              </div>
+              <div>
+                <p class="text-theme-sm font-medium text-black dark:text-white">
+                  Bayu Pratama
+                </p>
+                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
+                  >Finance Analyst</span
+                >
+              </div>
+            </div>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">08:30 AM</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">17:00 PM</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <p class="text-theme-sm text-black dark:text-white">8j 30m</p>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+            >
+              View
+            </button>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-error-50 text-error-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(216, 0, 39, 0.1); color: #d80027"
+            >
+              Late
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <span
+              class="bg-brand-50 text-brand-500 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
+              style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6"
+            >
+              Work From Office
+            </span>
+          </td>
+          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
+            <button
+              class="inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 6H5H21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11V17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Bottom Controls Row -->
+  <div
+    class="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row sm:items-center"
+  >
+    <!-- Entry Info -->
+    <p class="text-sm text-black dark:text-white">
+      Showing 1 to 5 of 5 entries
+    </p>
+
+    <!-- Pagination -->
+    <div class="flex">
+      <a
+        href="#"
+        class="border-stroke dark:border-strokedark dark:bg-form-input flex items-center justify-center rounded-l-md border bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600"
+      >
+        Previous
+      </a>
+      <a
+        href="#"
+        class="border-stroke bg-primary bg-opacity-20 text-primary dark:border-strokedark border-y px-3 py-2 text-sm font-medium"
+      >
+        1
+      </a>
+      <a
+        href="#"
+        class="border-stroke dark:border-strokedark dark:bg-form-input border-y bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600"
+      >
+        2
+      </a>
+      <a
+        href="#"
+        class="border-stroke dark:border-strokedark dark:bg-form-input flex items-center justify-center rounded-r-md border bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600"
+      >
+        Next
+      </a>
+    </div>
   </div>
 </div>

@@ -14,10 +14,53 @@ import chart03 from "./components/charts/chart-03";
 import map01 from "./components/map-01";
 import "./components/calendar-init.js";
 import "./components/image-resize";
+import "./components/modal/modalAlert.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
 Alpine.start();
+
+// Initialize delete confirmation functionality
+document.addEventListener("DOMContentLoaded", function () {
+  // Select all delete buttons
+  const deleteButtons = document.querySelectorAll(".js-delete-item-btn");
+
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      // Get data attributes
+      const itemId = this.getAttribute("data-item-id");
+      const itemName = this.getAttribute("data-item-name");
+
+      // Show danger modal alert for deletion confirmation
+      window.showAlertModal({
+        type: "danger",
+        title: "Konfirmasi Hapus",
+        message: `Apakah Anda yakin ingin menghapus data karyawan "${itemName}" (${itemId})? Tindakan ini tidak dapat dibatalkan.`,
+        buttonText: "Ya, Hapus",
+        showClose: true,
+        onOk: function () {
+          // Handle deletion logic here
+          console.log(`Menghapus karyawan: ${itemName} (${itemId})`);
+
+          setTimeout(() => {
+            window.showAlertModal({
+              type: "success",
+              title: "Berhasil Dihapus",
+              message: `Data karyawan "${itemName}" telah berhasil dihapus dari sistem.`,
+              buttonText: "OK",
+              showClose: false,
+            });
+          }, 300);
+        },
+        onClose: function () {
+          console.log("Penghapusan dibatalkan");
+        },
+      });
+    });
+  });
+});
 
 // Init flatpickr
 flatpickr(".datepicker", {

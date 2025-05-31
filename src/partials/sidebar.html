@@ -94,6 +94,128 @@
           </li>
           <!-- Menu Item Summary Report -->
 
+                   <!-- Menu Item Management -->
+            <li>
+            <a
+              href="#"
+              @click.prevent="selected = (selected === 'Management' ? '':'Management')"
+              class="menu-item group"
+              :class=" (selected === 'Management') || (page === 'managementUser' || page === 'managementAttendance' || page === 'managementBooking') ? 'menu-item-active' : 'menu-item-inactive'"
+            >
+              <svg
+              :class="(selected === 'Management') || (page === 'managementUser' || page === 'managementAttendance' || page === 'managementBooking') ? 'menu-item-icon-active'  :'menu-item-icon-inactive'"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              >
+              <path
+              d="M12 3.75C13.2426 3.75 14.25 4.75736 14.25 6C14.25 7.24264 13.2426 8.25 12 8.25C10.7574 8.25 9.75 7.24264 9.75 6C9.75 4.75736 10.7574 3.75 12 3.75Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              fill="none"
+              />
+              <path
+              d="M5.5 11.25C6.19036 11.25 6.75 11.8096 6.75 12.5C6.75 13.1904 6.19036 13.75 5.5 13.75C4.80964 13.75 4.25 13.1904 4.25 12.5C4.25 11.8096 4.80964 11.25 5.5 11.25Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              fill="none"
+              />
+              <path
+              d="M18.5 11.25C19.1904 11.25 19.75 11.8096 19.75 12.5C19.75 13.1904 19.1904 13.75 18.5 13.75C17.8096 13.75 17.25 13.1904 17.25 12.5C17.25 11.8096 17.8096 11.25 18.5 11.25Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              fill="none"
+              />
+              <path
+              d="M7.25 17.25C7.25 14.3505 9.60051 12 12.5 12H11.5C14.3995 12 16.75 14.3505 16.75 17.25V18.25C16.75 18.6642 16.4142 19 16 19H8C7.58579 19 7.25 18.6642 7.25 18.25V17.25Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              fill="none"
+              />
+              <path
+              d="M2.75 18.5C2.75 17.6716 3.42157 17 4.25 17H6.25"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              />
+              <path
+              d="M21.25 18.5C21.25 17.6716 20.5784 17 19.75 17H17.75"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              />
+              </svg>
+
+              <span
+              class="menu-item-text"
+              :class="sidebarToggle ? 'lg:hidden' : ''"
+              >
+              Management
+              </span>
+
+              <svg
+              class="menu-item-arrow absolute top-1/2 right-2.5 -translate-y-1/2 stroke-current"
+              :class="[(selected === 'Management') ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive', sidebarToggle ? 'lg:hidden' : '' ]"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              >
+              <path
+              d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
+              stroke=""
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              />
+              </svg>
+            </a>
+
+            <!-- Dropdown Menu Start -->
+            <div
+              class="translate transform overflow-hidden"
+              :class="(selected === 'Management') ? 'block' :'hidden'"
+            >
+              <ul
+                :class="sidebarToggle ? 'lg:hidden' : 'flex'"
+                class="menu-dropdown mt-2 flex flex-col gap-1 pl-9"
+              >
+                <li>
+                  <a
+                    href="management-user.html"
+                    class="menu-dropdown-item group"
+                    :class="page === 'managementUser' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
+                  >
+                    Management User
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="management-attendance.html"
+                    class="menu-dropdown-item group"
+                    :class="page === 'managementAttendance' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
+                  >
+                    Management Attendance
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="management-booking.html"
+                    class="menu-dropdown-item group"
+                    :class="page === 'managementBooking' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
+                  >
+                    Management Booking
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <!-- Dropdown Menu End -->
+          </li>
+          <!-- Menu Item Management -->
+
           <!-- Menu Item Calendar -->
           <li>
             <a
@@ -162,173 +284,7 @@
           </li>
           <!-- Menu Item Profile -->
 
-          <!-- Menu Item Management -->
-          <li>
-            <a
-              href="#"
-              @click.prevent="selected = (selected === 'Management' ? '':'Management')"
-              class="menu-item group"
-              :class=" (selected === 'Management') || (page === 'managementUser' || page === 'managementAttendance' || page === 'managementBooking') ? 'menu-item-active' : 'menu-item-inactive'"
-            >
-              <svg
-                :class="(selected === 'Management') || (page === 'managementUser' || page === 'managementAttendance' || page === 'managementBooking') ? 'menu-item-icon-active'  :'menu-item-icon-inactive'"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M12 2C13.1046 2 14 2.89543 14 4C14 5.10457 13.1046 6 12 6C10.8954 6 10 5.10457 10 4C10 2.89543 10.8954 2 12 2ZM12 8C6.48 8 2 9.79 2 12V14C2 15.1046 2.89543 16 4 16H20C21.1046 16 22 15.1046 22 14V12C22 9.79 17.52 8 12 8ZM8 18C8.55228 18 9 18.4477 9 19V21C9 21.5523 8.55228 22 8 22C7.44772 22 7 21.5523 7 21V19C7 18.4477 7.44772 18 8 18ZM16 18C16.5523 18 17 18.4477 17 19V21C17 21.5523 16.5523 22 16 22C15.4477 22 15 21.5523 15 21V19C15 18.4477 15.4477 18 16 18Z"
-                  fill=""
-                />
-              </svg>
-
-              <span
-                class="menu-item-text"
-                :class="sidebarToggle ? 'lg:hidden' : ''"
-              >
-                Management
-              </span>
-
-              <svg
-                class="menu-item-arrow absolute top-1/2 right-2.5 -translate-y-1/2 stroke-current"
-                :class="[(selected === 'Management') ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive', sidebarToggle ? 'lg:hidden' : '' ]"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
-                  stroke=""
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </a>
-
-            <!-- Dropdown Menu Start -->
-            <div
-              class="translate transform overflow-hidden"
-              :class="(selected === 'Management') ? 'block' :'hidden'"
-            >
-              <ul
-                :class="sidebarToggle ? 'lg:hidden' : 'flex'"
-                class="menu-dropdown mt-2 flex flex-col gap-1 pl-9"
-              >
-                <li>
-                  <a
-                    href="form-elements.html"
-                    class="menu-dropdown-item group"
-                    :class="page === 'managementUser' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                  >
-                    Management User
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="management-attendance.html"
-                    class="menu-dropdown-item group"
-                    :class="page === 'managementAttendance' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                  >
-                    Management Attendance
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="management-booking.html"
-                    class="menu-dropdown-item group"
-                    :class="page === 'managementBooking' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                  >
-                    Management Booking
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <!-- Dropdown Menu End -->
-          </li>
-          <!-- Menu Item Management -->
-
-          <!-- Menu Item Tables -->
-          <li>
-            <a
-              href="#"
-              @click.prevent="selected = (selected === 'Tables' ? '':'Tables')"
-              class="menu-item group"
-              :class="(selected === 'Tables') || (page === 'basicTables' || page === 'dataTables') ? 'menu-item-active' : 'menu-item-inactive'"
-            >
-              <svg
-                :class="(selected === 'Tables') || (page === 'basicTables' || page === 'dataTables') ? 'menu-item-icon-active'  :'menu-item-icon-inactive'"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M3.25 5.5C3.25 4.25736 4.25736 3.25 5.5 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V18.5C20.75 19.7426 19.7426 20.75 18.5 20.75H5.5C4.25736 20.75 3.25 19.7426 3.25 18.5V5.5ZM5.5 4.75C5.08579 4.75 4.75 5.08579 4.75 5.5V8.58325L19.25 8.58325V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H5.5ZM19.25 10.0833H15.416V13.9165H19.25V10.0833ZM13.916 10.0833L10.083 10.0833V13.9165L13.916 13.9165V10.0833ZM8.58301 10.0833H4.75V13.9165H8.58301V10.0833ZM4.75 18.5V15.4165H8.58301V19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5ZM10.083 19.25V15.4165L13.916 15.4165V19.25H10.083ZM15.416 19.25V15.4165H19.25V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15.416Z"
-                  fill=""
-                />
-              </svg>
-
-              <span
-                class="menu-item-text"
-                :class="sidebarToggle ? 'lg:hidden' : ''"
-              >
-                Tables
-              </span>
-
-              <svg
-                class="menu-item-arrow absolute top-1/2 right-2.5 -translate-y-1/2 stroke-current"
-                :class="[(selected === 'Tables') ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive', sidebarToggle ? 'lg:hidden' : '' ]"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
-                  stroke=""
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </a>
-
-            <!-- Dropdown Menu Start -->
-            <div
-              class="translate transform overflow-hidden"
-              :class="(selected === 'Tables') ? 'block' :'hidden'"
-            >
-              <ul
-                :class="sidebarToggle ? 'lg:hidden' : 'flex'"
-                class="menu-dropdown mt-2 flex flex-col gap-1 pl-9"
-              >
-                <li>
-                  <a
-                    href="basic-tables.html"
-                    class="menu-dropdown-item group"
-                    :class="page === 'basicTables' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                  >
-                    Basic Tables
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <!-- Dropdown Menu End -->
-          </li>
-          <!-- Menu Item Tables -->
-
-          <!-- Menu Item Pages -->
+            <!-- Menu Item Pages -->
           <li>
             <a
               href="#"
@@ -630,15 +586,6 @@
                     :class="page === 'signin' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
                   >
                     Sign In
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="signup.html"
-                    class="menu-dropdown-item group"
-                    :class="page === 'signup' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                  >
-                    Sign Up
                   </a>
                 </li>
               </ul>

@@ -7,7 +7,9 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Avatars | TailAdmin - Tailwind CSS Admin Dashboard Template</title>
+    <title>
+      Avatars | InfiniteTrack - Tailwind CSS Admin Dashboard Template
+    </title>
   </head>
   <body
     x-data="{ page: 'avatars', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
@@ -28,7 +30,7 @@
 
       <!-- ===== Content Area Start ===== -->
       <div
-        class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto"
+        class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto"
       >
         <!-- Small Device Overlay Start -->
         <include src="./partials/overlay.html" />
@@ -40,7 +42,7 @@
 
         <!-- ===== Main Content Start ===== -->
         <main>
-          <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
             <!-- Breadcrumb Start -->
             <div x-data="{ pageName: `Avatars`}">
               <include src="./partials/breadcrumb.html" />
@@ -58,7 +60,7 @@
                     Default Avatar
                   </h3>
                 </div>
-                <div class="p-8 border-t border-gray-100 dark:border-gray-800">
+                <div class="border-t border-gray-100 p-8 dark:border-gray-800">
                   <include src="./partials/avatar/avatar-01.html" />
                 </div>
               </div>
@@ -73,7 +75,7 @@
                     Avatar with online indicator
                   </h3>
                 </div>
-                <div class="p-8 border-t border-gray-100 dark:border-gray-800">
+                <div class="border-t border-gray-100 p-8 dark:border-gray-800">
                   <include src="./partials/avatar/avatar-02.html" />
                 </div>
               </div>
@@ -88,7 +90,7 @@
                     Avatar with Offline indicator
                   </h3>
                 </div>
-                <div class="p-8 border-t border-gray-100 dark:border-gray-800">
+                <div class="border-t border-gray-100 p-8 dark:border-gray-800">
                   <include src="./partials/avatar/avatar-03.html" />
                 </div>
               </div>
@@ -103,7 +105,7 @@
                     Avatar with busy indicator
                   </h3>
                 </div>
-                <div class="p-8 border-t border-gray-100 dark:border-gray-800">
+                <div class="border-t border-gray-100 p-8 dark:border-gray-800">
                   <include src="./partials/avatar/avatar-04.html" />
                 </div>
               </div>

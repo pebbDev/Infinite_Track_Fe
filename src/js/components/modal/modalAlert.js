@@ -229,10 +229,10 @@ class ModalAlert {
 
     // Insert modal into DOM
     document.body.insertAdjacentHTML("beforeend", modalHTML);
-    this.activeModal = document.getElementById("alert-modal");
+    this.activeModal = document.getElementById("alert-modal"); // Setup event listeners
+    this.setupEventListeners(onOk, onClose, showClose);
 
-    // Setup event listeners
-    this.setupEventListeners(onOk, onClose, showClose); // Show modal with animation
+    // Show modal with animation
     requestAnimationFrame(() => {
       this.activeModal.classList.remove("opacity-0");
       this.activeModal.querySelector(".relative").classList.remove("scale-95");
@@ -244,7 +244,6 @@ class ModalAlert {
 
     return this.activeModal;
   }
-
   /**
    * Setup event listeners for the modal
    */

@@ -8,11 +8,30 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>
-      Management Booking | InfiniteTrack - Tailwind CSS Admin Dashboard Template
+      Management Booking | TailAdmin - Tailwind CSS Admin Dashboard Template
     </title>
   </head>
   <body
-    x-data="{ page: 'managementBooking', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
+    x-data="{ 
+      page: 'managementBooking', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false,
+      'isBookingDetailModalOpen': false,
+      'bookingDetailData': {
+        userId: '',
+        fullName: '',
+        role: '',
+        position: '',
+        jadwalBooking: '',
+        notes: '',
+        koordinat: '',
+        latitude: '',
+        longitude: ''
+      }
+    }"
     x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
          $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
@@ -50,7 +69,7 @@
             <!-- Breadcrumb End -->
             <div class="space-y-5 sm:space-y-6">
               <!-- Work From Anywhere Booking Table -->
-              <include src="./partials/table-booking.html"></include>
+              <include src="./partials/table/table-booking.html"></include>
             </div>
           </div>
         </main>
@@ -59,5 +78,9 @@
       <!-- ===== Content Area End ===== -->
     </div>
     <!-- ===== Page Wrapper End ===== -->
+
+    <!-- ===== Booking Detail Modal Start ===== -->
+    <include src="./partials/modal/booking-detail-modal.html"></include>
+    <!-- ===== Booking Detail Modal End ===== -->
   </body>
 </html>

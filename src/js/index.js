@@ -7,13 +7,12 @@ import persist from "@alpinejs/persist";
 import flatpickr from "flatpickr";
 import Dropzone from "dropzone";
 
-import chart01 from "./components/charts/chart-01";
-import chart02 from "./components/charts/chart-02";
-import chart03 from "./components/charts/chart-03";
+
 import map01 from "./components/map-01";
 import "./components/calendar-init.js";
 import "./components/image-resize";
 import "./components/modal/modalAlert.js";
+import "./components/modal/deleteModal.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
@@ -188,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Danger buttons (red X icon/delete)
+  // Danger buttons (red X icon/delete) - Using new Delete Modal
   const dangerButtons = document.querySelectorAll(".js-danger-btn");
   dangerButtons.forEach((button) => {
     button.addEventListener("click", function (e) {
@@ -197,28 +196,25 @@ document.addEventListener("DOMContentLoaded", function () {
       const userId = this.getAttribute("data-user-id");
       const userName = this.getAttribute("data-user-name");
 
-      window.showAlertModal({
-        type: "danger",
+      // Use the new delete modal instead of alert modal
+      window.showDeleteModal({
         title: "Konfirmasi Hapus Booking",
         message: `Apakah Anda yakin ingin menghapus booking dari "${userName}" (${userId})? Tindakan ini tidak dapat dibatalkan.`,
-        buttonText: "Ya, Hapus",
-        showClose: true,
-        onOk: function () {
-          console.log(`Menghapus booking: ${userName} (${userId})`);
+        onConfirm: function (data) {
+          console.log(`Menghapus booking: ${data.userName} (${data.userId})`);
 
+          // Show success notification using alert modal
           setTimeout(() => {
             window.showAlertModal({
               type: "success",
               title: "Booking Dihapus",
-              message: `Booking dari "${userName}" telah berhasil dihapus dari sistem.`,
+              message: `Booking dari "${data.userName}" telah berhasil dihapus dari sistem.`,
               buttonText: "OK",
               showClose: false,
             });
           }, 300);
         },
-        onClose: function () {
-          console.log("Penghapusan booking dibatalkan");
-        },
+        data: { userId, userName },
       });
     });
   });
@@ -256,9 +252,6 @@ if (dropzoneArea.length) {
 
 // Document Loaded
 document.addEventListener("DOMContentLoaded", () => {
-  chart01();
-  chart02();
-  chart03();
   map01();
 });
 

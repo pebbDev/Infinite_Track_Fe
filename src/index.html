@@ -19,13 +19,13 @@
     :class="{'dark bg-gray-900': darkMode === true}"
   >
     <!-- ===== Preloader Start ===== -->
-    <include src="./partials/preloader.html"></include>
+    <include src="./partials/common/preloader.html"></include>
     <!-- ===== Preloader End ===== -->
 
     <!-- ===== Page Wrapper Start ===== -->
     <div class="flex h-screen overflow-hidden">
       <!-- ===== Sidebar Start ===== -->
-      <include src="./partials/sidebar.html"></include>
+      <include src="./partials/common/sidebar.html"></include>
       <!-- ===== Sidebar End ===== -->
 
       <!-- ===== Content Area Start ===== -->
@@ -33,11 +33,11 @@
         class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto"
       >
         <!-- Small Device Overlay Start -->
-        <include src="./partials/overlay.html" />
+        <include src="./partials/common/overlay.html" />
         <!-- Small Device Overlay End -->
 
         <!-- ===== Header Start ===== -->
-        <include src="./partials/header.html" />
+        <include src="./partials/common/header.html" />
         <!-- ===== Header End ===== -->
 
         <!-- ===== Main Content Start ===== -->
@@ -65,12 +65,12 @@
 
             <div class="grid grid-cols-12 gap-4 md:gap-6">
               <div class="col-span-12">
-                <include src="./partials/summary/top-card-group.html" />
+                <include src="./partials/cards/stats-card-group.html" />
               </div>
 
               <div class="col-span-12">
                 <!-- ====== Table One Start -->
-                <include src="./partials/table/table-01.html" />
+                <include src="./partials/table/table-attendance.html" />
                 <!-- ====== Table One End -->
               </div>
             </div>

@@ -7,7 +7,6 @@ import persist from "@alpinejs/persist";
 import flatpickr from "flatpickr";
 import Dropzone from "dropzone";
 
-
 import map01 from "./components/map-01";
 import "./components/calendar-init.js";
 import "./components/image-resize";

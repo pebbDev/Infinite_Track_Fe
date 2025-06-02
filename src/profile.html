@@ -12,7 +12,36 @@
     </title>
   </head>
   <body
-    x-data="{ page: 'profile', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false, 'isProfileInfoModal': false, 'isProfileAddressModal': false }"
+    x-data="{ 
+      page: 'profile', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false, 
+      'isProfileInfoModal': false, 
+      'isProfileAddressModal': false,
+      'userProfile': {
+        id: 7,
+        full_name: 'Febriyadi',
+        email: 'febriyadi05@email.com',
+        role_name: 'Internship',
+        position_name: 'Lead of Social Media and Public Relation',
+        program_name: 'Program Development & Relation',
+        division_name: null,
+        nip_nim: 'F55121082c',
+        phone: '08539507795',
+        photo: 'uploads\\face\\face-1748333090217-344943194.jpg',
+        photo_updated_at: '2025-05-27T08:04:50.000Z',
+        location: {
+          latitude: -6.2088,
+          longitude: 106.8456,
+          radius: 100,
+          description: 'Rumah utama',
+          category_name: 'Work From Home'
+        }
+      }
+    }"
     x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
          $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
@@ -70,24 +99,35 @@
                     <div
                       class="h-20 w-20 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800"
                     >
-                      <img src="./images/user/owner.jpg" alt="user" />
+                      <img
+                        :src="userProfile.photo ? `./images/${userProfile.photo.replace(/\\/g, '/')}` : './images/user/owner.jpg'"
+                        alt="user photo"
+                        class="h-full w-full object-cover"
+                      />
                     </div>
                     <div class="order-3 xl:order-2">
                       <h4
                         class="mb-2 text-center text-lg font-semibold text-gray-800 xl:text-left dark:text-white/90"
+                        x-text="userProfile.full_name"
                       >
                         Musharof Chowdhury
                       </h4>
                       <div
                         class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left"
                       >
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <p
+                          class="text-sm text-gray-500 dark:text-gray-400"
+                          x-text="userProfile.role_name"
+                        >
                           Team Manager
                         </p>
                         <div
                           class="hidden h-3.5 w-px bg-gray-300 xl:block dark:bg-gray-700"
                         ></div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <p
+                          class="text-sm text-gray-500 dark:text-gray-400"
+                          x-text="userProfile.position_name"
+                        >
                           Arizona, United States
                         </p>
                       </div>
@@ -205,7 +245,6 @@
                     >
                       Personal Information
                     </h4>
-
                     <div
                       class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32"
                     >
@@ -213,10 +252,11 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          First Name
+                          Full Name
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.full_name"
                         >
                           Musharof
                         </p>
@@ -226,10 +266,11 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          Last Name
+                          NIP/NIM
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.nip_nim"
                         >
                           Chowdhury
                         </p>
@@ -243,6 +284,7 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.email"
                         >
                           randomuser@pimjo.com
                         </p>
@@ -256,6 +298,7 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.phone"
                         >
                           +09 363 398 46
                         </p>
@@ -265,12 +308,54 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          Bio
+                          Role
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.role_name"
                         >
                           Team Manager
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
+                        >
+                          Position
+                        </p>
+                        <p
+                          class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.position_name"
+                        >
+                          Team Manager
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
+                        >
+                          Program
+                        </p>
+                        <p
+                          class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.program_name"
+                        >
+                          Team Manager
+                        </p>
+                      </div>
+                      <div x-show="userProfile.division_name">
+                        <p
+                          class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
+                        >
+                          Division
+                        </p>
+                        <p
+                          class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.division_name || '-'"
+                        >
+                          -
                         </p>
                       </div>
                     </div>
@@ -309,7 +394,7 @@
                     <h4
                       class="text-lg font-semibold text-gray-800 lg:mb-6 dark:text-white/90"
                     >
-                      Address
+                      Location Information
                     </h4>
 
                     <div
@@ -319,10 +404,11 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          Country
+                          Location Description
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.location.description"
                         >
                           United States
                         </p>
@@ -332,10 +418,11 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          City/State
+                          Category
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.location.category_name"
                         >
                           Arizona, United States
                         </p>
@@ -345,10 +432,11 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          Postal Code
+                          Latitude
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.location.latitude"
                         >
                           ERT 2489
                         </p>
@@ -358,12 +446,27 @@
                         <p
                           class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
                         >
-                          TAX ID
+                          Longitude
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.location.longitude"
                         >
                           AS4568384
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400"
+                        >
+                          Radius (meters)
+                        </p>
+                        <p
+                          class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          x-text="userProfile.location.radius + ' meters'"
+                        >
+                          100 meters
                         </p>
                       </div>
                     </div>

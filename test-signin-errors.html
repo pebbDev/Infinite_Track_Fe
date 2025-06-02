@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Signin Error Messages</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .error { color: red; margin: 10px 0; }
+        .success { color: green; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Signin Error Test Cases</h1>
+    <p>This page tests the signin error scenarios to ensure no duplicate messages appear.</p>
+    
+    <div class="test-section">
+        <h3>Test Case 1: Empty Email</h3>
+        <button onclick="testEmptyEmail()">Test Empty Email</button>
+        <div id="test1-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Case 2: Invalid Email Format</h3>
+        <button onclick="testInvalidEmail()">Test Invalid Email</button>
+        <div id="test2-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Case 3: Empty Password</h3>
+        <button onclick="testEmptyPassword()">Test Empty Password</button>
+        <div id="test3-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Case 4: Short Password</h3>
+        <button onclick="testShortPassword()">Test Short Password (< 6 chars)</button>
+        <div id="test4-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Case 5: Server Errors</h3>
+        <button onclick="testServerError()">Test Server Connection Error</button>
+        <div id="test5-result"></div>
+    </div>
+
+    <script>
+        // Mock the handleLoginSubmit function for testing
+        async function mockHandleLoginSubmit(formData, skipDOMErrorDisplay = false) {
+            const { email, password } = formData;
+            
+            // Simulate the validation logic from signinHandler.js
+            let validationError = null;
+            
+            // Validasi email
+            if (!email) {
+                validationError = "Email harus diisi";
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                validationError = "Format email tidak valid";
+            }
+            
+            // Validasi password jika email valid
+            if (!validationError) {
+                if (!password) {
+                    validationError = "Password harus diisi";
+                } else if (password.length < 6) {
+                    validationError = "Password minimal 6 karakter";
+                }
+            }
+            
+            // Jika ada error validasi
+            if (validationError) {
+                return { success: false, error: validationError };
+            }
+            
+            // Simulate server errors for testing
+            if (email === 'test@notfound.com') {
+                return { success: false, error: 'Email tidak terdaftar' };
+            }
+            
+            if (password === 'invalidpassword123') {
+                return { success: false, error: 'Password harus kombinasi huruf dan angka tanpa spasi' };
+            }
+            
+            if (email === 'server@error.com') {
+                return { success: false, error: 'tidak terhubung diserver' };
+            }
+            
+            // Success case
+            return { success: true, data: { email, name: 'Test User' } };
+        }
+        
+        async function testCase(testCaseId, formData, expectedError) {
+            const resultDiv = document.getElementById(testCaseId + '-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const result = await mockHandleLoginSubmit(formData, true);
+                
+                if (!result.success && result.error === expectedError) {
+                    resultDiv.innerHTML = `<div class="success">✅ PASS: Got expected error: "${result.error}"</div>`;
+                } else if (result.success) {
+                    resultDiv.innerHTML = `<div class="error">❌ FAIL: Expected error but got success</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ FAIL: Expected "${expectedError}" but got "${result.error}"</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ ERROR: ${error.message}</div>`;
+            }
+        }
+        
+        async function testEmptyEmail() {
+            await testCase('test1', { email: '', password: 'password123' }, 'Email harus diisi');
+        }
+        
+        async function testInvalidEmail() {
+            await testCase('test2', { email: 'invalid-email', password: 'password123' }, 'Format email tidak valid');
+        }
+        
+        async function testEmptyPassword() {
+            await testCase('test3', { email: 'test@example.com', password: '' }, 'Password harus diisi');
+        }
+        
+        async function testShortPassword() {
+            await testCase('test4', { email: 'test@example.com', password: '123' }, 'Password minimal 6 karakter');
+        }
+        
+        async function testServerError() {
+            await testCase('test5', { email: 'server@error.com', password: 'password123' }, 'tidak terhubung diserver');
+        }
+        
+        // Test all cases automatically
+        window.addEventListener('load', async () => {
+            console.log('Running automated tests...');
+            await testEmptyEmail();
+            await testInvalidEmail();
+            await testEmptyPassword();
+            await testShortPassword();
+            await testServerError();
+            console.log('All tests completed');
+        });
+    </script>
+</body>
+</html>

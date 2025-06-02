@@ -32,47 +32,49 @@ window.Alpine = Alpine;
 // Initialize authentication session checking
 function initializeAuthSession() {
   console.log("Initializing authentication session...");
-  
+
   // Check if user is on a protected page
   const currentPath = window.location.pathname;
   const protectedPages = [
-    '/index.html',
-    '/management-user.html', 
-    '/management-booking.html',
-    '/management-attendance.html',
-    '/profile.html',
-    '/calendar.html',
-    '/form-user.html'
+    "/index.html",
+    "/management-user.html",
+    "/management-booking.html",
+    "/management-attendance.html",
+    "/profile.html",
+    "/calendar.html",
+    "/form-user.html",
   ];
-  
+
   // Get page name from path
-  const pageName = currentPath.split('/').pop() || 'index.html';
-  const isProtectedPage = protectedPages.some(page => page.includes(pageName)) || currentPath === '/';
-  
+  const pageName = currentPath.split("/").pop() || "index.html";
+  const isProtectedPage =
+    protectedPages.some((page) => page.includes(pageName)) ||
+    currentPath === "/";
+
   // If on protected page, check authentication
   if (isProtectedPage) {
     console.log("On protected page, checking authentication...");
-    
+
     // Check if user is authenticated
     if (!isAuthenticated()) {
       console.log("User not authenticated, redirecting to signin...");
-      
+
       // Save current URL for redirect after login
-      sessionStorage.setItem('redirectAfterLogin', window.location.href);
-      
+      sessionStorage.setItem("redirectAfterLogin", window.location.href);
+
       // Redirect to signin page
-      window.location.href = '/signin.html';
+      window.location.href = "/signin.html";
       return;
     }
-    
+
     // User is authenticated, validate session
     validateUserSession();
   }
-  
+
   // If on signin page and user is already authenticated, redirect to dashboard
-  if (pageName === 'signin.html' && isAuthenticated()) {
+  if (pageName === "signin.html" && isAuthenticated()) {
     console.log("User already authenticated, redirecting to dashboard...");
-    window.location.href = '/index.html';
+    window.location.href = "/index.html";
     return;
   }
 }
@@ -81,55 +83,70 @@ function initializeAuthSession() {
 async function validateUserSession() {
   try {
     console.log("Validating user session...");
-    
+
     // Get user data from storage
     const storedUser = getUserFromStorage();
-    
+
     if (storedUser) {
       console.log("User data found in storage:", storedUser);
-      
+
       // Try to validate with server
       try {
         const currentUser = await getCurrentUser();
         if (currentUser) {
           console.log("Session validated with server");
-          
+
           // Update Alpine store if available
-          if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
+          if (
+            typeof Alpine !== "undefined" &&
+            Alpine.store &&
+            Alpine.store("auth")
+          ) {
             Alpine.store("auth").setUser(currentUser);
           }
         } else {
           throw new Error("Invalid session");
         }
       } catch (error) {
-        console.warn("Session validation failed, using stored data:", error.message);
-        
+        console.warn(
+          "Session validation failed, using stored data:",
+          error.message,
+        );
+
         // Use stored data if server validation fails
-        if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
+        if (
+          typeof Alpine !== "undefined" &&
+          Alpine.store &&
+          Alpine.store("auth")
+        ) {
           Alpine.store("auth").setUser(storedUser);
         }
       }
     } else {
       console.log("No user data in storage");
-      
+
       // Clear authentication and redirect to signin
-      if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
+      if (
+        typeof Alpine !== "undefined" &&
+        Alpine.store &&
+        Alpine.store("auth")
+      ) {
         Alpine.store("auth").clearAuth();
       }
-      
-      sessionStorage.setItem('redirectAfterLogin', window.location.href);
-      window.location.href = '/signin.html';
+
+      sessionStorage.setItem("redirectAfterLogin", window.location.href);
+      window.location.href = "/signin.html";
     }
   } catch (error) {
     console.error("Error validating session:", error);
-    
+
     // Clear authentication on error
     if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
       Alpine.store("auth").clearAuth();
     }
-    
-    sessionStorage.setItem('redirectAfterLogin', window.location.href);
-    window.location.href = '/signin.html';
+
+    sessionStorage.setItem("redirectAfterLogin", window.location.href);
+    window.location.href = "/signin.html";
   }
 }
 
@@ -137,12 +154,12 @@ async function validateUserSession() {
 Alpine.start();
 
 // Initialize authentication after Alpine.js is ready
-document.addEventListener('alpine:init', () => {
-  console.log('Alpine.js initialized, setting up authentication...');
-  
+document.addEventListener("alpine:init", () => {
+  console.log("Alpine.js initialized, setting up authentication...");
+
   // Initialize auth store
   initAuthStore();
-  
+
   // Initialize session checking
   initializeAuthSession();
 });

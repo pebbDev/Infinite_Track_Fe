@@ -42,9 +42,11 @@ function setupSigninForm() {
 
   // Cek apakah form menggunakan Alpine.js (x-data attribute)
   // Jika ya, jangan setup DOM handler untuk mencegah duplicate
-  if (form.hasAttribute('x-data')) {
-    console.log("Alpine.js form detected, skipping DOM form handler setup to prevent duplicates");
-    
+  if (form.hasAttribute("x-data")) {
+    console.log(
+      "Alpine.js form detected, skipping DOM form handler setup to prevent duplicates",
+    );
+
     // Hanya setup real-time validation dan auto-fill, tapi tidak form submission
     setupFormUtilities(emailInput, passwordInput, rememberMeCheckbox);
     return;
@@ -69,7 +71,7 @@ function setupSigninForm() {
     errorContainer.className = "signin-error-container mb-4";
     form.insertBefore(errorContainer, form.firstChild);
   }
-  
+
   // Event listener untuk form submission (hanya untuk non-Alpine.js forms)
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -129,13 +131,13 @@ function setupSigninForm() {
 function setupFormUtilities(emailInput, passwordInput, rememberMeCheckbox) {
   // Event listeners untuk validasi real-time (hanya untuk non-Alpine.js)
   // Alpine.js forms memiliki validasi sendiri
-  if (!emailInput.hasAttribute('x-model')) {
+  if (!emailInput.hasAttribute("x-model")) {
     emailInput.addEventListener("blur", () => {
       validateEmail(emailInput.value.trim());
     });
   }
 
-  if (!passwordInput.hasAttribute('x-model')) {
+  if (!passwordInput.hasAttribute("x-model")) {
     passwordInput.addEventListener("blur", () => {
       validatePassword(passwordInput.value);
     });
@@ -145,20 +147,20 @@ function setupFormUtilities(emailInput, passwordInput, rememberMeCheckbox) {
   const savedEmail = localStorage.getItem("rememberedEmail");
   if (savedEmail && emailInput.value === "") {
     emailInput.value = savedEmail;
-    
+
     // Update Alpine.js model jika ada
-    if (emailInput.hasAttribute('x-model')) {
-      emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+    if (emailInput.hasAttribute("x-model")) {
+      emailInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
   // Set remember me checkbox jika ada di localStorage
   const rememberMePreference = localStorage.getItem("rememberMe");
   if (rememberMePreference === "true" && rememberMeCheckbox) {
     rememberMeCheckbox.checked = true;
-    
+
     // Update Alpine.js model jika ada
-    if (rememberMeCheckbox.hasAttribute('x-model')) {
-      rememberMeCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+    if (rememberMeCheckbox.hasAttribute("x-model")) {
+      rememberMeCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
     }
   }
 }
@@ -175,9 +177,9 @@ function validateForm(email, password, skipDOMErrorDisplay = false) {
   if (!skipDOMErrorDisplay) {
     clearError();
   }
-  
+
   console.log("Starting validation for email:", email);
-  
+
   // Validasi email terlebih dahulu
   if (!validateEmail(email, skipDOMErrorDisplay)) {
     console.log("Email validation failed");
@@ -185,7 +187,7 @@ function validateForm(email, password, skipDOMErrorDisplay = false) {
   }
 
   console.log("Email validation passed, checking password");
-  
+
   // Validasi password hanya jika email valid
   if (!validatePassword(password, skipDOMErrorDisplay)) {
     console.log("Password validation failed");
@@ -335,10 +337,10 @@ function updateAlpineStore(userData) {
 function redirectAfterLogin() {
   // Import role-based redirect function
   const { redirectBasedOnRole } = window.RoleBasedAccess || {};
-  
+
   // Get current user data to determine role
   const userData = getCurrentUser ? getCurrentUser() : null;
-  
+
   // Cek jika ada URL redirect yang disimpan
   const redirectUrl =
     localStorage.getItem("redirectAfterLogin") ||
@@ -352,14 +354,16 @@ function redirectAfterLogin() {
     // Check if user has access to the requested page
     if (userData && userData.role_name && window.RoleBasedAccess) {
       const hasAccess = window.RoleBasedAccess.hasPageAccess(redirectUrl);
-      
+
       if (hasAccess) {
         // User has access, redirect to requested URL
         window.location.href = redirectUrl;
         return;
       } else {
         // User doesn't have access, redirect based on role
-        console.log(`User role ${userData.role_name} doesn't have access to ${redirectUrl}, redirecting based on role`);
+        console.log(
+          `User role ${userData.role_name} doesn't have access to ${redirectUrl}, redirecting based on role`,
+        );
         if (redirectBasedOnRole) {
           redirectBasedOnRole(userData.role_name);
           return;
@@ -373,7 +377,9 @@ function redirectAfterLogin() {
   }
   // Default redirect berdasarkan role jika tidak ada URL redirect
   if (userData && userData.role_name && redirectBasedOnRole) {
-    console.log(`Redirecting user with role ${userData.role_name} to appropriate page`);
+    console.log(
+      `Redirecting user with role ${userData.role_name} to appropriate page`,
+    );
     redirectBasedOnRole(userData.role_name);
   } else {
     // Fallback ke dashboard jika role checking tidak tersedia
@@ -391,14 +397,14 @@ async function handleLoginSubmit(formData, skipDOMErrorDisplay = false) {
 
   // Validasi input terlebih dahulu - jika gagal, return error yang spesifik
   let validationError = null;
-  
+
   // Validasi email
   if (!email) {
     validationError = "Email harus diisi";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     validationError = "Format email tidak valid";
   }
-  
+
   // Validasi password jika email valid
   if (!validationError) {
     if (!password) {
@@ -407,7 +413,7 @@ async function handleLoginSubmit(formData, skipDOMErrorDisplay = false) {
       validationError = "Password minimal 6 karakter";
     }
   }
-  
+
   // Jika ada error validasi
   if (validationError) {
     // Tampilkan error di DOM jika bukan dari Alpine.js
@@ -445,12 +451,12 @@ async function handleLoginSubmit(formData, skipDOMErrorDisplay = false) {
   } catch (error) {
     // Login gagal setelah validasi berhasil
     console.error("Login failed:", error.message);
-    
+
     // Hanya tampilkan DOM error jika tidak dipanggil dari Alpine.js
     if (!skipDOMErrorDisplay) {
       showError(error.message);
     }
-    
+
     return { success: false, error: error.message };
   } finally {
     // Restore submit button hanya jika bukan dari Alpine.js

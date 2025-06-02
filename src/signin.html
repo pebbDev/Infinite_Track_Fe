@@ -129,19 +129,31 @@
                       >Or</span
                     >
                   </div>
-                </div>                <form x-data="signinForm()" @submit.prevent="submitForm()">
+                </div>
+                <form x-data="signinForm()" @submit.prevent="submitForm()">
                   <!-- Error Message Container -->
                   <div x-show="error" x-transition class="mb-4">
-                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                    <div
+                      class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700"
+                      role="alert"
+                    >
                       <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        <svg
+                          class="mr-2 h-5 w-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                          ></path>
                         </svg>
                         <span class="text-sm font-medium" x-text="error"></span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div class="space-y-5">
                     <!-- Email -->
                     <div>
@@ -167,7 +179,8 @@
                       >
                         Password<span class="text-error-500">*</span>
                       </label>
-                      <div x-data="{ showPassword: false }" class="relative">                        <input
+                      <div x-data="{ showPassword: false }" class="relative">
+                        <input
                           :type="showPassword ? 'text' : 'password'"
                           id="password"
                           name="password"
@@ -216,7 +229,8 @@
                       </div>
                     </div>
                     <!-- Checkbox -->
-                    <div class="flex items-center justify-between">                      <div>
+                    <div class="flex items-center justify-between">
+                      <div>
                         <label
                           for="checkboxLabelOne"
                           class="flex cursor-pointer items-center text-sm font-normal text-gray-700 select-none dark:text-gray-400"
@@ -232,7 +246,9 @@
                               :class="formData.rememberMe ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
                               class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]"
                             >
-                              <span :class="formData.rememberMe ? '' : 'opacity-0'">
+                              <span
+                                :class="formData.rememberMe ? '' : 'opacity-0'"
+                              >
                                 <svg
                                   width="14"
                                   height="14"
@@ -259,7 +275,8 @@
                         class="text-brand-500 hover:text-brand-600 dark:text-brand-400 text-sm"
                         >Forgot password?</a
                       >
-                    </div>                    <!-- Button -->
+                    </div>
+                    <!-- Button -->
                     <div>
                       <button
                         type="submit"
@@ -267,17 +284,30 @@
                         :class="isLoading ? 'bg-brand-400 cursor-not-allowed' : 'bg-brand-500 hover:bg-brand-600'"
                         class="shadow-theme-xs flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition"
                       >
-                        <svg 
-                          x-show="isLoading" 
-                          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          fill="none" 
+                        <svg
+                          x-show="isLoading"
+                          class="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
                           viewBox="0 0 24 24"
                         >
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
-                        <span x-text="isLoading ? 'Signing In...' : 'Sign In'"></span>
+                        <span
+                          x-text="isLoading ? 'Signing In...' : 'Sign In'"
+                        ></span>
                       </button>
                     </div>
                   </div>
@@ -340,107 +370,124 @@
           </button>
         </div>
       </div>
-    </div>    <!-- ===== Page Wrapper End ===== -->
-    
+    </div>
+    <!-- ===== Page Wrapper End ===== -->
+
     <script>
       // Alpine.js component untuk signin form
       function signinForm() {
         return {
           formData: {
-            email: '',
-            password: '',
-            rememberMe: false
+            email: "",
+            password: "",
+            rememberMe: false,
           },
           isLoading: false,
-          error: '',
-          
+          error: "",
+
           init() {
             // Auto-fill email jika ada di localStorage
-            const savedEmail = localStorage.getItem('rememberedEmail');
+            const savedEmail = localStorage.getItem("rememberedEmail");
             if (savedEmail) {
               this.formData.email = savedEmail;
             }
-            
+
             // Set remember me checkbox jika ada preferensi
-            const rememberMePreference = localStorage.getItem('rememberMe');
-            if (rememberMePreference === 'true') {
+            const rememberMePreference = localStorage.getItem("rememberMe");
+            if (rememberMePreference === "true") {
               this.formData.rememberMe = true;
             }
-          },          async submitForm() {
-            this.error = '';
+          },
+          async submitForm() {
+            this.error = "";
             this.isLoading = true;
-            
+
             // Clear any existing DOM error messages to prevent confusion
-            if (typeof window.SigninHandler !== 'undefined' && window.SigninHandler.clearError) {
+            if (
+              typeof window.SigninHandler !== "undefined" &&
+              window.SigninHandler.clearError
+            ) {
               window.SigninHandler.clearError();
             }
-            
+
             try {
               // Pastikan handleLoginSubmit tersedia
-              if (typeof window.handleLoginSubmit === 'function') {
+              if (typeof window.handleLoginSubmit === "function") {
                 // Panggil dengan skipDOMErrorDisplay = true untuk mencegah error double
-                const result = await window.handleLoginSubmit(this.formData, true);
-                  if (result.success) {
+                const result = await window.handleLoginSubmit(
+                  this.formData,
+                  true,
+                );
+                if (result.success) {
                   // Redirect berdasarkan role user
-                  if (window.RoleBasedAccess && window.RoleBasedAccess.redirectBasedOnRole) {
+                  if (
+                    window.RoleBasedAccess &&
+                    window.RoleBasedAccess.redirectBasedOnRole
+                  ) {
                     // Get user data to determine role
                     const userData = result.data;
-                    
+
                     // Check if there's a saved redirect URL
-                    const savedRedirectUrl = localStorage.getItem('redirectAfterLogin') || 
-                                           sessionStorage.getItem('redirectAfterLogin');
-                    
+                    const savedRedirectUrl =
+                      localStorage.getItem("redirectAfterLogin") ||
+                      sessionStorage.getItem("redirectAfterLogin");
+
                     if (savedRedirectUrl) {
                       // Check if user has access to saved URL
-                      const hasAccess = window.RoleBasedAccess.hasPageAccess(savedRedirectUrl);
-                      
+                      const hasAccess =
+                        window.RoleBasedAccess.hasPageAccess(savedRedirectUrl);
+
                       if (hasAccess) {
                         // Clear redirect URLs
-                        localStorage.removeItem('redirectAfterLogin');
-                        sessionStorage.removeItem('redirectAfterLogin');
-                        
+                        localStorage.removeItem("redirectAfterLogin");
+                        sessionStorage.removeItem("redirectAfterLogin");
+
                         window.location.href = savedRedirectUrl;
                         return;
                       }
                     }
-                    
+
                     // Clear redirect URLs
-                    localStorage.removeItem('redirectAfterLogin');
-                    sessionStorage.removeItem('redirectAfterLogin');
-                    
+                    localStorage.removeItem("redirectAfterLogin");
+                    sessionStorage.removeItem("redirectAfterLogin");
+
                     // Redirect based on user role
-                    window.RoleBasedAccess.redirectBasedOnRole(userData.role_name);
+                    window.RoleBasedAccess.redirectBasedOnRole(
+                      userData.role_name,
+                    );
                   } else {
                     // Fallback to default redirect
-                    const redirectUrl = localStorage.getItem('redirectAfterLogin') || 
-                                      sessionStorage.getItem('redirectAfterLogin') || 
-                                      '/index.html';
-                    
+                    const redirectUrl =
+                      localStorage.getItem("redirectAfterLogin") ||
+                      sessionStorage.getItem("redirectAfterLogin") ||
+                      "/index.html";
+
                     // Clear redirect URL
-                    localStorage.removeItem('redirectAfterLogin');
-                    sessionStorage.removeItem('redirectAfterLogin');
-                    
+                    localStorage.removeItem("redirectAfterLogin");
+                    sessionStorage.removeItem("redirectAfterLogin");
+
                     window.location.href = redirectUrl;
-                  }                } else {
+                  }
+                } else {
                   // Tampilkan semua error dari handleLoginSubmit, termasuk validation errors
                   // Karena DOM handler tidak lagi berjalan untuk Alpine.js forms
-                  this.error = result.error || 'Login gagal';
+                  this.error = result.error || "Login gagal";
                 }
               } else {
-                throw new Error('Handler login tidak ditemukan');
+                throw new Error("Handler login tidak ditemukan");
               }
             } catch (error) {
-              console.error('Login error:', error);
-              this.error = error.message || 'Terjadi kesalahan saat login';
+              console.error("Login error:", error);
+              this.error = error.message || "Terjadi kesalahan saat login";
             } finally {
               this.isLoading = false;
             }
           },
-          
+
           clearError() {
-            this.error = '';
-          }
-        }
+            this.error = "";
+          },
+        };
       }
     </script>
   </body>

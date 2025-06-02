@@ -3,7 +3,7 @@
  * Middleware untuk mengecek autentikasi dan redirect jika diperlukan
  */
 
-import { isAuthenticated, getCurrentUser } from '../services/authService.js';
+import { isAuthenticated, getCurrentUser } from "../services/authService.js";
 
 /**
  * Initialize authentication guard
@@ -11,24 +11,21 @@ import { isAuthenticated, getCurrentUser } from '../services/authService.js';
 function initAuthGuard() {
   // Daftar halaman yang memerlukan autentikasi
   const protectedPages = [
-    '/index.html',
-    '/profile.html',
-    '/management-user.html',
-    '/management-booking.html',
-    '/management-attendance.html',
-    '/calendar.html',
-    '/form-user.html',
-    '/alerts.html',
-    '/badge.html',
-    '/buttons.html',
-    '/blank.html'
+    "/index.html",
+    "/profile.html",
+    "/management-user.html",
+    "/management-booking.html",
+    "/management-attendance.html",
+    "/calendar.html",
+    "/form-user.html",
+    "/alerts.html",
+    "/badge.html",
+    "/buttons.html",
+    "/blank.html",
   ];
 
   // Daftar halaman publik (tidak perlu autentikasi)
-  const publicPages = [
-    '/signin.html',
-    '/404.html'
-  ];
+  const publicPages = ["/signin.html", "/404.html"];
 
   // Jalankan pengecekan
   checkAuthentication();
@@ -40,24 +37,24 @@ function initAuthGuard() {
 function checkAuthentication() {
   const currentPath = window.location.pathname;
   const currentPage = getCurrentPageFromPath(currentPath);
-  
-  console.log('Auth guard checking page:', currentPage);
+
+  console.log("Auth guard checking page:", currentPage);
 
   // Jika di halaman signin dan sudah login, redirect ke dashboard
-  if (currentPage === '/signin.html' && isAuthenticated()) {
-    console.log('User already authenticated, redirecting to dashboard');
-    window.location.href = '/index.html';
+  if (currentPage === "/signin.html" && isAuthenticated()) {
+    console.log("User already authenticated, redirecting to dashboard");
+    window.location.href = "/index.html";
     return;
   }
 
   // Jika di halaman protected dan belum login, redirect ke signin
   if (isProtectedPage(currentPage) && !isAuthenticated()) {
-    console.log('User not authenticated, redirecting to signin');
-    
+    console.log("User not authenticated, redirecting to signin");
+
     // Simpan current URL untuk redirect setelah login
-    sessionStorage.setItem('redirectAfterLogin', window.location.href);
-    
-    window.location.href = '/signin.html';
+    sessionStorage.setItem("redirectAfterLogin", window.location.href);
+
+    window.location.href = "/signin.html";
     return;
   }
 
@@ -66,7 +63,7 @@ function checkAuthentication() {
     updateAlpineAuthStore();
   }
 
-  console.log('Auth guard check completed');
+  console.log("Auth guard check completed");
 }
 
 /**
@@ -76,18 +73,18 @@ function checkAuthentication() {
  */
 function getCurrentPageFromPath(path) {
   // Handle root path
-  if (path === '/' || path === '') {
-    return '/index.html';
+  if (path === "/" || path === "") {
+    return "/index.html";
   }
 
   // Handle paths without .html extension
-  if (!path.includes('.') && !path.endsWith('/')) {
-    return path + '.html';
+  if (!path.includes(".") && !path.endsWith("/")) {
+    return path + ".html";
   }
 
   // Handle paths ending with /
-  if (path.endsWith('/')) {
-    return path + 'index.html';
+  if (path.endsWith("/")) {
+    return path + "index.html";
   }
 
   return path;
@@ -100,17 +97,17 @@ function getCurrentPageFromPath(path) {
  */
 function isProtectedPage(page) {
   const protectedPages = [
-    '/index.html',
-    '/profile.html',
-    '/management-user.html',
-    '/management-booking.html',
-    '/management-attendance.html',
-    '/calendar.html',
-    '/form-user.html',
-    '/alerts.html',
-    '/badge.html',
-    '/buttons.html',
-    '/blank.html'
+    "/index.html",
+    "/profile.html",
+    "/management-user.html",
+    "/management-booking.html",
+    "/management-attendance.html",
+    "/calendar.html",
+    "/form-user.html",
+    "/alerts.html",
+    "/badge.html",
+    "/buttons.html",
+    "/blank.html",
   ];
 
   return protectedPages.includes(page);
@@ -120,10 +117,10 @@ function isProtectedPage(page) {
  * Update Alpine.js auth store with current user data
  */
 function updateAlpineAuthStore() {
-  if (typeof Alpine !== 'undefined' && Alpine.store && Alpine.store('auth')) {
+  if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
     const userData = getCurrentUser();
     if (userData) {
-      Alpine.store('auth').setUser(userData);
+      Alpine.store("auth").setUser(userData);
     }
   }
 }
@@ -134,16 +131,16 @@ function updateAlpineAuthStore() {
  */
 function redirectToLogin(returnUrl = null) {
   if (returnUrl) {
-    sessionStorage.setItem('redirectAfterLogin', returnUrl);
+    sessionStorage.setItem("redirectAfterLogin", returnUrl);
   }
-  window.location.href = '/signin.html';
+  window.location.href = "/signin.html";
 }
 
 /**
  * Redirect to dashboard
  */
 function redirectToDashboard() {
-  window.location.href = '/index.html';
+  window.location.href = "/index.html";
 }
 
 /**
@@ -180,7 +177,7 @@ function requirePermission(permission, callback, onDenied = null) {
     if (onDenied) {
       onDenied();
     } else {
-      alert('Anda tidak memiliki permission untuk melakukan aksi ini.');
+      alert("Anda tidak memiliki permission untuk melakukan aksi ini.");
     }
     return;
   }
@@ -196,32 +193,32 @@ const AuthGuard = {
   redirectToLogin,
   redirectToDashboard,
   hasPermission,
-  requirePermission
+  requirePermission,
 };
 
-export { 
-  initAuthGuard, 
-  checkAuthentication, 
-  isProtectedPage, 
-  redirectToLogin, 
+export {
+  initAuthGuard,
+  checkAuthentication,
+  isProtectedPage,
+  redirectToLogin,
   redirectToDashboard,
   hasPermission,
-  requirePermission
+  requirePermission,
 };
 
 export default AuthGuard;
 
 // Untuk penggunaan global di browser
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.AuthGuard = AuthGuard;
 }
 
 // Auto-initialize jika bukan di halaman signin
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   const currentPage = getCurrentPageFromPath(window.location.pathname);
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
       // Delay sedikit untuk memastikan semua module sudah loaded
       setTimeout(initAuthGuard, 100);
     });

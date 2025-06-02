@@ -34,7 +34,8 @@ function initAuthStore() {
 
     get userEmail() {
       return this.user?.email || "";
-    },    get userRole() {
+    },
+    get userRole() {
       return this.user?.role_name || this.user?.role || "user";
     },
 
@@ -116,7 +117,7 @@ function initAuthStore() {
       } finally {
         this.setLoading(false);
       }
-    },    // Helper methods
+    }, // Helper methods
     canAccess(permission) {
       return this.isAuthenticated && this.hasPermission(permission);
     },

@@ -229,7 +229,7 @@ function setupAccessDeniedEventListeners(modal, userRole) {
     modal.classList.add("opacity-0");
     modal.querySelector(".relative").classList.add("scale-95");
     modal.querySelector(".relative").classList.remove("scale-100");
-    
+
     setTimeout(() => {
       modal.remove();
       document.body.style.overflow = "";
@@ -248,41 +248,44 @@ function setupAccessDeniedEventListeners(modal, userRole) {
     try {
       // Import logout function from authService
       const { logout: authLogout } = await import("../services/authService.js");
-      
+
       // Call the proper logout function
       await authLogout();
-      
+
       // Clear additional session data
       sessionStorage.clear();
-      
+
       // Clear remember me preferences
       localStorage.removeItem("rememberMe");
       localStorage.removeItem("rememberedEmail");
-      
+
       // Clear any redirect URLs
       localStorage.removeItem("redirectAfterLogin");
       sessionStorage.removeItem("redirectAfterLogin");
-      
+
       // Update Alpine.js store if available
-      if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
+      if (
+        typeof Alpine !== "undefined" &&
+        Alpine.store &&
+        Alpine.store("auth")
+      ) {
         Alpine.store("auth").clearAuth();
       }
-      
+
       console.log("Logout completed successfully");
-      
+
       closeModal();
       setTimeout(() => {
         window.location.href = "/signin.html";
       }, 300);
-      
     } catch (error) {
       console.error("Logout error:", error);
-      
+
       // Force logout if API call fails
       forceLogout();
     }
   };
-  
+
   // Force logout function (fallback)
   const forceLogout = () => {
     // Clear all localStorage items
@@ -292,20 +295,22 @@ function setupAccessDeniedEventListeners(modal, userRole) {
     localStorage.removeItem("rememberMe");
     localStorage.removeItem("rememberedEmail");
     localStorage.removeItem("redirectAfterLogin");
-    
+
     // Clear sessionStorage
     sessionStorage.clear();
-    
+
     // Clear cookies manually
     document.cookie.split(";").forEach((c) => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
-    
+
     // Update Alpine.js store if available
     if (typeof Alpine !== "undefined" && Alpine.store && Alpine.store("auth")) {
       Alpine.store("auth").clearAuth();
     }
-    
+
     closeModal();
     setTimeout(() => {
       window.location.href = "/signin.html";
@@ -336,7 +341,7 @@ function setupAccessDeniedEventListeners(modal, userRole) {
       document.removeEventListener("keydown", handleEscKey);
     }
   };
-  
+
   document.addEventListener("keydown", handleEscKey);
 }
 

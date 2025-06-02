@@ -9,9 +9,7 @@ import {
   removeUserFromStorage,
   getUserFromStorage,
 } from "../utils/storageManager.js";
-
-// Base URL untuk API
-const API_BASE_URL = "/api/auth/";
+import { API_CONFIG, AUTH_CONFIG, envLog } from "../config/env.js";
 
 // Konfigurasi axios default
 axios.defaults.withCredentials = true; // Mengizinkan pengiriman cookie
@@ -29,8 +27,10 @@ async function login(email, password) {
       throw new Error("Email dan password harus diisi");
     }
 
+    envLog("debug", "Attempting login with URL:", API_CONFIG.LOGIN_URL);
+
     // Kirim request POST ke endpoint login
-    const response = await axios.post(`${API_BASE_URL}/login`, {
+    const response = await axios.post(API_CONFIG.LOGIN_URL, {
       email,
       password,
     });
@@ -129,11 +129,13 @@ async function logout() {
   try {
     // Coba kirim request logout ke backend untuk menghapus cookie di server
     try {
-      await axios.post(`${API_BASE_URL}/logout`);
-      console.log("Logout berhasil di backend");
+      envLog("debug", "Attempting logout with URL:", API_CONFIG.LOGOUT_URL);
+      await axios.post(API_CONFIG.LOGOUT_URL);
+      envLog("info", "Logout berhasil di backend");
     } catch (error) {
       // Jika endpoint logout tidak ada atau error, lanjutkan proses logout di frontend
-      console.warn(
+      envLog(
+        "warn",
         "Backend logout failed, proceeding with frontend logout:",
         error.message,
       );

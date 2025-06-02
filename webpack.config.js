@@ -2,6 +2,8 @@ const path = require("path");
 const glob = require("glob");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require("webpack");
+require("dotenv").config();
 
 const INCLUDE_PATTERN =
   /<include\s+src=["'](.+?)["']\s*\/?>\s*(?:<\/include>)?/gis;
@@ -110,12 +112,74 @@ module.exports = {
       filename: "style.css",
       chunkFilename: "style.css",
     }),
+    // Define plugin untuk menginjeksi environment variables
+    new webpack.DefinePlugin({
+      "process.env.API_BASE_URL": JSON.stringify(
+        process.env.API_BASE_URL || "/api",
+      ),
+      "process.env.API_AUTH_ENDPOINT": JSON.stringify(
+        process.env.API_AUTH_ENDPOINT || "/auth",
+      ),
+      "process.env.API_VERSION": JSON.stringify(
+        process.env.API_VERSION || "v1",
+      ),
+      "process.env.APP_NAME": JSON.stringify(
+        process.env.APP_NAME || "Infinite Track",
+      ),
+      "process.env.APP_VERSION": JSON.stringify(
+        process.env.APP_VERSION || "2.0.1",
+      ),
+      "process.env.APP_ENVIRONMENT": JSON.stringify(
+        process.env.APP_ENVIRONMENT || "development",
+      ),
+      "process.env.SESSION_TIMEOUT": JSON.stringify(
+        process.env.SESSION_TIMEOUT || "3600000",
+      ),
+      "process.env.REMEMBER_ME_DAYS": JSON.stringify(
+        process.env.REMEMBER_ME_DAYS || "7",
+      ),
+      "process.env.DEFAULT_LANGUAGE": JSON.stringify(
+        process.env.DEFAULT_LANGUAGE || "id",
+      ),
+      "process.env.TIMEZONE": JSON.stringify(
+        process.env.TIMEZONE || "Asia/Jakarta",
+      ),
+      "process.env.DEBUG_MODE": JSON.stringify(
+        process.env.DEBUG_MODE || "false",
+      ),
+      "process.env.LOG_LEVEL": JSON.stringify(process.env.LOG_LEVEL || "info"),
+    }),
   ],
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "build"),
     clean: true,
     assetModuleFilename: "[path][name][ext]",
+  },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "build"),
+    },
+    compress: true,
+    port: 3000,
+    hot: true,
+    open: true,
+    historyApiFallback: true,
+    proxy: [
+      {
+        context: ["/api"],
+        target: "http://localhost:3005",
+        changeOrigin: true,
+        secure: false,
+        logLevel: "debug",
+        onError: (err, req, res) => {
+          console.log("Proxy Error:", err);
+        },
+        onProxyReq: (proxyReq, req, res) => {
+          console.log("Proxying request to:", proxyReq.path);
+        },
+      },
+    ],
   },
   target: "web", // fix for "browserslist" error message
   stats: "errors-only", // suppress irrelevant log messages

@@ -3,6 +3,8 @@
  * Mengelola penyimpanan dan pengambilan data pengguna dari localStorage
  */
 
+import { AUTH_CONFIG, envLog } from "../config/env.js";
+
 /**
  * Menyimpan data pengguna ke localStorage
  * @param {Object} userData - Objek data pengguna yang akan disimpan
@@ -11,15 +13,16 @@
 function saveUserToStorage(userData) {
   try {
     if (!userData || typeof userData !== "object") {
-      console.error("saveUserToStorage: userData harus berupa objek");
+      envLog("error", "saveUserToStorage: userData harus berupa objek");
       return false;
     }
 
     const userDataString = JSON.stringify(userData);
-    localStorage.setItem("currentUserData", userDataString);
+    localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.USER_DATA, userDataString);
+    envLog("debug", "User data saved to storage");
     return true;
   } catch (error) {
-    console.error("Error saving user data to localStorage:", error);
+    envLog("error", "Error saving user data to localStorage:", error);
     return false;
   }
 }
@@ -30,16 +33,19 @@ function saveUserToStorage(userData) {
  */
 function getUserFromStorage() {
   try {
-    const userDataString = localStorage.getItem("currentUserData");
+    const userDataString = localStorage.getItem(
+      AUTH_CONFIG.STORAGE_KEYS.USER_DATA,
+    );
 
     if (!userDataString) {
       return null;
     }
 
     const userData = JSON.parse(userDataString);
+    envLog("debug", "User data retrieved from storage");
     return userData;
   } catch (error) {
-    console.error("Error parsing user data from localStorage:", error);
+    envLog("error", "Error parsing user data from localStorage:", error);
     return null;
   }
 }
@@ -50,10 +56,18 @@ function getUserFromStorage() {
  */
 function removeUserFromStorage() {
   try {
+    // Hapus semua data terkait authentication
+    Object.values(AUTH_CONFIG.STORAGE_KEYS).forEach((key) => {
+      localStorage.removeItem(key);
+    });
+
+    // Hapus data lama (backward compatibility)
     localStorage.removeItem("currentUserData");
+
+    envLog("debug", "All user data removed from storage");
     return true;
   } catch (error) {
-    console.error("Error removing user data from localStorage:", error);
+    envLog("error", "Error removing user data from localStorage:", error);
     return false;
   }
 }

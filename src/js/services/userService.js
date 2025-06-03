@@ -10,6 +10,24 @@ import { API_CONFIG, envLog } from "../config/env.js";
 axios.defaults.withCredentials = true; // Mengizinkan pengiriman cookie
 
 /**
+ * Mendapatkan token dari localStorage untuk header Authorization
+ * @returns {string|null} - Bearer token atau null jika tidak ada
+ */
+function getBearerToken() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  return user.token || null;
+}
+
+/**
+ * Membuat header Authorization dengan Bearer token
+ * @returns {Object} - Headers object dengan Authorization atau empty object
+ */
+function getAuthHeaders() {
+  const token = getBearerToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+/**
  * Mengambil daftar pengguna dari API
  * @param {Object} params - Parameter query untuk filtering dan sorting
  * @param {string} params.search - Kata kunci pencarian
@@ -240,5 +258,374 @@ async function deleteUser(userId) {
   }
 }
 
+/**
+ * Membuat pengguna baru
+ * @param {Object} userData - Data pengguna
+ * @param {File} photoFile - File foto profil
+ * @returns {Promise<Object>} - Promise yang resolve dengan data pengguna baru atau reject dengan error
+ */
+async function createUser(userData, photoFile) {
+  try {
+    envLog("debug", "Creating new user:", userData);
+
+    // Buat FormData untuk multipart/form-data
+    const formData = new FormData();
+
+    // Tambahkan field-field required sesuai API
+    formData.append("full_name", userData.full_name || "");
+    formData.append("email", userData.email || "");
+    formData.append("password", userData.password || "");
+    formData.append("phone", userData.phone || "");
+    formData.append("nip_nim", userData.nip_nim || "");
+    formData.append("id_roles", userData.id_roles || "");
+    formData.append("id_programs", userData.id_programs || "");
+    formData.append("id_position", userData.id_position || "");
+    formData.append("id_divisions", userData.id_divisions || "");
+    formData.append("latitude", userData.latitude || "");
+    formData.append("longitude", userData.longitude || "");
+    formData.append("radius", userData.radius || "");
+    formData.append("description", userData.description || "");
+
+    // Tambahkan file foto jika ada
+    if (photoFile) {
+      formData.append("face_photo", photoFile);
+    }
+
+    const response = await axios.post(
+      `${API_CONFIG.BASE_URL}/users`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+
+    if (response.data && response.data.success === true) {
+      envLog("debug", "Successfully created user:", response.data.data);
+      return response.data.data;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal membuat pengguna baru";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error creating user:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error("Anda tidak memiliki akses untuk membuat pengguna.");
+      } else if (status === 422) {
+        throw new Error(data?.message || "Data yang dikirim tidak valid.");
+      } else if (status === 500) {
+        throw new Error("Terjadi kesalahan server. Silakan coba lagi nanti.");
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal membuat pengguna baru`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
+/**
+ * Mengambil daftar roles dari API dengan caching
+ * @returns {Promise<Array>} - Promise yang resolve dengan array roles
+ */
+async function getRoles() {
+  try {
+    envLog("debug", "Fetching roles from API");
+
+    // Check cache first
+    const cacheKey = "roles_cache";
+    const cacheTTL = 5 * 60 * 1000; // 5 minutes
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < cacheTTL) {
+        envLog("debug", "Using cached roles data");
+        return data;
+      }
+    }
+
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/roles`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.data && response.data.success === true) {
+      const roles = response.data.data;
+
+      // Cache the data
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          data: roles,
+          timestamp: Date.now(),
+        }),
+      );
+
+      envLog("debug", "Successfully fetched roles:", roles);
+      return roles;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal mengambil data roles";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error fetching roles:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error("Anda tidak memiliki akses untuk melihat data roles.");
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal mengambil data roles`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
+/**
+ * Mengambil daftar programs dari API dengan caching
+ * @returns {Promise<Array>} - Promise yang resolve dengan array programs
+ */
+async function getPrograms() {
+  try {
+    envLog("debug", "Fetching programs from API");
+
+    // Check cache first
+    const cacheKey = "programs_cache";
+    const cacheTTL = 5 * 60 * 1000; // 5 minutes
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < cacheTTL) {
+        envLog("debug", "Using cached programs data");
+        return data;
+      }
+    }
+
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/programs`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.data && response.data.success === true) {
+      const programs = response.data.data;
+
+      // Cache the data
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          data: programs,
+          timestamp: Date.now(),
+        }),
+      );
+
+      envLog("debug", "Successfully fetched programs:", programs);
+      return programs;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal mengambil data programs";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error fetching programs:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error(
+          "Anda tidak memiliki akses untuk melihat data programs.",
+        );
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal mengambil data programs`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
+/**
+ * Mengambil daftar positions berdasarkan program ID dari API
+ * @param {string|number} programId - ID program untuk filter positions
+ * @returns {Promise<Array>} - Promise yang resolve dengan array positions
+ */
+async function getPositions(programId = null) {
+  try {
+    envLog(
+      "debug",
+      "Fetching positions from API",
+      programId ? `for program ${programId}` : "",
+    );
+
+    // Build URL with query parameter if programId provided
+    const url = new URL(
+      `${API_CONFIG.BASE_URL}/positions`,
+      window.location.origin,
+    );
+    if (programId) {
+      url.searchParams.append("program_id", programId);
+    }
+
+    const response = await axios.get(url.toString(), {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.data && response.data.success === true) {
+      const positions = response.data.data;
+      envLog("debug", "Successfully fetched positions:", positions);
+      return positions;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal mengambil data positions";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error fetching positions:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error(
+          "Anda tidak memiliki akses untuk melihat data positions.",
+        );
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal mengambil data positions`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
+/**
+ * Mengambil daftar divisions dari API dengan caching
+ * @returns {Promise<Array>} - Promise yang resolve dengan array divisions
+ */
+async function getDivisions() {
+  try {
+    envLog("debug", "Fetching divisions from API");
+
+    // Check cache first
+    const cacheKey = "divisions_cache";
+    const cacheTTL = 5 * 60 * 1000; // 5 minutes
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < cacheTTL) {
+        envLog("debug", "Using cached divisions data");
+        return data;
+      }
+    }
+
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/divisions`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.data && response.data.success === true) {
+      const divisions = response.data.data;
+
+      // Cache the data
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          data: divisions,
+          timestamp: Date.now(),
+        }),
+      );
+
+      envLog("debug", "Successfully fetched divisions:", divisions);
+      return divisions;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal mengambil data divisions";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error fetching divisions:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error(
+          "Anda tidak memiliki akses untuk melihat data divisions.",
+        );
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal mengambil data divisions`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
 // Export functions
-export { getUsers, getUserById, updateUser, deleteUser };
+export {
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  createUser,
+  getRoles,
+  getPrograms,
+  getPositions,
+  getDivisions,
+};

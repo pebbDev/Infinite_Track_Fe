@@ -28,12 +28,14 @@ import { getUserFromStorage } from "./utils/storageManager.js";
 import { initAuthStore } from "./stores/authStore.js";
 import { initRoleBasedAccess } from "./utils/roleBasedAccess.js";
 import { userListAlpineData } from "./features/userManagement/userListSimple.js";
+import { userFormAlpineData } from "./features/userManagement/userForm.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
 
 // Expose Alpine.js components to window for use in HTML
 window.userListAlpineData = userListAlpineData;
+window.userFormAlpineData = userFormAlpineData;
 
 // Initialize authentication session checking
 function initializeAuthSession() {

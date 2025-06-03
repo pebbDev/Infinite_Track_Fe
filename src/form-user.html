@@ -49,10 +49,146 @@
             </div>
             <!-- Breadcrumb End -->
             <!-- ====== Tambah User Form Start -->
-            <form id="addUserForm" class="space-y-6">
-              <!-- Include Form Fields Partial -->
-              <include src="./partials/form/form-user-fields.html" />
-            </form>
+            <div x-data="userFormAlpineData()" x-init="init()">
+              <!-- Loading State for Master Data -->
+              <div
+                x-show="isLoadingMasters"
+                class="flex items-center justify-center py-8"
+              >
+                <div class="flex items-center space-x-2">
+                  <svg
+                    class="text-brand-500 h-5 w-5 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span class="text-gray-600 dark:text-gray-400"
+                    >Loading master data...</span
+                  >
+                </div>
+              </div>
+
+              <!-- Error Message Display -->
+              <div
+                x-show="errorMessage"
+                class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
+              >
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg
+                      class="h-5 w-5 text-red-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h3
+                      class="text-sm font-medium text-red-800 dark:text-red-400"
+                    >
+                      Terjadi Kesalahan
+                    </h3>
+                    <div
+                      class="mt-2 text-sm text-red-700 dark:text-red-300"
+                      x-text="errorMessage"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Program Warning Alert -->
+              <div
+                x-show="showProgramWarning"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform translate-y-2"
+                class="border-warning-500 bg-warning-50 dark:border-warning-500/30 dark:bg-warning-500/15 mb-6 rounded-xl border p-4"
+              >
+                <div class="flex items-start gap-3">
+                  <div class="text-warning-500 -mt-0.5 dark:text-orange-400">
+                    <svg
+                      class="fill-current"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M3.6501 12.0001C3.6501 7.38852 7.38852 3.6501 12.0001 3.6501C16.6117 3.6501 20.3501 7.38852 20.3501 12.0001C20.3501 16.6117 16.6117 20.3501 12.0001 20.3501C7.38852 20.3501 3.6501 16.6117 3.6501 12.0001ZM12.0001 1.8501C6.39441 1.8501 1.8501 6.39441 1.8501 12.0001C1.8501 17.6058 6.39441 22.1501 12.0001 22.1501C17.6058 22.1501 22.1501 17.6058 22.1501 12.0001C22.1501 6.39441 17.6058 1.8501 12.0001 1.8501ZM10.9992 7.52517C10.9992 8.07746 11.4469 8.52517 11.9992 8.52517H12.0002C12.5525 8.52517 13.0002 8.07746 13.0002 7.52517C13.0002 6.97289 12.5525 6.52517 12.0002 6.52517H11.9992C11.4469 6.52517 10.9992 6.97289 10.9992 7.52517ZM12.0002 17.3715C11.586 17.3715 11.2502 17.0357 11.2502 16.6215V10.945C11.2502 10.5308 11.586 10.195 12.0002 10.195C12.4144 10.195 12.7502 10.5308 12.7502 10.945V16.6215C12.7502 17.0357 12.4144 17.3715 12.0002 17.3715Z"
+                        fill=""
+                      />
+                    </svg>
+                  </div>
+
+                  <div class="flex-1">
+                    <h4
+                      class="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90"
+                    >
+                      Peringatan: Program Harus Dipilih Terlebih Dahulu
+                    </h4>
+
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Silakan pilih Program terlebih dahulu sebelum memilih
+                      Position. Data Position akan dimuat berdasarkan Program
+                      yang dipilih.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    @click="hideProgramWarning()"
+                    class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                  >
+                    <svg
+                      class="h-5 w-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <form
+                id="addUserForm"
+                class="space-y-6"
+                x-show="!isLoadingMasters"
+              >
+                <!-- Include Form Fields Partial -->
+                <include src="./partials/form/form-user-fields.html" />
+              </form>
+            </div>
             <!-- ====== Tambah User Form End -->
           </div>
         </main>
@@ -61,9 +197,8 @@
       <!-- ===== Content Area End ===== -->
     </div>
     <!-- ===== Page Wrapper End ===== -->
-
     <script>
-      // Toggle Password Visibility
+      // Toggle Password Visibility (Fallback if needed)
       function togglePassword(inputId) {
         const input = document.getElementById(inputId);
         const eye = document.getElementById(inputId + "-eye");
@@ -82,119 +217,6 @@
           `;
         }
       }
-
-      // File Upload Functions
-      function dragOverHandler(ev) {
-        ev.preventDefault();
-        ev.currentTarget.classList.add(
-          "border-brand-500",
-          "bg-brand-50",
-          "dark:bg-brand-900/20",
-        );
-      }
-      function dragEnterHandler(ev) {
-        ev.preventDefault();
-        ev.currentTarget.classList.add(
-          "border-brand-500",
-          "bg-brand-50",
-          "dark:bg-brand-900/20",
-        );
-      }
-
-      function dragLeaveHandler(ev) {
-        ev.preventDefault();
-        if (!ev.currentTarget.contains(ev.relatedTarget)) {
-          ev.currentTarget.classList.remove(
-            "border-brand-500",
-            "bg-brand-50",
-            "dark:bg-brand-900/20",
-          );
-        }
-      }
-
-      function dropHandler(ev) {
-        ev.preventDefault();
-        ev.currentTarget.classList.remove(
-          "border-brand-500",
-          "bg-brand-50",
-          "dark:bg-brand-900/20",
-        );
-
-        const files = ev.dataTransfer.files;
-        if (files.length > 0) {
-          handleFileUpload(files[0]);
-        }
-      }
-
-      function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (file) {
-          handleFileUpload(file);
-        }
-      }
-
-      function handleFileUpload(file) {
-        // Validate file type
-        const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
-        if (!allowedTypes.includes(file.type)) {
-          alert("Format file tidak didukung. Gunakan PNG, JPEG, atau JPG.");
-          return;
-        }
-
-        // Validate file size (2MB)
-        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
-        if (file.size > maxSize) {
-          alert("Ukuran file terlalu besar. Maksimal 2MB.");
-          return;
-        }
-
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const preview = document.getElementById("photo-preview");
-          const previewImage = document.getElementById("preview-image");
-
-          previewImage.src = e.target.result;
-          preview.classList.remove("hidden");
-
-          // Hide dropzone text
-          document.getElementById("photo-dropzone").style.display = "none";
-        };
-        reader.readAsDataURL(file);
-      }
-
-      function removePhoto() {
-        const preview = document.getElementById("photo-preview");
-        const photoInput = document.getElementById("photo-input");
-        const dropzone = document.getElementById("photo-dropzone");
-
-        preview.classList.add("hidden");
-        photoInput.value = "";
-        dropzone.style.display = "block";
-      }
-
-      // Form Validation
-      document
-        .getElementById("addUserForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          // Validate email
-          const email = document.getElementById("email").value;
-          const emailError = document.getElementById("email-error");
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-          if (!emailRegex.test(email)) {
-            emailError.classList.remove("hidden");
-            return;
-          } else {
-            emailError.classList.add("hidden");
-          }
-
-          // If validation passes, you can submit the form
-          alert("Form submitted successfully!");
-          // Here you would typically send the data to your server
-        });
     </script>
   </body>
 </html>

@@ -22,6 +22,7 @@
             id="email"
             name="email"
             required
+            x-model="formData.email"
             placeholder="Masukkan alamat email"
             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
           />
@@ -43,8 +44,9 @@
             type="password"
             id="password"
             name="password"
-            required
-            placeholder="Masukkan password"
+            x-model="formData.password"
+            :required="!isEditMode"
+            :placeholder="isEditMode ? 'Kosongkan jika tidak ingin mengubah password' : 'Masukkan password'"
             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
           />
           <button
@@ -81,13 +83,13 @@
             id="role"
             name="role"
             required
+            x-model="formData.roleId"
             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
           >
-            <option value="" disabled selected>Select Role</option>
-            <option value="Management">Management</option>
-            <option value="Internship">Internship</option>
-            <option value="Employee">Employee</option>
-            <option value="Admin">Admin</option>
+            <option value="" disabled>Select Role</option>
+            <template x-for="role in roles" :key="role.id">
+              <option :value="role.id" x-text="role.name"></option>
+            </template>
           </select>
           <span
             class="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2"
@@ -123,15 +125,13 @@
             id="position"
             name="position"
             required
+            x-model="formData.positionId"
             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
           >
-            <option value="" disabled selected>Select Position</option>
-            <option value="Software Engineer">Software Engineer</option>
-            <option value="UI/UX Designer">UI/UX Designer</option>
-            <option value="Project Manager">Project Manager</option>
-            <option value="QA Analyst">QA Analyst</option>
-            <option value="Data Scientist">Data Scientist</option>
-            <option value="Product Owner">Product Owner</option>
+            <option value="" disabled>Select Position</option>
+            <template x-for="position in positions" :key="position.id">
+              <option :value="position.id" x-text="position.name"></option>
+            </template>
           </select>
           <span
             class="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2"
@@ -178,6 +178,7 @@
           id="fullName"
           name="fullName"
           required
+          x-model="formData.fullName"
           placeholder="Masukkan nama lengkap"
           class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
         />
@@ -195,6 +196,7 @@
           id="nipNim"
           name="nipNim"
           required
+          x-model="formData.nipNim"
           placeholder="Masukkan NIP atau NIM"
           class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
         />
@@ -211,7 +213,7 @@
           type="tel"
           id="phone"
           name="phone"
-          required
+          x-model="formData.phoneNumber"
           placeholder="+62 8XX XXXX XXXX"
           class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
         />
@@ -379,12 +381,12 @@
     <p class="text-sm text-gray-500 dark:text-gray-400">
       Masukkan nama tempat atau geser marker pada peta.
     </p>
-
     <!-- Map Search Input -->
     <input
       type="text"
       id="mapSearch"
       name="mapSearch"
+      x-model="formData.address"
       placeholder="Enter location or select a location on the map"
       class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
     />

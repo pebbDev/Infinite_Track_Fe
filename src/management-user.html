@@ -39,17 +39,21 @@
         <!-- ===== Header Start ===== -->
         <include src="./partials/common/header.html" />
         <!-- ===== Header End ===== -->
-
         <!-- ===== Main Content Start ===== -->
         <main>
           <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
             <!-- Breadcrumb Start -->
-            <div x-data="{ pageName: `Management User`}">
+            <div x-data="{ pageName: `Manajemen Pengguna`}">
               <include src="./partials/common/breadcrumb.html" />
             </div>
             <!-- Breadcrumb End -->
 
-            <div class="space-y-5 sm:space-y-6">
+            <!-- User Management Container with Alpine.js -->
+            <div
+              x-data="userListAlpineData()"
+              x-init="init()"
+              class="space-y-5 sm:space-y-6"
+            >
               <!-- User Table -->
               <include src="./partials/table/table-user.html"></include>
             </div>

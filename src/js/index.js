@@ -15,7 +15,9 @@ import "./components/modal/deleteModal.js";
 import "./components/logoutComponent.js";
 import "./utils/storageManager.js";
 import "./services/authService.js";
+import "./services/userService.js";
 import "./features/signinHandler.js";
+import "./features/userManagement/userList.js";
 import "./stores/authStore.js";
 import "./utils/authGuard.js";
 import "./utils/roleBasedAccess.js";
@@ -25,9 +27,13 @@ import { isAuthenticated, getCurrentUser } from "./services/authService.js";
 import { getUserFromStorage } from "./utils/storageManager.js";
 import { initAuthStore } from "./stores/authStore.js";
 import { initRoleBasedAccess } from "./utils/roleBasedAccess.js";
+import { userListAlpineData } from "./features/userManagement/userListSimple.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
+
+// Expose Alpine.js components to window for use in HTML
+window.userListAlpineData = userListAlpineData;
 
 // Initialize authentication session checking
 function initializeAuthSession() {

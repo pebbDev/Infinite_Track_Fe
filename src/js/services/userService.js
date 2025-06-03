@@ -154,16 +154,27 @@ async function getUserById(userId) {
 /**
  * Update data pengguna berdasarkan ID
  * @param {string|number} userId - ID pengguna
- * @param {Object} userData - Data pengguna yang akan diupdate
+ * @param {FormData} formData - FormData object yang berisi data pengguna yang akan diupdate
  * @returns {Promise<Object>} - Promise yang resolve dengan data pengguna yang diupdate atau reject dengan error
  */
-async function updateUser(userId, userData) {
+async function updateUser(userId, formData) {
   try {
-    envLog("debug", "Updating user:", userId, userData);
+    envLog("debug", "Updating user:", userId);
+
+    // Debug: log form data contents
+    for (let [key, value] of formData.entries()) {
+      envLog("debug", `FormData ${key}:`, value);
+    }
 
     const response = await axios.patch(
       `${API_CONFIG.BASE_URL}/users/${userId}`,
-      userData,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
 
     if (response.data && response.data.success === true) {
@@ -260,35 +271,16 @@ async function deleteUser(userId) {
 
 /**
  * Membuat pengguna baru
- * @param {Object} userData - Data pengguna
- * @param {File} photoFile - File foto profil
+ * @param {FormData} formData - FormData object yang sudah berisi semua data pengguna dan file
  * @returns {Promise<Object>} - Promise yang resolve dengan data pengguna baru atau reject dengan error
  */
-async function createUser(userData, photoFile) {
+async function createUser(formData) {
   try {
-    envLog("debug", "Creating new user:", userData);
+    envLog("debug", "Creating new user with FormData");
 
-    // Buat FormData untuk multipart/form-data
-    const formData = new FormData();
-
-    // Tambahkan field-field required sesuai API
-    formData.append("full_name", userData.full_name || "");
-    formData.append("email", userData.email || "");
-    formData.append("password", userData.password || "");
-    formData.append("phone", userData.phone || "");
-    formData.append("nip_nim", userData.nip_nim || "");
-    formData.append("id_roles", userData.id_roles || "");
-    formData.append("id_programs", userData.id_programs || "");
-    formData.append("id_position", userData.id_position || "");
-    formData.append("id_divisions", userData.id_divisions || "");
-    formData.append("latitude", userData.latitude || "");
-    formData.append("longitude", userData.longitude || "");
-    formData.append("radius", userData.radius || "");
-    formData.append("description", userData.description || "");
-
-    // Tambahkan file foto jika ada
-    if (photoFile) {
-      formData.append("face_photo", photoFile);
+    // Debug: log form data contents
+    for (let [key, value] of formData.entries()) {
+      envLog("debug", `FormData ${key}:`, value);
     }
 
     const response = await axios.post(

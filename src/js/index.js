@@ -1,11 +1,21 @@
 import "flatpickr/dist/flatpickr.min.css";
 import "dropzone/dist/dropzone.css";
+import "leaflet/dist/leaflet.css";
 import "../css/style.css";
 
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
 import flatpickr from "flatpickr";
 import Dropzone from "dropzone";
+import L from "leaflet";
+
+// Fix Leaflet default markers
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+});
 
 import map01 from "./components/map-01";
 import "./components/calendar-init.js";
@@ -17,7 +27,6 @@ import "./utils/storageManager.js";
 import "./services/authService.js";
 import "./services/userService.js";
 import "./features/signinHandler.js";
-import "./features/userManagement/userList.js";
 import "./stores/authStore.js";
 import "./utils/authGuard.js";
 import "./utils/roleBasedAccess.js";

@@ -107,6 +107,11 @@ function userListAlpineData() {
           position: user.position_name || user.position,
           nipNim: user.nip_nim || user.nipNim,
           phoneNumber: user.phone || user.phoneNumber,
+          // Location data mapping
+          latitude: user.latitude || null,
+          longitude: user.longitude || null,
+          radius: user.radius || null,
+          description: user.description || null,
           // Computed properties
           initials: this.getInitials(user.full_name || user.fullName),
           avatarColor: this.getAvatarColor(user.id),

@@ -47,15 +47,17 @@
               <include src="./partials/common/breadcrumb.html" />
             </div>
             <!-- Breadcrumb End -->
-
             <!-- User Management Container with Alpine.js -->
             <div
-              x-data="userListAlpineData()"
+              x-data="{ ...userListAlpineData(), ...mapDetailModalState() }"
               x-init="init()"
               class="space-y-5 sm:space-y-6"
             >
               <!-- User Table -->
               <include src="./partials/table/table-user.html"></include>
+
+              <!-- Map Detail Modal -->
+              <include src="./partials/modal/map-detail-modal.html"></include>
             </div>
           </div>
         </main>

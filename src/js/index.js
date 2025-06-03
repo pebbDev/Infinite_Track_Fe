@@ -22,6 +22,7 @@ import "./components/calendar-init.js";
 import "./components/image-resize";
 import "./components/modal/modalAlert.js";
 import "./components/modal/deleteModal.js";
+import "./components/modal/mapDetailModal.js";
 import "./components/logoutComponent.js";
 import "./utils/storageManager.js";
 import "./services/authService.js";
@@ -45,6 +46,97 @@ window.Alpine = Alpine;
 // Expose Alpine.js components to window for use in HTML
 window.userListAlpineData = userListAlpineData;
 window.userFormAlpineData = userFormAlpineData;
+
+// Global Alpine.js state for Map Detail Modal
+Alpine.data("mapDetailModalState", () => ({
+  isMapDetailModalOpen: false,
+  selectedUserLocation: {
+    id: null,
+    fullName: "",
+    email: "",
+    position: "",
+    phoneNumber: "",
+    latitude: null,
+    longitude: null,
+    radius: null,
+    description: "",
+  },
+  openMapDetailModal(user) {
+    // Set user location data
+    this.selectedUserLocation = {
+      id: user.id,
+      fullName: user.fullName || user.full_name || "",
+      email: user.email || "",
+      position: user.position || user.position_name || "",
+      phoneNumber: user.phoneNumber || user.phone || user.phone_number || "",
+      latitude: user.latitude || user.location?.latitude || user.lat || null,
+      longitude:
+        user.longitude ||
+        user.location?.longitude ||
+        user.lng ||
+        user.lon ||
+        null,
+      radius: user.radius || user.location?.radius || null,
+      description:
+        user.description || user.location?.description || user.address || "",
+    };
+
+    // Debug log untuk membantu troubleshooting
+    console.log("Opening map detail modal for user:", user);
+    console.log("Mapped location data:", this.selectedUserLocation);
+
+    // Open modal regardless of coordinates availability
+    this.isMapDetailModalOpen = true;
+
+    // Initialize map only if coordinates are available
+    this.$nextTick(() => {
+      if (
+        this.selectedUserLocation.latitude &&
+        this.selectedUserLocation.longitude
+      ) {
+        window.mapDetailModal.initializeMap(this.selectedUserLocation);
+      }
+    });
+  },
+
+  closeMapDetailModal() {
+    this.isMapDetailModalOpen = false;
+    // Clean up map
+    window.mapDetailModal.destroyMap();
+    // Reset data
+    this.selectedUserLocation = {
+      id: null,
+      fullName: "",
+      email: "",
+      position: "",
+      phoneNumber: "",
+      latitude: null,
+      longitude: null,
+      radius: null,
+      description: "",
+    };
+  },
+}));
+
+// Make map detail modal functions globally available
+window.openMapDetailModal = function (user) {
+  // Get the Alpine component instance
+  const element = document.querySelector('[x-data*="mapDetailModalState"]');
+  if (element && element._x_dataStack) {
+    const alpineData = element._x_dataStack[0];
+    if (alpineData.openMapDetailModal) {
+      alpineData.openMapDetailModal(user);
+    }
+  } else {
+    // Fallback: create a temporary Alpine instance
+    Alpine.data("tempMapModal", () => ({
+      init() {
+        this.openMapDetailModal(user);
+      },
+      ...Alpine.raw(Alpine._x_data.mapDetailModalState()),
+    }));
+  }
+};
 
 // Initialize authentication session checking
 function initializeAuthSession() {

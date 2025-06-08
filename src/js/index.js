@@ -1,6 +1,6 @@
-import "flatpickr/dist/flatpickr.min.css";
-import "dropzone/dist/dropzone.css";
-import "leaflet/dist/leaflet.css";
+import "/node_modules/flatpickr/dist/flatpickr.min.css";
+import "/node_modules/dropzone/dist/dropzone.css";
+import "/node_modules/leaflet/dist/leaflet.css";
 import "../css/style.css";
 
 import Alpine from "alpinejs";
@@ -45,9 +45,15 @@ import { userFormAlpineData } from "./features/userManagement/userForm.js";
 import { attendanceLogAlpineData } from "./features/attendance/attendanceLog.js";
 import { bookingListAlpineData } from "./features/wfaBooking/bookingList.js";
 import { getUserPhotoUrl } from "./utils/photoValidation.js";
+import { dashboard } from "../../src/js/features/dashboard/dashboard.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
+
+// Register Dashboard component
+document.addEventListener('alpine:init', () => {
+  Alpine.data('dashboard', dashboard);
+});
 
 // Expose Alpine.js components to window for use in HTML
 window.userListAlpineData = userListAlpineData;
@@ -256,8 +262,49 @@ Alpine.data("bookingMapModalState", () => ({
         "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
     };
 
-    return statusClasses[status?.toLowerCase()] || statusClasses.pending;
+    return statusClasses[status?.toLowerCase()] || statusClasses.pending;  },
+}));
+
+// Global Alpine.js state for Delete Modal
+Alpine.data("deleteModalState", () => ({
+  isDeleteModalOpen: false,
+  deleteTargetId: null,
+  deleteConfirmMessage: "",
+  
+  openDeleteModal(targetId, message) {
+    this.deleteTargetId = targetId;
+    this.deleteConfirmMessage = message || "Are you sure you want to delete this item?";
+    this.isDeleteModalOpen = true;
   },
+  
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteTargetId = null;
+    this.deleteConfirmMessage = "";
+  },
+  
+  confirmDelete() {
+    if (this.deleteTargetId) {
+      // Find the parent component with executeDelete method
+      const dashboardComponent = document.querySelector('[x-data*="dashboard"]');
+      const attendanceComponent = document.querySelector('[x-data*="attendance"]');
+      
+      if (dashboardComponent && dashboardComponent._x_dataStack) {
+        const dashboardData = dashboardComponent._x_dataStack[0];
+        if (dashboardData && dashboardData.executeDelete) {
+          dashboardData.executeDelete(this.deleteTargetId);
+        }
+      } else if (attendanceComponent && attendanceComponent._x_dataStack) {
+        const attendanceData = attendanceComponent._x_dataStack[0];
+        if (attendanceData && attendanceData.executeDelete) {
+          attendanceData.executeDelete(this.deleteTargetId);
+        }
+      } else {
+        console.warn('No component found to handle delete operation');
+      }
+    }
+    this.closeDeleteModal();
+  }
 }));
 
 // Make map detail modal functions globally available

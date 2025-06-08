@@ -104,16 +104,16 @@ export function bookingListAlpineData() {
     },
 
     // Debounce timer untuk search
-    searchTimer: null,
-
-    /**
+    searchTimer: null /**
      * Initialize component
-     */
+     */,
     async init() {
       await this.fetchBookings();
-    } /**
+    },
+
+    /**
      * Fetch booking data dari API
-     */,
+     */
     async fetchBookings() {
       try {
         this.isLoading = true;
@@ -191,9 +191,11 @@ export function bookingListAlpineData() {
       } finally {
         this.isLoading = false;
       }
-    } /**
+    },
+
+    /**
      * Handle search input dengan debounce
-     */,
+     */
     debouncedSearch() {
       this.handleSearchInput();
     },
@@ -205,7 +207,9 @@ export function bookingListAlpineData() {
       this.filters.status = this.statusFilter;
       this.filters.page = 1; // Reset ke halaman pertama
       this.fetchBookings();
-    },    /**
+    },
+
+    /**
      * View booking detail
      * @param {Object} booking - Data booking item
      */
@@ -251,17 +255,21 @@ Detail Booking:
         this.filters.page = 1; // Reset ke halaman pertama
         this.fetchBookings();
       }, 500);
-    } /**
+    },
+
+    /**
      * Handle status filter change
-     */,
+     */
     handleStatusFilter() {
       this.filters.status = this.statusFilter;
       this.filters.page = 1; // Reset ke halaman pertama
       this.fetchBookings();
-    } /**
+    },
+
+    /**
      * Change page
      * @param {number} newPage - Nomor halaman baru
-     */,
+     */
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.pagination.total_pages) {
         this.filters.page = newPage;
@@ -296,12 +304,13 @@ Detail Booking:
       if (this.filters.sortBy !== fieldName) {
         return ""; // Tidak ada icon jika field tidak sedang di-sort
       }
-
       return this.filters.sortOrder === "ASC" ? "↑" : "↓";
-    } /**
+    },
+
+    /**
      * View location detail
      * @param {Object} booking - Data booking item
-     */,
+     */
     viewLocationDetail(booking) {
       // Check if coordinates are available
       if (!booking.location_latitude || !booking.location_longitude) {
@@ -354,9 +363,11 @@ Detail Booking:
           }
         }
       });
-    } /**
+    },
+
+    /**
      * Close booking map modal
-     */,
+     */
     closeMapDetailModal() {
       this.isBookingMapModalOpen = false;
       // Clean up booking map
@@ -385,16 +396,16 @@ Detail Booking:
         notes: "",
         phoneNumber: "",
       };
+    } /**
+     * Close booking map modal (alias for compatibility)
+     */,
+    closeBookingMapModal() {
+      this.closeMapDetailModal();
     },
 
     /**
-     * Close booking map modal (alias for compatibility)
-     */
-    closeBookingMapModal() {
-      this.closeMapDetailModal();
-    } /**
      * Open map detail modal (for general compatibility)
-     */,
+     */
     openMapDetailModal(location) {
       this.selectedUserLocation = {
         id: location.id || null,
@@ -420,10 +431,12 @@ Detail Booking:
           }
         }
       });
-    } /**
+    },
+
+    /**
      * Approve booking
      * @param {string|number} bookingId - ID booking yang akan diapprove
-     */,
+     */
     async approveBooking(bookingId) {
       try {
         const response = await updateBookingStatus(bookingId, "approved");
@@ -459,10 +472,12 @@ Detail Booking:
           });
         }
       }
-    } /**
+    },
+
+    /**
      * Reject booking
      * @param {string|number} bookingId - ID booking yang akan direject
-     */,
+     */
     async rejectBooking(bookingId) {
       try {
         const response = await updateBookingStatus(bookingId, "rejected");
@@ -508,9 +523,11 @@ Detail Booking:
       this.deleteConfirmMessage =
         "Apakah Anda yakin ingin menghapus data booking ini? Tindakan ini tidak dapat dibatalkan.";
       this.isDeleteModalOpen = true;
-    } /**
+    },
+
+    /**
      * Execute delete booking (dipanggil dari modal)
-     */,
+     */
     async executeDelete() {
       if (!this.deleteTargetId) return;
 

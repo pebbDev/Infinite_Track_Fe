@@ -3,7 +3,7 @@
  * Handles the display and interaction of booking location details in a modal with map
  */
 
-import { formatDate, formatDateTime } from '../../utils/dateTimeFormatter.js';
+import { formatDate, formatDateTime } from "../../utils/dateTimeFormatter.js";
 
 const bookingMapModal = () => {
   return {
@@ -59,7 +59,7 @@ const bookingMapModal = () => {
         // Add marker
         this.marker = L.marker([lat, lng], { icon: bookingIcon }).addTo(
           this.map,
-        );        // Create popup content
+        ); // Create popup content
         const popupContent = `
           <div class="booking-popup">
             <h3 class="font-semibold text-sm mb-2">${booking.location_name || "WFA Location"}</h3>
@@ -96,7 +96,7 @@ const bookingMapModal = () => {
       } catch (error) {
         console.error("Error initializing booking map:", error);
       }
-    },    // Format date time for display
+    }, // Format date time for display
     formatDateTime(dateString) {
       if (!dateString) return "-";
 

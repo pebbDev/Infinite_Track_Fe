@@ -54,8 +54,11 @@
     "dropzone": "^6.0.0-beta.2",
     "flatpickr": "^4.6.13",
     "fullcalendar": "^6.1.15",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "jsvectormap": "^1.6.0",
     "leaflet": "^1.9.4",
-    "swiper": "^11.1.14"
+    "swiper": "^11.1.14",
+    "xlsx": "^0.18.5"
   }
 }

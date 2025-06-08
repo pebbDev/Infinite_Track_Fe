@@ -1,0 +1,448 @@
+<!-- Dashboard Report Table Partial -->
+<!-- Exact same structure as attendance table but using dashboard data -->
+
+<!-- Loading Spinner -->
+<div x-show="isLoading" class="flex items-center justify-center py-12">
+  <div class="flex items-center space-x-3">
+    <div
+      class="border-t-primary h-8 w-8 animate-spin rounded-full border-4 border-gray-300"
+    ></div>
+    <span class="text-sm text-gray-600 dark:text-gray-400"
+      >Memuat data laporan...</span
+    >
+  </div>
+</div>
+
+<!-- Error Message -->
+<div
+  x-show="errorMessage && !isLoading"
+  class="bg-error-50 dark:bg-error-500/15 rounded-lg p-4"
+>
+  <div class="flex items-center">
+    <svg
+      class="text-error-600 dark:text-error-400 mr-3 h-5 w-5"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      ></path>
+    </svg>
+    <span
+      class="text-error-700 dark:text-error-300 text-sm"
+      x-text="errorMessage"
+    ></span>
+  </div>
+</div>
+
+<!-- Table Controls -->
+<div
+  x-show="!isLoading && !errorMessage"
+  class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+>
+  <!-- Entries per page -->
+  <div class="flex items-center space-x-2">
+    <span class="text-sm text-gray-700 dark:text-gray-300">Show</span>
+    <select
+      x-model="entriesPerPage"
+      @change="onEntriesPerPageChange()"
+      class="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+    >
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+    <span class="text-sm text-gray-700 dark:text-gray-300">entries</span>
+  </div>
+
+  <!-- Search -->
+  <div class="flex items-center space-x-2">
+    <label class="text-sm text-gray-700 dark:text-gray-300">Search:</label>
+    <input
+      type="text"
+      x-model="searchQuery"
+      @input="onSearchChange()"
+      placeholder="Search..."
+      class="rounded border border-gray-300 px-3 py-1 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+    />
+  </div>
+</div>
+
+<!-- Main Table -->
+<div
+  x-show="!isLoading && !errorMessage"
+  class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <!-- Table Header -->
+      <thead class="bg-gray-50 dark:bg-gray-800">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            <button
+              @click="changeSort('id')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>User ID</span>
+              <span x-text="getSortIcon('id')" class="text-primary"></span>
+            </button>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            <button
+              @click="changeSort('full_name')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Full Name</span>
+              <span
+                x-text="getSortIcon('full_name')"
+                class="text-primary"
+              ></span>
+            </button>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            <button
+              @click="changeSort('time_in')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Time In</span>
+              <span x-text="getSortIcon('time_in')" class="text-primary"></span>
+            </button>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            <button
+              @click="changeSort('time_out')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Time Out</span>
+              <span
+                x-text="getSortIcon('time_out')"
+                class="text-primary"
+              ></span>
+            </button>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            Work Hour
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            Koordinat
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            <button
+              @click="changeSort('status')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Status</span>
+              <span x-text="getSortIcon('status')" class="text-primary"></span>
+            </button>
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            Information
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            Action
+          </th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody
+        class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
+      >
+        <template
+          x-for="log in paginatedAttendanceData"
+          :key="log.id_attendance"
+        >
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+            <!-- User ID -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
+            >
+              <span x-text="log.id" class="font-medium"></span>
+            </td>
+            <!-- Full Name -->
+            <td class="px-6 py-4">
+              <div class="flex items-center space-x-3">
+                <!-- User Avatar with Initials -->
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium"
+                  :class="getAvatarColor(log.full_name)"
+                >
+                  <span x-text="getInitials(log.full_name)"></span>
+                </div>
+                <div>
+                  <div
+                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    x-text="log.full_name"
+                  ></div>
+                  <div
+                    class="text-sm text-gray-500 dark:text-gray-400"
+                    x-text="log.role_name"
+                  ></div>
+                </div>
+              </div>
+            </td>
+            <!-- Time In -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
+            >
+              <span x-text="log.time_in || '-'"></span>
+            </td>
+            <!-- Time Out -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
+            >
+              <span x-text="log.time_out || '-'"></span>
+            </td>
+
+            <!-- Work Hour -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
+            >
+              <span x-text="log.work_hour || '-'"></span>
+            </td>
+            <!-- Koordinat -->
+            <td class="px-6 py-4 text-sm whitespace-nowrap">
+              <button
+                @click="viewLocation(log)"
+                :disabled="!log.location?.latitude || !log.location?.longitude"
+                :class="log.location?.latitude && log.location?.longitude ? 'hover:bg-blue-600 bg-blue-500' : 'bg-gray-400 cursor-not-allowed'"
+                class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition-colors"
+              >
+                <svg
+                  class="mr-1 h-3 w-3"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                <span
+                  x-text="log.location?.latitude && log.location?.longitude ? 'View Detail' : 'No Location'"
+                ></span>
+              </button>
+            </td>
+
+            <!-- Status -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                :class="getStatusBadgeClass(log.status)"
+                x-text="getStatusBadgeText(log.status)"
+              ></span>
+            </td>
+
+            <!-- Information -->
+            <td class="px-6 py-4 text-center whitespace-nowrap">
+              <span
+                :class="getInfoBadgeClass(log.information || log.work_type)"
+                x-text="getInfoBadgeText(log.information || log.work_type)"
+              ></span>
+            </td>
+            <!-- Action -->
+            <td class="px-6 py-4 text-sm whitespace-nowrap">
+              <button
+                @click="confirmDelete(log.id_attendance)"
+                class="rounded p-1 text-red-500 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                title="Delete attendance record"
+              >
+                <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </template>
+
+        <!-- Empty State -->
+        <template x-if="paginatedAttendanceData.length === 0">
+          <tr>
+            <td colspan="9" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center space-y-3">
+                <svg
+                  class="h-12 w-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 48 48"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20 12H8a4 4 0 00-4 4v20a4 4 0 004 4h32a4 4 0 004-4V16a4 4 0 00-4-4H28m-8 0V8a4 4 0 00-8 0v4m8 0a4 4 0 01-8 0V8a4 4 0 018 0v4z"
+                  ></path>
+                </svg>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  <p class="font-medium">Tidak ada data laporan ditemukan</p>
+                  <p>Silakan coba dengan kata kunci pencarian yang berbeda.</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    x-show="!isLoading && totalPages > 1"
+    class="border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-900"
+  >
+    <div class="flex items-center justify-between">
+      <!-- Info Text -->
+      <div class="text-sm text-gray-700 dark:text-gray-300">
+        <span x-text="showingInfo"></span>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="flex items-center space-x-2">
+        <!-- Previous Button -->
+        <button
+          @click="previousPage()"
+          :disabled="currentPage === 1"
+          :class="currentPage === 1 ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'"
+          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-800"
+        >
+          Previous
+        </button>
+
+        <!-- Page Numbers -->
+        <template x-for="pageNum in getPageNumbers()" :key="pageNum">
+          <button
+            @click="pageNum !== '...' && goToPage(pageNum)"
+            :disabled="pageNum === '...'"
+            :class="pageNum === currentPage ? 'bg-primary text-white border-primary' : pageNum === '...' ? 'cursor-not-allowed' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'"
+            class="rounded-md border px-4 py-2 text-sm font-medium"
+            x-text="pageNum"
+          ></button>
+        </template>
+
+        <!-- Next Button -->
+        <button
+          @click="nextPage()"
+          :disabled="currentPage === totalPages"
+          :class="currentPage === totalPages ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'"
+          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-800"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  x-show="isDeleteModalOpen"
+  class="fixed inset-0 z-50 overflow-y-auto"
+  style="display: none"
+>
+  <div
+    class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <!-- Background overlay -->
+    <div
+      x-show="isDeleteModalOpen"
+      x-transition:enter="ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="ease-in duration-200"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      class="bg-opacity-75 fixed inset-0 bg-gray-500 transition-opacity"
+      @click="closeDeleteModal()"
+    ></div>
+
+    <span class="hidden sm:inline-block sm:h-screen sm:align-middle"
+      >&#8203;</span
+    >
+
+    <!-- Modal panel -->
+    <div
+      x-show="isDeleteModalOpen"
+      x-transition:enter="ease-out duration-300"
+      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave="ease-in duration-200"
+      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      class="inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle dark:bg-gray-800"
+    >
+      <div class="sm:flex sm:items-start">
+        <div
+          class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+        >
+          <svg
+            class="h-6 w-6 text-red-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+          <h3
+            class="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+          >
+            Hapus Data Absensi
+          </h3>
+          <div class="mt-2">
+            <p
+              class="text-sm text-gray-500 dark:text-gray-400"
+              x-text="deleteConfirmMessage"
+            ></p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+        <button
+          type="button"
+          @click="executeDelete()"
+          class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+        >
+          Hapus
+        </button>
+        <button
+          type="button"
+          @click="closeDeleteModal()"
+          class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+        >
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

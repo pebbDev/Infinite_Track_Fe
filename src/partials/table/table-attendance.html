@@ -1,112 +1,129 @@
-<div
-  class="border-stroke shadow-default dark:border-strokedark dark:bg-boxdark rounded-sm border bg-white px-5 py-6 sm:px-7.5"
->
-  <!-- Main Title -->
-  <h4 class="mb-6 text-lg font-medium text-black dark:text-white">
-    Data Absensi Karyawan Harian
-  </h4>
+<!-- Attendance Table Partial -->
 
-  <!-- Top Controls Row -->
-  <div
-    class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-  >
-    <!-- Show Entries -->
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-black dark:text-white">Show</span>
-      <select
-        class="border-stroke dark:border-strokedark dark:bg-form-input focus:border-primary active:border-primary dark:bg-form-input relative z-20 inline-flex appearance-none rounded border bg-white px-4 py-1 text-black transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] dark:text-white"
-      >
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-      <span class="text-sm text-black dark:text-white">entries</span>
-    </div>
-
-    <!-- Search -->
-    <div class="relative">
-      <span class="absolute top-1/2 left-4.5 z-10 -translate-y-1/2">
-        <svg
-          class="fill-black dark:fill-white"
-          width="20"
-          height="20"
-          viewBox="0 0 20 20"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M9.16666 3.33332C5.945 3.33332 3.33332 5.945 3.33332 9.16666C3.33332 12.3883 5.945 15 9.16666 15C12.3883 15 15 12.3883 15 9.16666C15 5.945 12.3883 3.33332 9.16666 3.33332ZM1.66666 9.16666C1.66666 5.02452 5.02452 1.66666 9.16666 1.66666C13.3088 1.66666 16.6667 5.02452 16.6667 9.16666C16.6667 13.3088 13.3088 16.6667 9.16666 16.6667C5.02452 16.6667 1.66666 13.3088 1.66666 9.16666Z"
-            fill="currentColor"
-          />
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M13.2857 13.2857C13.6112 12.9603 14.1388 12.9603 14.4643 13.2857L18.0893 16.9107C18.4147 17.2362 18.4147 17.7638 18.0893 18.0893C17.7638 18.4147 17.2362 18.4147 16.9107 18.0893L13.2857 14.4643C12.9603 14.1388 12.9603 13.6112 13.2857 13.2857Z"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary w-full rounded border-[1.5px] bg-transparent px-11 py-2 text-black transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] sm:w-60 xl:w-75 dark:text-white"
-      />
-    </div>
+<!-- Loading Spinner -->
+<div x-show="isLoading" class="flex items-center justify-center py-12">
+  <div class="flex items-center space-x-3">
+    <div
+      class="border-t-primary h-8 w-8 animate-spin rounded-full border-4 border-gray-300"
+    ></div>
+    <span class="text-sm text-gray-600 dark:text-gray-400"
+      >Memuat data absensi...</span
+    >
   </div>
+</div>
 
-  <!-- Table Wrapper -->
-  <div class="max-w-full overflow-x-auto">
-    <table class="w-full table-auto">
+<!-- Error Message -->
+<div
+  x-show="errorMessage && !isLoading"
+  class="bg-error-50 dark:bg-error-500/15 rounded-lg p-4"
+>
+  <div class="flex items-center">
+    <svg
+      class="text-error-600 dark:text-error-400 mr-3 h-5 w-5"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      ></path>
+    </svg>
+    <span
+      class="text-error-700 dark:text-error-300 text-sm"
+      x-text="errorMessage"
+    ></span>
+  </div>
+</div>
+
+<!-- Main Table -->
+<div
+  x-show="!isLoading && !errorMessage"
+  class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
       <!-- Table Header -->
-      <thead>
-        <tr
-          class="bg-gray-2 dark:bg-meta-4 border-b border-gray-100 text-left dark:border-gray-800"
-        >
+      <thead class="bg-gray-50 dark:bg-gray-800">
+        <tr>
           <th
-            class="min-w-[100px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            User Id
+            <button
+              @click="changeSort('id')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>User ID</span>
+              <span x-text="getSortIcon('id')" class="text-primary"></span>
+            </button>
           </th>
           <th
-            class="min-w-[320px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Full Name
+            <button
+              @click="changeSort('full_name')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Full Name</span>
+              <span
+                x-text="getSortIcon('full_name')"
+                class="text-primary"
+              ></span>
+            </button>
           </th>
           <th
-            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Time In
+            <button
+              @click="changeSort('time_in')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Time In</span>
+              <span x-text="getSortIcon('time_in')" class="text-primary"></span>
+            </button>
           </th>
           <th
-            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Time Out
+            <button
+              @click="changeSort('time_out')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Time Out</span>
+              <span
+                x-text="getSortIcon('time_out')"
+                class="text-primary"
+              ></span>
+            </button>
           </th>
           <th
-            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             Work Hour
           </th>
           <th
-            class="min-w-[120px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Kordinat
+            Koordinat
           </th>
           <th
-            class="min-w-[100px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Status
+            <button
+              @click="changeSort('status')"
+              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
+            >
+              <span>Status</span>
+              <span x-text="getSortIcon('status')" class="text-primary"></span>
+            </button>
           </th>
           <th
-            class="min-w-[200px] px-4 py-4 text-left font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             Information
           </th>
           <th
-            class="min-w-[0px] py-4 text-center font-medium text-black dark:text-white"
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             Action
           </th>
@@ -114,550 +131,205 @@
       </thead>
 
       <!-- Table Body -->
-      <tbody>
-        <!-- Row 1 -->
-        <tr>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">EMP001</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100"
-              >
-                <span class="text-theme-xs font-medium text-blue-600">AS</span>
-              </div>
-              <div>
-                <p class="text-theme-sm font-medium text-black dark:text-white">
-                  Ahmad Suryana
-                </p>
-                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
-                  >Manager IT</span
+      <tbody
+        class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
+      >
+        <template x-for="log in attendanceData" :key="log.id_attendance">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+            <!-- User ID -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
+            >
+              <span x-text="log.id" class="font-medium"></span>
+            </td>
+            <!-- Full Name -->
+            <td class="px-6 py-4">
+              <div class="flex items-center space-x-3">
+                <!-- User Avatar with Initials -->
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium"
+                  :class="getAvatarColor(log.full_name)"
                 >
+                  <span x-text="getInitials(log.full_name)"></span>
+                </div>
+                <div>
+                  <div
+                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    x-text="log.full_name"
+                  ></div>
+                  <div
+                    class="text-sm text-gray-500 dark:text-gray-400"
+                    x-text="log.role_name"
+                  ></div>
+                </div>
               </div>
-            </div>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">08:00 AM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">17:30 PM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">9j 30m</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+            </td>
+            <!-- Time In -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
             >
-              View
-            </button>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-success-50 text-success-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(3, 152, 85, 0.1); color: #039855"
+              <span x-text="log.time_in || '-'"></span>
+            </td>
+            <!-- Time Out -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
             >
-              On Time
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-brand-50 text-brand-500 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6"
-            >
-              Work From Office
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="js-delete-item-btn inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
-              data-item-id="EMP001"
-              data-item-name="Ahmad Suryana"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 6H5H21"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </td>
-        </tr>
+              <span x-text="log.time_out || '-'"></span>
+            </td>
 
-        <!-- Row 2 -->
-        <tr>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">EMP002</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100"
+            <!-- Work Hour -->
+            <td
+              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
+            >
+              <span x-text="log.work_hour || '-'"></span>
+            </td>
+            <!-- Koordinat -->
+            <td class="px-6 py-4 text-sm whitespace-nowrap">
+              <button
+                @click="viewLocation(log)"
+                :disabled="!log.location?.latitude || !log.location?.longitude"
+                :class="log.location?.latitude && log.location?.longitude ? 'hover:bg-blue-600 bg-blue-500' : 'bg-gray-400 cursor-not-allowed'"
+                class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition-colors"
               >
-                <span class="text-theme-xs font-medium text-green-600">SP</span>
-              </div>
-              <div>
-                <p class="text-theme-sm font-medium text-black dark:text-white">
-                  Siti Permata
-                </p>
-                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
-                  >HR Specialist</span
+                <svg
+                  class="mr-1 h-3 w-3"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
                 >
-              </div>
-            </div>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">08:17 AM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">16:28 PM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">8j 11m</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
-            >
-              View
-            </button>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-error-50 text-error-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(216, 0, 39, 0.1); color: #d80027"
-            >
-              Late
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-blue-light-50 text-blue-light-500 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9"
-            >
-              Work From Home
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="js-delete-item-btn inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
-              data-item-id="EMP002"
-              data-item-name="Siti Permata"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 6H5H21"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </td>
-        </tr>
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                <span
+                  x-text="log.location?.latitude && log.location?.longitude ? 'View Detail' : 'No Location'"
+                ></span>
+              </button>
+            </td>
 
-        <!-- Row 3 -->
-        <tr>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">EMP003</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100"
-              >
-                <span class="text-theme-xs font-medium text-purple-600"
-                  >RD</span
-                >
-              </div>
-              <div>
-                <p class="text-theme-sm font-medium text-black dark:text-white">
-                  Rizki Darmawan
-                </p>
-                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
-                  >Software Developer</span
-                >
-              </div>
-            </div>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">-</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">-</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">0j 0m</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="text-theme-xs inline-flex cursor-not-allowed items-center justify-center rounded border border-gray-300 px-3 py-1 font-medium text-gray-400"
-              disabled
-            >
-              View
-            </button>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="text-theme-xs inline-flex rounded-full bg-gray-100 px-3 py-1 font-medium text-gray-700"
-              style="background-color: #f3f4f6; color: #4c4c4c"
-            >
-              Alpha
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-warning-50 text-warning-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(251, 146, 60, 0.1); color: #f59e0b"
-            >
-              Work From Anywhere
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="js-delete-item-btn inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
-              data-item-id="EMP003"
-              data-item-name="Rizki Darmawan"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 6H5H21"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </td>
-        </tr>
+            <!-- Status -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                :class="getStatusBadgeClass(log.status)"
+                x-text="getStatusBadgeText(log.status)"
+              ></span>
+            </td>
 
-        <!-- Row 4 -->
-        <tr>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">EMP004</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100"
+            <!-- Information -->
+            <td class="px-6 py-4 text-center whitespace-nowrap">
+              <span
+                :class="getInfoBadgeClass(log.information)"
+                x-text="getInfoBadgeText(log.information)"
+              ></span>
+            </td>
+            <!-- Action -->
+            <td class="px-6 py-4 text-sm whitespace-nowrap">
+              <button
+                @click="confirmDelete(log.id_attendance)"
+                class="rounded p-1 text-red-500 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+                title="Delete attendance record"
               >
-                <span class="text-theme-xs font-medium text-orange-600"
-                  >LN</span
-                >
-              </div>
-              <div>
-                <p class="text-theme-sm font-medium text-black dark:text-white">
-                  Lestari Ningsih
-                </p>
-                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
-                  >Marketing Executive</span
-                >
-              </div>
-            </div>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">07:45 AM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">17:15 PM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">9j 30m</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
-            >
-              View
-            </button>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-success-50 text-success-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(3, 152, 85, 0.1); color: #039855"
-            >
-              On Time
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-warning-50 text-warning-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(251, 146, 60, 0.1); color: #f59e0b"
-            >
-              Work From Anywhere
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="js-delete-item-btn inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
-              data-item-id="EMP004"
-              data-item-name="Lestari Ningsih"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 6H5H21"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </td>
-        </tr>
+                <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </template>
 
-        <!-- Row 5 -->
-        <tr>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">EMP005</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100"
-              >
-                <span class="text-theme-xs font-medium text-red-600">BP</span>
-              </div>
-              <div>
-                <p class="text-theme-sm font-medium text-black dark:text-white">
-                  Bayu Pratama
-                </p>
-                <span class="text-theme-xs text-gray-500 dark:text-gray-400"
-                  >Finance Analyst</span
+        <!-- Empty State -->
+        <template x-if="attendanceData.length === 0">
+          <tr>
+            <td colspan="9" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center space-y-3">
+                <svg
+                  class="h-12 w-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 48 48"
                 >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20 12H8a4 4 0 00-4 4v20a4 4 0 004 4h32a4 4 0 004-4V16a4 4 0 00-4-4H28m-8 0V8a4 4 0 00-8 0v4m8 0a4 4 0 01-8 0V8a4 4 0 018 0v4z"
+                  ></path>
+                </svg>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  <p class="font-medium">Tidak ada data absensi ditemukan</p>
+                  <p>Silakan coba dengan kata kunci pencarian yang berbeda.</p>
+                </div>
               </div>
-            </div>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">08:30 AM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">17:00 PM</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <p class="text-theme-sm text-black dark:text-white">8j 30m</p>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="border-primary text-primary hover:bg-primary focus:bg-primary active:bg-primary dark:border-primary dark:text-primary dark:hover:bg-primary dark:focus:bg-primary dark:active:bg-primary text-theme-xs inline-flex items-center justify-center rounded border px-3 py-1 font-medium transition outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
-            >
-              View
-            </button>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-error-50 text-error-600 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(216, 0, 39, 0.1); color: #d80027"
-            >
-              Late
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <span
-              class="bg-brand-50 text-brand-500 text-theme-xs inline-flex rounded-full px-3 py-1 font-medium"
-              style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6"
-            >
-              Work From Office
-            </span>
-          </td>
-          <td class="dark:border-strokedark border-b border-[#eee] px-4 py-4">
-            <button
-              class="js-delete-item-btn inline-flex items-center justify-center rounded p-2 text-red-500 hover:bg-red-50 hover:text-red-700"
-              data-item-id="EMP005"
-              data-item-name="Bayu Pratama"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 6H5H21"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14 11V17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
   </div>
 
-  <!-- Bottom Controls Row -->
+  <!-- Pagination -->
   <div
-    class="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row sm:items-center"
+    x-show="!isLoading && pagination.total_records > 0"
+    class="border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-900"
   >
-    <!-- Entry Info -->
-    <p class="text-sm text-black dark:text-white">
-      Showing 1 to 5 of 5 entries
-    </p>
+    <div class="flex items-center justify-between">
+      <!-- Info Text -->
+      <div class="text-sm text-gray-700 dark:text-gray-300">
+        Showing
+        <span
+          class="font-medium"
+          x-text="((pagination.current_page - 1) * pagination.per_page) + 1"
+        ></span>
+        to
+        <span
+          class="font-medium"
+          x-text="Math.min(pagination.current_page * pagination.per_page, pagination.total_records)"
+        ></span>
+        of
+        <span class="font-medium" x-text="pagination.total_records"></span>
+        entries
+      </div>
 
-    <!-- Pagination -->
-    <div class="flex">
-      <a
-        href="#"
-        class="border-stroke dark:border-strokedark dark:bg-form-input flex items-center justify-center rounded-l-md border bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600"
-      >
-        Previous
-      </a>
-      <a
-        href="#"
-        class="border-stroke bg-primary bg-opacity-20 text-primary dark:border-strokedark border-y px-3 py-2 text-sm font-medium"
-      >
-        1
-      </a>
-      <a
-        href="#"
-        class="border-stroke dark:border-strokedark dark:bg-form-input border-y bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600"
-      >
-        2
-      </a>
-      <a
-        href="#"
-        class="border-stroke dark:border-strokedark dark:bg-form-input flex items-center justify-center rounded-r-md border bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600"
-      >
-        Next
-      </a>
+      <!-- Pagination Controls -->
+      <div class="flex items-center space-x-2">
+        <!-- Previous Button -->
+        <button
+          @click="changePage(pagination.current_page - 1)"
+          :disabled="!pagination.has_prev_page"
+          :class="pagination.has_prev_page ? 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-800"
+        >
+          Previous
+        </button>
+
+        <!-- Page Numbers -->
+        <template
+          x-for="pageNum in Array.from({length: Math.min(5, pagination.total_pages)}, (_, i) => Math.max(1, pagination.current_page - 2) + i).filter(num => num <= pagination.total_pages)"
+          :key="pageNum"
+        >
+          <button
+            @click="changePage(pageNum)"
+            :class="pageNum === pagination.current_page ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'"
+            class="rounded-md border px-4 py-2 text-sm font-medium"
+            x-text="pageNum"
+          ></button>
+        </template>
+
+        <!-- Next Button -->
+        <button
+          @click="changePage(pagination.current_page + 1)"
+          :disabled="!pagination.has_next_page"
+          :class="pagination.has_next_page ? 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-800"
+        >
+          Next
+        </button>
+      </div>
     </div>
   </div>
 </div>

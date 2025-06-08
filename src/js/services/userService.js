@@ -12,7 +12,7 @@ import {
 } from "../utils/photoValidation.js";
 
 // Konfigurasi axios default
-axios.defaults.withCredentials = true; // Mengizinkan pengiriman cookie
+axios.defaults.withCredentials = true;
 
 /**
  * Mendapatkan token dari localStorage untuk header Authorization
@@ -513,9 +513,14 @@ async function getRoles() {
     const response = await axios.get(`${API_CONFIG.BASE_URL}/roles`, {
       headers: getAuthHeaders(),
     });
-
     if (response.data && response.data.success === true) {
-      const roles = response.data.data;
+      const rawRoles = response.data.data;
+
+      // Map API response to frontend expected structure
+      const roles = rawRoles.map((role) => ({
+        id: role.id_roles || role.id,
+        name: role.role_name || role.name,
+      }));
 
       // Cache the data
       localStorage.setItem(
@@ -583,9 +588,14 @@ async function getPrograms() {
     const response = await axios.get(`${API_CONFIG.BASE_URL}/programs`, {
       headers: getAuthHeaders(),
     });
-
     if (response.data && response.data.success === true) {
-      const programs = response.data.data;
+      const rawPrograms = response.data.data;
+
+      // Map API response to frontend expected structure
+      const programs = rawPrograms.map((program) => ({
+        id: program.id_programs || program.id,
+        name: program.program_name || program.name,
+      }));
 
       // Cache the data
       localStorage.setItem(
@@ -656,9 +666,15 @@ async function getPositions(programId = null) {
     const response = await axios.get(url.toString(), {
       headers: getAuthHeaders(),
     });
-
     if (response.data && response.data.success === true) {
-      const positions = response.data.data;
+      const rawPositions = response.data.data;
+
+      // Map API response to frontend expected structure
+      const positions = rawPositions.map((position) => ({
+        id: position.id_positions || position.id,
+        name: position.position_name || position.name,
+      }));
+
       envLog("debug", "Successfully fetched positions:", positions);
       return positions;
     } else {
@@ -718,9 +734,14 @@ async function getDivisions() {
     const response = await axios.get(`${API_CONFIG.BASE_URL}/divisions`, {
       headers: getAuthHeaders(),
     });
-
     if (response.data && response.data.success === true) {
-      const divisions = response.data.data;
+      const rawDivisions = response.data.data;
+
+      // Map API response to frontend expected structure
+      const divisions = rawDivisions.map((division) => ({
+        id: division.id_divisions || division.id,
+        name: division.division_name || division.name,
+      }));
 
       // Cache the data
       localStorage.setItem(

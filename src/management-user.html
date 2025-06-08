@@ -12,7 +12,15 @@
     </title>
   </head>
   <body
-    x-data="{ page: 'managementUser', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
+    x-data="{ 
+      page: 'managementUser', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false,
+      ...mapDetailModalState()
+    }"
     x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
          $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
@@ -49,7 +57,7 @@
             <!-- Breadcrumb End -->
             <!-- User Management Container with Alpine.js -->
             <div
-              x-data="{ ...userListAlpineData(), ...mapDetailModalState() }"
+              x-data="userListAlpineData()"
               x-init="init()"
               class="space-y-5 sm:space-y-6"
             >
@@ -57,7 +65,7 @@
               <include src="./partials/table/table-user.html"></include>
 
               <!-- Map Detail Modal -->
-              <include src="./partials/modal/map-detail-modal.html"></include>
+              <include src="./partials/modal/user-map-modal.html"></include>
             </div>
           </div>
         </main>

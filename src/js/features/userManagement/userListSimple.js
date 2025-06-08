@@ -8,6 +8,7 @@ import {
   updateUser,
   deleteUser,
 } from "../../services/userService.js";
+import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
 
 /**
  * Data dan metode Alpine.js untuk komponen daftar pengguna
@@ -106,15 +107,16 @@ function userListAlpineData() {
           role: user.role_name || user.role,
           position: user.position_name || user.position,
           nipNim: user.nip_nim || user.nipNim,
-          phoneNumber: user.phone || user.phoneNumber,
-          // Location data mapping
-          latitude: user.latitude || null,
-          longitude: user.longitude || null,
-          radius: user.radius || null,
-          description: user.description || null,
+          phoneNumber: user.phone || user.phoneNumber, // Location data mapping from nested location object
+          latitude: user.location?.latitude || null,
+          longitude: user.location?.longitude || null,
+          radius: user.location?.radius || null,
+          description: user.location?.description || null,
+          categoryName: user.location?.category_name || null,
+          locationId: user.location?.location_id || null,
           // Computed properties
-          initials: this.getInitials(user.full_name || user.fullName),
-          avatarColor: this.getAvatarColor(user.id),
+          initials: getInitials(user.full_name || user.fullName),
+          avatarColor: getAvatarColor(user.full_name || user.fullName),
         }));
 
         console.log(
@@ -228,76 +230,80 @@ function userListAlpineData() {
         `Pagination Info: Total Data=${this.filteredUsers.length}, Entries/Page=${this.entriesPerPage}, Total Pages=${totalPages}, Current Page=${this.currentPage}, Showing Pages=[${pages.join(",")}]`,
       );
       return pages;
-    },
-
-    /**
+    } /**
      * Menangani aksi view pengguna
-     */
+     */,
     viewUser(userId) {
       console.log("View user:", userId);
       // TODO: Implementasi modal view atau navigasi ke detail
     },
 
     /**
-     * Menangani aksi edit pengguna
-     */
-    editUser(userId) {
-      console.log("Edit user:", userId);
-      // TODO: Implementasi navigasi ke halaman edit
-      // window.location.href = `form-user.html?id=${userId}`;
-    },
-
-    /**
-     * Menangani aksi hapus pengguna
-     */
-    deleteUser(userId) {
-      console.log("Delete user:", userId);
-      if (confirm("Are you sure you want to delete this user?")) {
-        // TODO: Implementasi API call untuk delete
-        this.users = this.users.filter((user) => user.id !== userId);
-      }
-    },
-
-    /**
-     * Mendapatkan inisial dari nama lengkap untuk avatar
-     * @param {string} fullName - Nama lengkap pengguna
-     * @returns {string} - Inisial (maksimal 2 karakter)
+     * Wrapper methods for template usage
      */
     getInitials(fullName) {
-      if (!fullName) return "U";
-
-      const names = fullName.trim().split(" ");
-      if (names.length === 1) {
-        return names[0].charAt(0).toUpperCase();
-      } else {
-        return (
-          names[0].charAt(0) + names[names.length - 1].charAt(0)
-        ).toUpperCase();
-      }
+      return getInitials(fullName);
+    },
+    getAvatarColor(fullName) {
+      return getAvatarColor(fullName);
     },
 
     /**
-     * Mendapatkan warna avatar berdasarkan ID pengguna
-     * @param {string|number} userId - ID pengguna
-     * @returns {string} - Class CSS untuk warna background
+     * Open map detail modal - using global modal function
      */
-    getAvatarColor(userId) {
-      const colors = [
-        "bg-blue-100 text-blue-600",
-        "bg-green-100 text-green-600",
-        "bg-purple-100 text-purple-600",
-        "bg-orange-100 text-orange-600",
-        "bg-red-100 text-red-600",
-        "bg-yellow-100 text-yellow-600",
-        "bg-pink-100 text-pink-600",
-        "bg-indigo-100 text-indigo-600",
-      ];
+    openMapDetailModal(user) {
+      console.log("Opening map detail modal for user:", user);
 
-      const index = (userId ? userId.toString().length : 0) % colors.length;
-      return colors[index];
+      // Prepare payload for global map modal
+      const locationPayload = {
+        fullName: user.fullName || user.full_name || "Unknown User",
+        email: user.email || "-",
+        position: user.position || user.position_name || "-",
+        phoneNumber: user.phoneNumber || user.phone || "-",
+        latitude: user.latitude || null,
+        longitude: user.longitude || null,
+        radius: user.radius || 100, // Default radius 100m
+        description: user.description || "Lokasi pengguna",
+        categoryName: user.categoryName || "",
+      };
+
+      console.log("Mapped location data:", locationPayload);
+
+      // Call global function to open map modal
+      if (typeof window.openMapDetailModal === "function") {
+        window.openMapDetailModal(locationPayload);
+      } else {
+        console.warn("openMapDetailModal function not found");
+        // Fallback: show coordinates in alert
+        if (locationPayload.latitude && locationPayload.longitude) {
+          alert(
+            `Koordinat: ${locationPayload.latitude}, ${locationPayload.longitude}`,
+          );
+        } else {
+          alert("Koordinat lokasi tidak tersedia");
+        }
+      }
     } /**
-     * Menangani aksi edit pengguna
+     * Wrapper method for template - Get initials from full name
+     * @param {string} fullName - Full name of the user
+     * @returns {string} - User initials
      */,
+    getInitials(fullName) {
+      return getInitials(fullName);
+    },
+
+    /**
+     * Wrapper method for template - Get avatar color based on name
+     * @param {string} fullName - Full name of the user
+     * @returns {string} - CSS class for avatar color
+     */
+    getAvatarColor(fullName) {
+      return getAvatarColor(fullName);
+    },
+
+    /**
+     * Menangani aksi edit pengguna
+     */
     editUser(userId) {
       console.log("Edit user:", userId);
       // Navigate to form page with user ID for editing
@@ -345,6 +351,8 @@ function userListAlpineData() {
 
         // Tutup modal
         this.closeDeleteModal();
+
+        await this.fetchUsers();
 
         // Tampilkan pesan sukses
         this.showSuccessModal(

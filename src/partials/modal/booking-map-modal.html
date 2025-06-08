@@ -60,7 +60,7 @@
         Informasi lokasi dan detail booking Work From Anywhere
       </p>
     </div>
-    
+
     <!-- Modal Body -->
     <div class="modal-body flex flex-1 flex-col gap-6 lg:flex-row">
       <!-- Left Panel - Booking Information -->
@@ -115,6 +115,17 @@
                 x-text="selectedBookingLocation.status"
               ></span>
             </div>
+            <div>
+              <label
+                class="text-sm font-medium text-gray-600 dark:text-gray-400"
+              >
+                Notes
+              </label>
+              <p
+                class="text-base text-gray-900 dark:text-white"
+                x-text="selectedBookingLocation.notes || '-'"
+              ></p>
+            </div>
           </div>
         </div>
 
@@ -128,22 +139,11 @@
               <label
                 class="text-sm font-medium text-gray-600 dark:text-gray-400"
               >
-                Start Date
+                Schedule Date
               </label>
               <p
                 class="text-base text-gray-900 dark:text-white"
-                x-text="formatDateTime(selectedBookingLocation.start_date)"
-              ></p>
-            </div>
-            <div>
-              <label
-                class="text-sm font-medium text-gray-600 dark:text-gray-400"
-              >
-                End Date
-              </label>
-              <p
-                class="text-base text-gray-900 dark:text-white"
-                x-text="formatDateTime(selectedBookingLocation.end_date)"
+                x-text="formatDateTime(selectedBookingLocation.schedule_date)"
               ></p>
             </div>
             <div>
@@ -177,17 +177,6 @@
               <p
                 class="font-mono text-base text-gray-900 dark:text-white"
                 x-text="selectedBookingLocation.longitude || '-'"
-              ></p>
-            </div>
-            <div x-show="selectedBookingLocation.notes">
-              <label
-                class="text-sm font-medium text-gray-600 dark:text-gray-400"
-              >
-                Notes
-              </label>
-              <p
-                class="text-base text-gray-900 dark:text-white"
-                x-text="selectedBookingLocation.notes"
               ></p>
             </div>
           </div>
@@ -260,7 +249,7 @@
           </button>
         </div>
       </template>
-      
+
       <button
         class="bg-primary hover:bg-primary/90 focus:bg-primary/90 rounded-lg px-6 py-3 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
         @click="isBookingMapModalOpen = false"

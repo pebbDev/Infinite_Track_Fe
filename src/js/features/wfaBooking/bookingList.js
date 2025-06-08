@@ -8,10 +8,7 @@ import {
   updateBookingStatus,
   deleteBooking,
 } from "../../services/bookingService.js";
-import {
-  formatDateTime,
-  formatDate,
-} from "../../utils/dateTimeFormatter.js";
+import { formatDateTime, formatDate } from "../../utils/dateTimeFormatter.js";
 import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
 
 /**
@@ -21,7 +18,8 @@ import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
 export function bookingListAlpineData() {
   return {
     // State data
-    bookings: [],    pagination: {
+    bookings: [],
+    pagination: {
       current_page: 1,
       total_pages: 1,
       total_items: 0,
@@ -40,9 +38,9 @@ export function bookingListAlpineData() {
       limit: 10,
     },
     isLoading: true,
-    errorMessage: "",    // Search term untuk input
+    errorMessage: "", // Search term untuk input
     searchTerm: "",
-    statusFilter: "",    // Modal states
+    statusFilter: "", // Modal states
     isDeleteModalOpen: false,
     deleteConfirmMessage: "",
     deleteTargetId: null,
@@ -61,7 +59,7 @@ export function bookingListAlpineData() {
       latitude: null,
       longitude: null,
       status: "",
-    },// Map modal states  
+    }, // Map modal states
     isBookingMapModalOpen: false,
     selectedBookingLocation: {
       title: "",
@@ -69,6 +67,17 @@ export function bookingListAlpineData() {
       latitude: null,
       longitude: null,
       radius: null,
+      // Complete booking data
+      id: null,
+      employee_name: "",
+      employee_id: "",
+      status: "",
+      start_date: "",
+      end_date: "",
+      schedule_date: "",
+      location_name: "",
+      notes: "",
+      phoneNumber: "", // Phone field that will be replaced with notes
     },
 
     // Legacy map modal (for compatibility)
@@ -102,50 +111,70 @@ export function bookingListAlpineData() {
      */
     async init() {
       await this.fetchBookings();
-    },
-
-    /**
+    } /**
      * Fetch booking data dari API
-     */
+     */,
     async fetchBookings() {
       try {
         this.isLoading = true;
-        this.errorMessage = "";        const response = await getBookings(this.filters);
-        
+        this.errorMessage = "";
+
+        const response = await getBookings(this.filters);
+
+        // Handle different API response structures
+        const bookingsData = response.data?.bookings || response.bookings || [];
+        const paginationData =
+          response.data?.pagination || response.pagination || {};
+
         // Map API response to expected template format
-        this.bookings = (response.data?.bookings || []).map(booking => ({
+        this.bookings = bookingsData.map((booking) => ({
           // Map API fields to template expected fields
-          id: booking.booking_id,
-          employee_name: booking.user_full_name,
-          employee_id: booking.user_nip_nim,
-          employee_email: booking.user_email,
-          employee_position: booking.user_position_name,
-          employee_role: booking.user_role_name,
-          start_date: booking.schedule_date,
-          end_date: booking.schedule_date, // Same as start for single day booking
+          id: booking.booking_id || booking.id,
+          employee_name: booking.user_full_name || booking.employee_name,
+          employee_id: booking.user_nip_nim || booking.employee_id,
+          employee_email: booking.user_email || booking.employee_email,
+          employee_position:
+            booking.user_position_name || booking.employee_position,
+          employee_role: booking.user_role_name || booking.employee_role,
+          start_date: booking.schedule_date || booking.start_date,
+          end_date: booking.schedule_date || booking.end_date, // Same as start for single day booking
           schedule_date: booking.schedule_date,
           status: booking.status,
-          location_name: booking.location?.description || 'N/A',
-          location_latitude: booking.location?.latitude,
-          location_longitude: booking.location?.longitude,
-          location_radius: booking.location?.radius,
-          notes: booking.notes,
+          location_name:
+            booking.location?.description || booking.location_name || "N/A",
+          location_latitude: booking.location?.latitude || booking.latitude,
+          location_longitude: booking.location?.longitude || booking.longitude,
+          location_radius: booking.location?.radius || booking.radius || 100,
+          notes: booking.notes || booking.note || "",
           created_at: booking.created_at,
           processed_at: booking.processed_at,
           approved_by: booking.approved_by,
           // Keep original data for reference
-          original: booking
+          original: booking,
         }));
+
+        // Handle pagination with fallbacks
         this.pagination = {
-          current_page: response.data?.pagination?.current_page || 1,
-          total_pages: response.data?.pagination?.total_pages || 1,
-          total_items: response.data?.pagination?.total_items || 0,
-          total_records: response.data?.pagination?.total_items || 0, // Alias for table compatibility
-          items_per_page: response.data?.pagination?.items_per_page || 10,
-          per_page: response.data?.pagination?.items_per_page || 10, // Alias for table compatibility
-          has_next_page: (response.data?.pagination?.current_page || 1) < (response.data?.pagination?.total_pages || 1),
-          has_prev_page: (response.data?.pagination?.current_page || 1) > 1,
+          current_page: paginationData.current_page || 1,
+          total_pages: paginationData.total_pages || 1,
+          total_items: paginationData.total_items || paginationData.total || 0,
+          total_records:
+            paginationData.total_items || paginationData.total || 0, // Alias for table compatibility
+          items_per_page:
+            paginationData.items_per_page || paginationData.per_page || 10,
+          per_page:
+            paginationData.items_per_page || paginationData.per_page || 10, // Alias for table compatibility
+          has_next_page:
+            (paginationData.current_page || 1) <
+            (paginationData.total_pages || 1),
+          has_prev_page: (paginationData.current_page || 1) > 1,
         };
+
+        // Log successful data fetch for debugging
+        console.log("Bookings fetched successfully:", {
+          count: this.bookings.length,
+          pagination: this.pagination,
+        });
       } catch (error) {
         this.errorMessage = error.message || "Gagal memuat data booking";
         console.error("Error fetching bookings:", error);
@@ -162,9 +191,9 @@ export function bookingListAlpineData() {
       } finally {
         this.isLoading = false;
       }
-    },    /**
+    } /**
      * Handle search input dengan debounce
-     */
+     */,
     debouncedSearch() {
       this.handleSearchInput();
     },
@@ -189,11 +218,11 @@ export function bookingListAlpineData() {
 Detail Booking:
 - ID: ${booking.id}
 - Employee: ${booking.employee_name} (${booking.employee_id})
-- Position: ${booking.employee_position || '-'}
+- Position: ${booking.employee_position || "-"}
 - Schedule: ${this.formatDateTime(booking.schedule_date)}
-- Notes: ${booking.notes || '-'}
+- Notes: ${booking.notes || "-"}
 - Status: ${booking.status}
-- Location: ${booking.location_name || 'No Location'}
+- Location: ${booking.location_name || "No Location"}
 - Created: ${this.formatDateTime(booking.created_at)}
       `.trim();
 
@@ -224,17 +253,17 @@ Detail Booking:
         this.filters.page = 1; // Reset ke halaman pertama
         this.fetchBookings();
       }, 500);
-    },    /**
+    } /**
      * Handle status filter change
-     */
+     */,
     handleStatusFilter() {
       this.filters.status = this.statusFilter;
       this.filters.page = 1; // Reset ke halaman pertama
       this.fetchBookings();
-    },/**
+    } /**
      * Change page
      * @param {number} newPage - Nomor halaman baru
-     */
+     */,
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.pagination.total_pages) {
         this.filters.page = newPage;
@@ -271,68 +300,103 @@ Detail Booking:
       }
 
       return this.filters.sortOrder === "ASC" ? "↑" : "↓";
-    },    /**
+    } /**
      * View location detail
      * @param {Object} booking - Data booking item
-     */
+     */,
     viewLocationDetail(booking) {
-      // Siapkan payload untuk modal peta
+      // Check if coordinates are available
+      if (!booking.location_latitude || !booking.location_longitude) {
+        if (typeof window.showAlertModal === "function") {
+          window.showAlertModal({
+            type: "warning",
+            title: "Lokasi Tidak Tersedia",
+            message: "Data koordinat lokasi tidak tersedia untuk booking ini.",
+            buttonText: "OK",
+          });
+        }
+        return;
+      }
+
+      // Siapkan payload untuk modal peta dengan data booking lengkap
       const locationData = {
+        // Original location data
         title: `Lokasi Booking - ${booking.employee_name}`,
-        description: booking.location_name || booking.notes || "Lokasi booking WFA",
+        description:
+          booking.location_name || booking.notes || "Lokasi booking WFA",
         latitude: booking.location_latitude,
         longitude: booking.location_longitude,
         radius: booking.location_radius || 100, // Default radius 100m
+
+        // Complete booking data for modal
+        id: booking.id,
+        employee_name: booking.employee_name,
+        employee_id: booking.employee_id,
+        status: booking.status,
+        start_date: booking.start_date,
+        end_date: booking.end_date,
+        schedule_date: booking.schedule_date,
+        location_name: booking.location_name,
+        notes: booking.notes || "",
+        phoneNumber: booking.phone_number || booking.phoneNumber || "", // Add phone field that will be replaced with notes
       };
 
-      // Set state untuk kedua versi (compatibility)
-      this.mapDetailPayload = locationData;
+      // Set state untuk booking map modal only (tidak menggunakan map-detail-modal)
       this.selectedBookingLocation = locationData;
 
-      // Buka modal
-      this.isMapDetailModalOpen = true;
+      // Buka modal booking-map-modal.html saja
       this.isBookingMapModalOpen = true;
 
       // Initialize map setelah modal terbuka
       this.$nextTick(() => {
-        if (typeof window.initializeReadOnlyMap === "function") {
-          window.initializeReadOnlyMap("booking-location-map", locationData);
+        if (typeof window.bookingMapModal === "function") {
+          const mapModal = window.bookingMapModal();
+          if (typeof mapModal.initializeMap === "function") {
+            mapModal.initializeMap(locationData);
+          }
         }
       });
-    },    /**
-     * Close map detail modal
-     */
+    } /**
+     * Close booking map modal
+     */,
     closeMapDetailModal() {
-      this.isMapDetailModalOpen = false;
       this.isBookingMapModalOpen = false;
-      
-      // Clean up map
-      if (typeof window.mapDetailModal?.destroyMap === "function") {
-        window.mapDetailModal.destroyMap();
+      // Clean up booking map
+      if (typeof window.bookingMapModal === "function") {
+        const mapModal = window.bookingMapModal();
+        if (typeof mapModal.cleanup === "function") {
+          mapModal.cleanup();
+        }
       }
-      
-      // Reset data
-      this.selectedUserLocation = {
-        id: null,
-        fullName: "",
-        email: "",
-        position: "",
-        phoneNumber: "",
+
+      // Reset booking location data
+      this.selectedBookingLocation = {
+        title: "",
+        description: "",
         latitude: null,
         longitude: null,
         radius: null,
-        description: "",
+        id: null,
+        employee_name: "",
+        employee_id: "",
+        status: "",
+        start_date: "",
+        end_date: "",
+        schedule_date: "",
+        location_name: "",
+        notes: "",
+        phoneNumber: "",
       };
-    },/**
+    },
+
+    /**
      * Close booking map modal (alias for compatibility)
      */
     closeBookingMapModal() {
       this.closeMapDetailModal();
-    },
-
-    /**
+    } /**
      * Open map detail modal (for general compatibility)
-     */
+     */,
     openMapDetailModal(location) {
       this.selectedUserLocation = {
         id: location.id || null,
@@ -345,38 +409,44 @@ Detail Booking:
         radius: location.radius || 100,
         description: location.description || "",
       };
-      
+
       this.isMapDetailModalOpen = true;
-      
+
       this.$nextTick(() => {
-        if (this.selectedUserLocation.latitude && this.selectedUserLocation.longitude) {
-          if (typeof window.mapDetailModal?.initializeMap === "function") {
-            window.mapDetailModal.initializeMap(this.selectedUserLocation);
+        if (
+          this.selectedUserLocation.latitude &&
+          this.selectedUserLocation.longitude
+        ) {
+          if (typeof window.bookingMapModal?.initializeMap === "function") {
+            window.bookingMapModal.initializeMap(this.selectedUserLocation);
           }
         }
       });
-    },
-
-    /**
+    } /**
      * Approve booking
      * @param {string|number} bookingId - ID booking yang akan diapprove
-     */
+     */,
     async approveBooking(bookingId) {
       try {
-        await updateBookingStatus(bookingId, "approved");
+        const response = await updateBookingStatus(bookingId, "approved");
 
-        // Tampilkan modal sukses
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
-            type: "success",
-            title: "Booking Disetujui",
-            message: "Booking berhasil disetujui.",
-            buttonText: "OK",
-          });
+        // Handle successful response
+        if (response.success || response.status === "success") {
+          // Tampilkan modal sukses
+          if (typeof window.showAlertModal === "function") {
+            window.showAlertModal({
+              type: "success",
+              title: "Booking Disetujui",
+              message: response.message || "Booking berhasil disetujui.",
+              buttonText: "OK",
+            });
+          }
+
+          // Refresh data
+          await this.fetchBookings();
+        } else {
+          throw new Error(response.message || "Gagal menyetujui booking");
         }
-
-        // Refresh data
-        await this.fetchBookings();
       } catch (error) {
         console.error("Error approving booking:", error);
 
@@ -385,33 +455,37 @@ Detail Booking:
           window.showAlertModal({
             type: "danger",
             title: "Gagal Menyetujui Booking",
-            message: error.message || "Terjadi kesalahan saat menyetujui booking.",
+            message:
+              error.message || "Terjadi kesalahan saat menyetujui booking.",
             buttonText: "OK",
           });
         }
       }
-    },
-
-    /**
+    } /**
      * Reject booking
      * @param {string|number} bookingId - ID booking yang akan direject
-     */
+     */,
     async rejectBooking(bookingId) {
       try {
-        await updateBookingStatus(bookingId, "rejected");
+        const response = await updateBookingStatus(bookingId, "rejected");
 
-        // Tampilkan modal sukses
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
-            type: "success",
-            title: "Booking Ditolak",
-            message: "Booking berhasil ditolak.",
-            buttonText: "OK",
-          });
+        // Handle successful response
+        if (response.success || response.status === "success") {
+          // Tampilkan modal sukses
+          if (typeof window.showAlertModal === "function") {
+            window.showAlertModal({
+              type: "success",
+              title: "Booking Ditolak",
+              message: response.message || "Booking berhasil ditolak.",
+              buttonText: "OK",
+            });
+          }
+
+          // Refresh data
+          await this.fetchBookings();
+        } else {
+          throw new Error(response.message || "Gagal menolak booking");
         }
-
-        // Refresh data
-        await this.fetchBookings();
       } catch (error) {
         console.error("Error rejecting booking:", error);
 
@@ -436,29 +510,46 @@ Detail Booking:
       this.deleteConfirmMessage =
         "Apakah Anda yakin ingin menghapus data booking ini? Tindakan ini tidak dapat dibatalkan.";
       this.isDeleteModalOpen = true;
-    },
-
-    /**
+    } /**
      * Execute delete booking (dipanggil dari modal)
-     */
+     */,
     async executeDelete() {
       if (!this.deleteTargetId) return;
 
       try {
-        await deleteBooking(this.deleteTargetId);
+        const response = await deleteBooking(this.deleteTargetId);
 
         // Tutup modal
         this.isDeleteModalOpen = false;
         this.deleteTargetId = null;
 
-        // Tampilkan modal sukses
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
-            type: "success",
-            title: "Data Booking Dihapus",
-            message: "Data booking berhasil dihapus dari sistem.",
-            buttonText: "OK",
-          });
+        // Handle successful response
+        if (
+          response.success ||
+          response.status === "success" ||
+          response.message
+        ) {
+          // Tampilkan modal sukses
+          if (typeof window.showAlertModal === "function") {
+            window.showAlertModal({
+              type: "success",
+              title: "Data Booking Dihapus",
+              message:
+                response.message ||
+                "Data booking berhasil dihapus dari sistem.",
+              buttonText: "OK",
+            });
+          }
+        } else {
+          // Tampilkan modal sukses default jika tidak ada response message
+          if (typeof window.showAlertModal === "function") {
+            window.showAlertModal({
+              type: "success",
+              title: "Data Booking Dihapus",
+              message: "Data booking berhasil dihapus dari sistem.",
+              buttonText: "OK",
+            });
+          }
         }
 
         // Refresh data
@@ -475,7 +566,8 @@ Detail Booking:
           window.showAlertModal({
             type: "danger",
             title: "Gagal Menghapus Data",
-            message: error.message || "Terjadi kesalahan saat menghapus data booking.",
+            message:
+              error.message || "Terjadi kesalahan saat menghapus data booking.",
             buttonText: "OK",
           });
         }
@@ -543,17 +635,17 @@ Detail Booking:
      */
     getInitials(fullName) {
       return getInitials(fullName);
-    },    /**
+    } /**
      * Get avatar color menggunakan utility function
      * @param {string} fullName - Full name
      * @returns {string} - CSS classes for avatar
-     */
+     */,
     getAvatarColor(fullName) {
       return getAvatarColor(fullName);
-    },    /**
+    } /**
      * View booking detail
      * @param {Object} booking - Booking object
-     */
+     */,
     viewBookingDetail(booking) {
       this.bookingDetailData = {
         id: booking.id,
@@ -569,61 +661,19 @@ Detail Booking:
         status: booking.status,
       };
       this.isBookingDetailModalOpen = true;
-      
+
       // Initialize map if coordinates are available
       this.$nextTick(() => {
-        if (this.bookingDetailData.latitude && this.bookingDetailData.longitude) {
+        if (
+          this.bookingDetailData.latitude &&
+          this.bookingDetailData.longitude
+        ) {
           this.initBookingDetailMap();
         }
       });
-    },
-
-    /**
-     * View location detail in map modal
-     * @param {Object} booking - Booking object
-     */
-    viewLocationDetail(booking) {
-      if (!booking.location_latitude || !booking.location_longitude) {
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
-            type: "warning",
-            title: "Lokasi Tidak Tersedia",
-            message: "Data koordinat lokasi tidak tersedia untuk booking ini.",
-            buttonText: "OK",
-          });
-        }
-        return;
-      }
-
-      // Set data untuk map detail modal (menggunakan struktur yang sama dengan attendance)
-      this.selectedUserLocation = {
-        id: booking.id,
-        fullName: booking.employee_name,
-        email: booking.employee_email || "-",
-        position: booking.employee_position || "-",
-        phoneNumber: "-", // Not available in booking data
-        latitude: booking.location_latitude,
-        longitude: booking.location_longitude,
-        radius: booking.location_radius || 100,
-        description: booking.location_name || "Lokasi Booking",
-      };
-
-      // Open map detail modal
-      this.isMapDetailModalOpen = true;
-      
-      // Initialize map
-      this.$nextTick(() => {
-        if (this.selectedUserLocation.latitude && this.selectedUserLocation.longitude) {
-          if (typeof window.mapDetailModal?.initializeMap === "function") {
-            window.mapDetailModal.initializeMap(this.selectedUserLocation);
-          }
-        }
-      });
-    },
-
-    /**
+    } /**
      * Close booking detail modal
-     */
+     */,
     closeBookingDetailModal() {
       this.isBookingDetailModalOpen = false;
       this.bookingDetailData = {
@@ -639,42 +689,49 @@ Detail Booking:
         longitude: null,
         status: "",
       };
-    },    /**
+    } /**
      * Initialize map for booking detail modal
-     */
+     */,
     initBookingDetailMap() {
       // Initialize map similar to map-detail-modal
-      const mapContainer = document.getElementById('booking-detail-map-container');
-      if (!mapContainer || !this.bookingDetailData.latitude || !this.bookingDetailData.longitude) {
+      const mapContainer = document.getElementById(
+        "booking-detail-map-container",
+      );
+      if (
+        !mapContainer ||
+        !this.bookingDetailData.latitude ||
+        !this.bookingDetailData.longitude
+      ) {
         console.warn("Map container or coordinates not available");
         return;
       }
 
       // Check if Leaflet is available
-      if (typeof L === 'undefined') {
+      if (typeof L === "undefined") {
         console.error("Leaflet library not loaded");
         return;
       }
 
       try {
         // Clear existing map
-        mapContainer.innerHTML = '';
+        mapContainer.innerHTML = "";
 
         // Create map
         const map = L.map(mapContainer).setView(
-          [this.bookingDetailData.latitude, this.bookingDetailData.longitude], 
-          16
+          [this.bookingDetailData.latitude, this.bookingDetailData.longitude],
+          16,
         );
 
         // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
         }).addTo(map);
 
         // Add marker
-        const marker = L.marker([this.bookingDetailData.latitude, this.bookingDetailData.longitude])
-          .addTo(map)
-          .bindPopup(`
+        const marker = L.marker([
+          this.bookingDetailData.latitude,
+          this.bookingDetailData.longitude,
+        ]).addTo(map).bindPopup(`
             <div class="p-2">
               <h6 class="font-semibold">${this.bookingDetailData.fullName}</h6>
               <p class="text-sm">${this.bookingDetailData.locationName}</p>

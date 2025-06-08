@@ -210,43 +210,44 @@
                 :class="getStatusBadgeClass(booking.status)"
                 x-text="booking.status"
               ></span>
-            </td>
-              <!-- Actions -->
+            </td>            <!-- Actions -->
             <td class="px-6 py-4 text-sm whitespace-nowrap">
               <div class="flex items-center space-x-2">
-                <!-- View/Detail Button -->
-                <button
-                  @click="viewBookingDetail(booking)"
-                  class="rounded p-2 text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-blue-900/20"
-                  title="Lihat detail booking"
-                >
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                </button>
-                
-                <!-- Approve Button (only for pending status) -->
+                <!-- Approve and Reject Buttons (only for pending status) -->
                 <template x-if="booking.status === 'pending'">
-                  <button
-                    @click="approveBooking(booking.id)"
-                    class="rounded p-2 text-green-600 hover:bg-green-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-1 dark:hover:bg-green-900/20"
-                    title="Approve booking"
-                  >
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                  </button>
+                  <div class="flex items-center space-x-2">
+                    <!-- Approve Button -->
+                    <button
+                      @click="approveBooking(booking.id)"
+                      class="rounded p-2 text-green-600 hover:bg-green-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-1 dark:hover:bg-green-900/20"
+                      title="Approve booking"
+                    >
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </button>
+                    
+                    <!-- Reject Button -->
+                    <button
+                      @click="rejectBooking(booking.id)"
+                      class="rounded p-2 text-red-600 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-1 dark:hover:bg-red-900/20"
+                      title="Reject booking"
+                    >
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </template>
                 
-                <!-- Delete Button -->
+                <!-- Delete Button (always shown) -->
                 <button
                   @click="confirmDelete(booking.id)"
-                  class="rounded p-2 text-red-600 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-1 dark:hover:bg-red-900/20"
+                  class="rounded p-2 text-gray-600 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 dark:hover:bg-gray-900/20"
                   title="Hapus booking"
                 >
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
                 </button>
               </div>

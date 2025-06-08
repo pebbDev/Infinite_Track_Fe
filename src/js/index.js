@@ -128,6 +128,133 @@ Alpine.data("mapDetailModalState", () => ({
   },
 }));
 
+// Global Alpine.js state for Booking Map Modal
+Alpine.data("bookingMapModalState", () => ({
+  isBookingMapModalOpen: false,
+  selectedBookingLocation: {
+    title: "",
+    description: "",
+    latitude: null,
+    longitude: null,
+    radius: null,
+    // Complete booking data
+    id: null,
+    employee_name: "",
+    employee_id: "",
+    status: "",
+    start_date: "",
+    end_date: "",
+    schedule_date: "",
+    location_name: "",
+    notes: "",
+  },
+  openBookingMapModal(booking) {
+    // Set booking location data
+    this.selectedBookingLocation = {
+      title: booking.location_name || "WFA Location",
+      description:
+        booking.notes ||
+        booking.description ||
+        "Work From Anywhere booking location",
+      latitude: booking.latitude || booking.lat || null,
+      longitude: booking.longitude || booking.lng || null,
+      radius: booking.radius || 100,
+      // Complete booking data
+      id: booking.id,
+      employee_name: booking.employee_name || booking.full_name || "",
+      employee_id: booking.employee_id || booking.user_id || "",
+      status: booking.status || "pending",
+      start_date: booking.start_date,
+      end_date: booking.end_date,
+      schedule_date: booking.schedule_date,
+      location_name: booking.location_name || "",
+      notes: booking.notes || "",
+    };
+
+    // Debug log untuk membantu troubleshooting
+    console.log("Opening booking map modal for booking:", booking);
+    console.log("Mapped booking location data:", this.selectedBookingLocation);
+
+    // Open modal regardless of coordinates availability
+    this.isBookingMapModalOpen = true;
+
+    // Initialize map only if coordinates are available
+    this.$nextTick(() => {
+      if (
+        this.selectedBookingLocation.latitude &&
+        this.selectedBookingLocation.longitude
+      ) {
+        if (typeof window.bookingMapModal === "function") {
+          window.bookingMapModal().initializeMap(this.selectedBookingLocation);
+        } else {
+          console.warn("window.bookingMapModal function not found");
+        }
+      }
+    });
+  },
+
+  closeBookingMapModal() {
+    this.isBookingMapModalOpen = false;
+    // Clean up map if available
+    if (typeof window.bookingMapModal === "function") {
+      const modalInstance = window.bookingMapModal();
+      if (modalInstance.cleanup) {
+        modalInstance.cleanup();
+      }
+    }
+    // Reset data
+    this.selectedBookingLocation = {
+      title: "",
+      description: "",
+      latitude: null,
+      longitude: null,
+      radius: null,
+      id: null,
+      employee_name: "",
+      employee_id: "",
+      status: "",
+      start_date: "",
+      end_date: "",
+      schedule_date: "",
+      location_name: "",
+      notes: "",
+    };
+  },
+
+  // Format date time for display
+  formatDateTime(dateString) {
+    if (!dateString) return "-";
+
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("id-ID", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      return dateString;
+    }
+  },
+
+  // Get status badge class for styling
+  getStatusBadgeClass(status) {
+    const statusClasses = {
+      pending:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+      approved:
+        "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+      rejected: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+      cancelled:
+        "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
+    };
+
+    return statusClasses[status?.toLowerCase()] || statusClasses.pending;
+  },
+}));
+
 // Make map detail modal functions globally available
 window.openMapDetailModal = function (user) {
   // Get the Alpine component instance

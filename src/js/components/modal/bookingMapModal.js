@@ -19,7 +19,7 @@ const bookingMapModal = () => {
         const lng = parseFloat(booking.longitude);
 
         if (!lat || !lng) {
-          console.warn('Invalid coordinates for booking map');
+          console.warn("Invalid coordinates for booking map");
           return;
         }
 
@@ -29,12 +29,12 @@ const bookingMapModal = () => {
         }
 
         // Initialize Leaflet map
-        this.map = L.map('bookingMapContainer').setView([lat, lng], 15);
+        this.map = L.map("bookingMapContainer").setView([lat, lng], 15);
 
         // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors',
-          maxZoom: 19
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+          maxZoom: 19,
         }).addTo(this.map);
 
         // Create custom icon for booking location
@@ -49,18 +49,20 @@ const bookingMapModal = () => {
               <div class="marker-pulse bg-blue-500"></div>
             </div>
           `,
-          className: 'custom-booking-marker',
+          className: "custom-booking-marker",
           iconSize: [30, 30],
-          iconAnchor: [15, 30]
+          iconAnchor: [15, 30],
         });
 
         // Add marker
-        this.marker = L.marker([lat, lng], { icon: bookingIcon }).addTo(this.map);
+        this.marker = L.marker([lat, lng], { icon: bookingIcon }).addTo(
+          this.map,
+        );
 
         // Create popup content
         const popupContent = `
           <div class="booking-popup">
-            <h3 class="font-semibold text-sm mb-2">${booking.location_name || 'WFA Location'}</h3>
+            <h3 class="font-semibold text-sm mb-2">${booking.location_name || "WFA Location"}</h3>
             <p class="text-xs text-gray-600 mb-1">
               <strong>Employee:</strong> ${booking.employee_name}
             </p>
@@ -78,10 +80,10 @@ const bookingMapModal = () => {
         // Add circle to show approximate area (if radius available)
         if (booking.radius) {
           L.circle([lat, lng], {
-            color: '#3B82F6',
-            fillColor: '#3B82F6',
+            color: "#3B82F6",
+            fillColor: "#3B82F6",
             fillOpacity: 0.1,
-            radius: booking.radius
+            radius: booking.radius,
           }).addTo(this.map);
         }
 
@@ -91,24 +93,23 @@ const bookingMapModal = () => {
             this.map.invalidateSize();
           }
         }, 300);
-
       } catch (error) {
-        console.error('Error initializing booking map:', error);
+        console.error("Error initializing booking map:", error);
       }
     },
 
     // Format date time for display
     formatDateTime(dateString) {
-      if (!dateString) return '-';
-      
+      if (!dateString) return "-";
+
       try {
         const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
+        return date.toLocaleDateString("id-ID", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
         });
       } catch (error) {
         return dateString;
@@ -118,12 +119,16 @@ const bookingMapModal = () => {
     // Get status badge class for styling
     getStatusBadgeClass(status) {
       const statusClasses = {
-        'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-        'approved': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-        'rejected': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-        'cancelled': 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+        pending:
+          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+        approved:
+          "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+        rejected:
+          "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+        cancelled:
+          "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
       };
-      
+
       return statusClasses[status?.toLowerCase()] || statusClasses.pending;
     },
 
@@ -134,7 +139,7 @@ const bookingMapModal = () => {
         this.map = null;
         this.marker = null;
       }
-    }
+    },
   };
 };
 
@@ -209,9 +214,9 @@ const bookingMapStyles = `
 `;
 
 // Inject styles if not already present
-if (!document.querySelector('#booking-map-styles')) {
-  const styleElement = document.createElement('div');
-  styleElement.id = 'booking-map-styles';
+if (!document.querySelector("#booking-map-styles")) {
+  const styleElement = document.createElement("div");
+  styleElement.id = "booking-map-styles";
   styleElement.innerHTML = bookingMapStyles;
   document.head.appendChild(styleElement);
 }

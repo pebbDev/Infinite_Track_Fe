@@ -23,10 +23,12 @@ import "./components/image-resize";
 import "./components/modal/modalAlert.js";
 import "./components/modal/deleteModal.js";
 import "./components/modal/mapDetailModal.js";
+import "./components/modal/bookingMapModal.js";
 import "./components/logoutComponent.js";
 import "./utils/storageManager.js";
 import "./services/authService.js";
 import "./services/userService.js";
+import "./services/bookingService.js";
 import "./features/signinHandler.js";
 import "./stores/authStore.js";
 import "./utils/authGuard.js";
@@ -40,6 +42,7 @@ import { initRoleBasedAccess } from "./utils/roleBasedAccess.js";
 import { userListAlpineData } from "./features/userManagement/userListSimple.js";
 import { userFormAlpineData } from "./features/userManagement/userForm.js";
 import { attendanceLogAlpineData } from "./features/attendance/attendanceLog.js";
+import { bookingListAlpineData } from "./features/wfaBooking/bookingList.js";
 import { getUserPhotoUrl } from "./utils/photoValidation.js";
 
 Alpine.plugin(persist);
@@ -49,6 +52,7 @@ window.Alpine = Alpine;
 window.userListAlpineData = userListAlpineData;
 window.userFormAlpineData = userFormAlpineData;
 window.attendanceLogAlpineData = attendanceLogAlpineData;
+window.bookingListAlpineData = bookingListAlpineData;
 
 // Expose utility functions to window for use in HTML
 window.getUserPhotoUrl = getUserPhotoUrl;

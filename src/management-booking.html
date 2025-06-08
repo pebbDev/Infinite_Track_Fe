@@ -10,8 +10,7 @@
     <title>
       Management Booking | TailAdmin - Tailwind CSS Admin Dashboard Template
     </title>
-  </head>
-  <body
+  </head>  <body
     x-data="{ 
       page: 'managementBooking', 
       'loaded': true, 
@@ -19,20 +18,7 @@
       'stickyMenu': false, 
       'sidebarToggle': false, 
       'scrollTop': false,
-      'isBookingDetailModalOpen': false,
-      'isDeleteModalOpen': false,
-      'deleteConfirmMessage': '',
-      'bookingDetailData': {
-        userId: '',
-        fullName: '',
-        role: '',
-        position: '',
-        jadwalBooking: '',
-        notes: '',
-        koordinat: '',
-        latitude: '',
-        longitude: ''
-      }
+      ...window.bookingListAlpineData()
     }"
     x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
@@ -79,11 +65,9 @@
       </div>
       <!-- ===== Content Area End ===== -->
     </div>
-    <!-- ===== Page Wrapper End ===== -->
-
-    <!-- ===== Booking Detail Modal Start ===== -->
-    <include src="./partials/modal/booking-detail-modal.html"></include>
-    <!-- ===== Booking Detail Modal End ===== -->
+    <!-- ===== Page Wrapper End ===== -->    <!-- ===== Booking Map Modal Start ===== -->
+    <include src="./partials/modal/booking-map-modal.html"></include>
+    <!-- ===== Booking Map Modal End ===== -->
 
     <!-- ===== Delete Confirmation Modal Start ===== -->
     <include src="./partials/modal/delete-confirmation-modal.html"></include>

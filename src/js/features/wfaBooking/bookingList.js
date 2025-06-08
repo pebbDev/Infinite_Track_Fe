@@ -205,9 +205,7 @@ export function bookingListAlpineData() {
       this.filters.status = this.statusFilter;
       this.filters.page = 1; // Reset ke halaman pertama
       this.fetchBookings();
-    },
-
-    /**
+    },    /**
      * View booking detail
      * @param {Object} booking - Data booking item
      */
@@ -219,7 +217,7 @@ Detail Booking:
 - ID: ${booking.id}
 - Employee: ${booking.employee_name} (${booking.employee_id})
 - Position: ${booking.employee_position || "-"}
-- Schedule: ${this.formatDateTime(booking.schedule_date)}
+- Schedule: ${this.formatDate(booking.schedule_date)}
 - Notes: ${booking.notes || "-"}
 - Status: ${booking.status}
 - Location: ${booking.location_name || "No Location"}

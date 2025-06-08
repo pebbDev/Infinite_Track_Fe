@@ -39,6 +39,7 @@ import { isAuthenticated, getCurrentUser } from "./services/authService.js";
 import { getUserFromStorage } from "./utils/storageManager.js";
 import { initAuthStore } from "./stores/authStore.js";
 import { initRoleBasedAccess } from "./utils/roleBasedAccess.js";
+import { formatDate } from "./utils/dateTimeFormatter.js";
 import { userListAlpineData } from "./features/userManagement/userListSimple.js";
 import { userFormAlpineData } from "./features/userManagement/userForm.js";
 import { attendanceLogAlpineData } from "./features/attendance/attendanceLog.js";
@@ -220,7 +221,6 @@ Alpine.data("bookingMapModalState", () => ({
       notes: "",
     };
   },
-
   // Format date time for display
   formatDateTime(dateString) {
     if (!dateString) return "-";
@@ -237,6 +237,11 @@ Alpine.data("bookingMapModalState", () => ({
     } catch (error) {
       return dateString;
     }
+  },
+
+  // Format date for display (date only, no time)
+  formatDate(dateString) {
+    return formatDate(dateString);
   },
 
   // Get status badge class for styling

@@ -3,6 +3,8 @@
  * Handles the display and interaction of booking location details in a modal with map
  */
 
+import { formatDate, formatDateTime } from '../../utils/dateTimeFormatter.js';
+
 const bookingMapModal = () => {
   return {
     // Initialize the booking map modal component
@@ -57,9 +59,7 @@ const bookingMapModal = () => {
         // Add marker
         this.marker = L.marker([lat, lng], { icon: bookingIcon }).addTo(
           this.map,
-        );
-
-        // Create popup content
+        );        // Create popup content
         const popupContent = `
           <div class="booking-popup">
             <h3 class="font-semibold text-sm mb-2">${booking.location_name || "WFA Location"}</h3>
@@ -67,7 +67,7 @@ const bookingMapModal = () => {
               <strong>Employee:</strong> ${booking.employee_name}
             </p>
             <p class="text-xs text-gray-600 mb-1">
-              <strong>Period:</strong> ${this.formatDateTime(booking.start_date)} - ${this.formatDateTime(booking.end_date)}
+              <strong>Schedule:</strong> ${this.formatDate(booking.schedule_date)}
             </p>
             <p class="text-xs text-gray-600">
               <strong>Status:</strong> <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${this.getStatusBadgeClass(booking.status)}">${booking.status}</span>
@@ -96,9 +96,7 @@ const bookingMapModal = () => {
       } catch (error) {
         console.error("Error initializing booking map:", error);
       }
-    },
-
-    // Format date time for display
+    },    // Format date time for display
     formatDateTime(dateString) {
       if (!dateString) return "-";
 
@@ -114,6 +112,11 @@ const bookingMapModal = () => {
       } catch (error) {
         return dateString;
       }
+    },
+
+    // Format date for display (date only, no time)
+    formatDate(dateString) {
+      return formatDate(dateString);
     },
 
     // Get status badge class for styling

@@ -56,8 +56,7 @@
               <span>ID</span>
               <span x-text="getSortIcon('id')" class="text-primary"></span>
             </button>
-          </th>
-          <th
+          </th>          <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             <button
@@ -75,23 +74,23 @@
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             <button
-              @click="changeSort('start_date')"
+              @click="changeSort('employee_position')"
               class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
             >
-              <span>Start Date</span>
-              <span x-text="getSortIcon('start_date')" class="text-primary"></span>
+              <span>Position</span>
+              <span x-text="getSortIcon('employee_position')" class="text-primary"></span>
             </button>
           </th>
           <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             <button
-              @click="changeSort('end_date')"
+              @click="changeSort('schedule_date')"
               class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
             >
-              <span>End Date</span>
+              <span>Schedule Date</span>
               <span
-                x-text="getSortIcon('end_date')"
+                x-text="getSortIcon('schedule_date')"
                 class="text-primary"
               ></span>
             </button>
@@ -99,9 +98,13 @@
           <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Location
+            Notes
           </th>
           <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            Koordinat
+          </th>          <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             <button
@@ -110,17 +113,6 @@
             >
               <span>Status</span>
               <span x-text="getSortIcon('status')" class="text-primary"></span>
-            </button>
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
-          >
-            <button
-              @click="changeSort('created_at')"
-              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
-            >
-              <span>Created At</span>
-              <span x-text="getSortIcon('created_at')" class="text-primary"></span>
             </button>
           </th>
           <th
@@ -143,8 +135,7 @@
             >
               <span x-text="booking.id" class="font-medium"></span>
             </td>
-            
-            <!-- Employee -->
+              <!-- Employee -->
             <td class="px-6 py-4">
               <div class="flex items-center space-x-3">
                 <!-- User Avatar with Initials -->
@@ -167,21 +158,31 @@
               </div>
             </td>
             
-            <!-- Start Date -->
+            <!-- Position -->
             <td
               class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
             >
-              <span x-text="formatDateTime(booking.start_date)"></span>
+              <span x-text="booking.employee_position || '-'"></span>
             </td>
             
-            <!-- End Date -->
+            <!-- Schedule Date -->
             <td
               class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
             >
-              <span x-text="formatDateTime(booking.end_date)"></span>
+              <span x-text="formatDateTime(booking.schedule_date)"></span>
+            </td>            <!-- Notes -->
+            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+              <div class="max-w-xs max-h-10 overflow-hidden">
+                <div 
+                  x-text="booking.notes || '-'" 
+                  class="text-sm leading-5"
+                  :title="booking.notes"
+                  style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-clamp: 2;"
+                ></div>
+              </div>
             </td>
 
-            <!-- Location -->
+            <!-- Koordinat -->
             <td class="px-6 py-4 text-sm whitespace-nowrap">
               <button
                 @click="viewLocationDetail(booking)"
@@ -198,62 +199,42 @@
                     fill-rule="evenodd"
                     d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
                     clip-rule="evenodd"
-                  ></path>
-                </svg>
+                  ></path>                </svg>
                 <span
                   x-text="booking.location_name || 'No Location'"
                 ></span>
               </button>
-            </td>
-
-            <!-- Status -->
+            </td>            <!-- Status -->
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 :class="getStatusBadgeClass(booking.status)"
                 x-text="booking.status"
               ></span>
             </td>
-
-            <!-- Created At -->
-            <td
-              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
-            >
-              <span x-text="formatDateTime(booking.created_at)"></span>
-            </td>
-            
-            <!-- Actions -->
+              <!-- Actions -->
             <td class="px-6 py-4 text-sm whitespace-nowrap">
               <div class="flex items-center space-x-2">
+                <!-- View/Detail Button -->
+                <button
+                  @click="viewBookingDetail(booking)"
+                  class="rounded p-2 text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:hover:bg-blue-900/20"
+                  title="Lihat detail booking"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+                
                 <!-- Approve Button (only for pending status) -->
                 <template x-if="booking.status === 'pending'">
                   <button
                     @click="approveBooking(booking.id)"
-                    class="rounded p-1 text-green-600 hover:bg-green-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                    class="rounded p-2 text-green-600 hover:bg-green-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-1 dark:hover:bg-green-900/20"
                     title="Approve booking"
                   >
-                    <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </template>
-                
-                <!-- Reject Button (only for pending status) -->
-                <template x-if="booking.status === 'pending'">
-                  <button
-                    @click="rejectBooking(booking.id)"
-                    class="rounded p-1 text-yellow-600 hover:bg-yellow-50 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1"
-                    title="Reject booking"
-                  >
-                    <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
-                      <path
-                        fill-rule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                      />
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                   </button>
                 </template>
@@ -261,23 +242,17 @@
                 <!-- Delete Button -->
                 <button
                   @click="confirmDelete(booking.id)"
-                  class="rounded p-1 text-red-500 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-                  title="Delete booking"
+                  class="rounded p-2 text-red-600 hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-1 dark:hover:bg-red-900/20"
+                  title="Hapus booking"
                 >
-                  <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                      clip-rule="evenodd"
-                    />
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
                 </button>
               </div>
             </td>
           </tr>
-        </template>
-
-        <!-- Empty State -->
+        </template>        <!-- Empty State -->
         <template x-if="bookings.length === 0">
           <tr>
             <td colspan="8" class="px-6 py-12 text-center">

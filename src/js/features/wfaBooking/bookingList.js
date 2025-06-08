@@ -40,13 +40,28 @@ export function bookingListAlpineData() {
       limit: 10,
     },
     isLoading: true,
-    errorMessage: "",
-
-    // Search term untuk input
-    searchTerm: "",    // Modal states
+    errorMessage: "",    // Search term untuk input
+    searchTerm: "",
+    statusFilter: "",    // Modal states
     isDeleteModalOpen: false,
     deleteConfirmMessage: "",
-    deleteTargetId: null,    // Map modal states  
+    deleteTargetId: null,
+
+    // Booking Detail Modal states
+    isBookingDetailModalOpen: false,
+    bookingDetailData: {
+      id: null,
+      userId: "",
+      fullName: "",
+      role: "",
+      position: "",
+      scheduleDate: "",
+      notes: "",
+      locationName: "",
+      latitude: null,
+      longitude: null,
+      status: "",
+    },// Map modal states  
     isBookingMapModalOpen: false,
     selectedBookingLocation: {
       title: "",
@@ -147,6 +162,51 @@ export function bookingListAlpineData() {
       } finally {
         this.isLoading = false;
       }
+    },    /**
+     * Handle search input dengan debounce
+     */
+    debouncedSearch() {
+      this.handleSearchInput();
+    },
+
+    /**
+     * Apply filters (called when status filter changes)
+     */
+    applyFilters() {
+      this.filters.status = this.statusFilter;
+      this.filters.page = 1; // Reset ke halaman pertama
+      this.fetchBookings();
+    },
+
+    /**
+     * View booking detail
+     * @param {Object} booking - Data booking item
+     */
+    viewBookingDetail(booking) {
+      // Tampilkan alert dengan detail booking untuk sementara
+      // Bisa dikembangkan menjadi modal detail yang lebih lengkap
+      const details = `
+Detail Booking:
+- ID: ${booking.id}
+- Employee: ${booking.employee_name} (${booking.employee_id})
+- Position: ${booking.employee_position || '-'}
+- Schedule: ${this.formatDateTime(booking.schedule_date)}
+- Notes: ${booking.notes || '-'}
+- Status: ${booking.status}
+- Location: ${booking.location_name || 'No Location'}
+- Created: ${this.formatDateTime(booking.created_at)}
+      `.trim();
+
+      if (typeof window.showAlertModal === "function") {
+        window.showAlertModal({
+          type: "info",
+          title: "Detail Booking",
+          message: details,
+          buttonText: "OK",
+        });
+      } else {
+        alert(details);
+      }
     },
 
     /**
@@ -164,15 +224,14 @@ export function bookingListAlpineData() {
         this.filters.page = 1; // Reset ke halaman pertama
         this.fetchBookings();
       }, 500);
-    },
-
-    /**
+    },    /**
      * Handle status filter change
      */
     handleStatusFilter() {
+      this.filters.status = this.statusFilter;
       this.filters.page = 1; // Reset ke halaman pertama
       this.fetchBookings();
-    },    /**
+    },/**
      * Change page
      * @param {number} newPage - Nomor halaman baru
      */
@@ -484,15 +543,162 @@ export function bookingListAlpineData() {
      */
     getInitials(fullName) {
       return getInitials(fullName);
-    },
-
-    /**
+    },    /**
      * Get avatar color menggunakan utility function
      * @param {string} fullName - Full name
      * @returns {string} - CSS classes for avatar
      */
     getAvatarColor(fullName) {
       return getAvatarColor(fullName);
+    },    /**
+     * View booking detail
+     * @param {Object} booking - Booking object
+     */
+    viewBookingDetail(booking) {
+      this.bookingDetailData = {
+        id: booking.id,
+        userId: booking.employee_id,
+        fullName: booking.employee_name,
+        role: booking.employee_role || "Employee",
+        position: booking.employee_position || "-",
+        scheduleDate: booking.schedule_date,
+        notes: booking.notes || "Tidak ada catatan",
+        locationName: booking.location_name || "Tidak ada lokasi",
+        latitude: booking.location_latitude,
+        longitude: booking.location_longitude,
+        status: booking.status,
+      };
+      this.isBookingDetailModalOpen = true;
+      
+      // Initialize map if coordinates are available
+      this.$nextTick(() => {
+        if (this.bookingDetailData.latitude && this.bookingDetailData.longitude) {
+          this.initBookingDetailMap();
+        }
+      });
+    },
+
+    /**
+     * View location detail in map modal
+     * @param {Object} booking - Booking object
+     */
+    viewLocationDetail(booking) {
+      if (!booking.location_latitude || !booking.location_longitude) {
+        if (typeof window.showAlertModal === "function") {
+          window.showAlertModal({
+            type: "warning",
+            title: "Lokasi Tidak Tersedia",
+            message: "Data koordinat lokasi tidak tersedia untuk booking ini.",
+            buttonText: "OK",
+          });
+        }
+        return;
+      }
+
+      // Set data untuk map detail modal (menggunakan struktur yang sama dengan attendance)
+      this.selectedUserLocation = {
+        id: booking.id,
+        fullName: booking.employee_name,
+        email: booking.employee_email || "-",
+        position: booking.employee_position || "-",
+        phoneNumber: "-", // Not available in booking data
+        latitude: booking.location_latitude,
+        longitude: booking.location_longitude,
+        radius: booking.location_radius || 100,
+        description: booking.location_name || "Lokasi Booking",
+      };
+
+      // Open map detail modal
+      this.isMapDetailModalOpen = true;
+      
+      // Initialize map
+      this.$nextTick(() => {
+        if (this.selectedUserLocation.latitude && this.selectedUserLocation.longitude) {
+          if (typeof window.mapDetailModal?.initializeMap === "function") {
+            window.mapDetailModal.initializeMap(this.selectedUserLocation);
+          }
+        }
+      });
+    },
+
+    /**
+     * Close booking detail modal
+     */
+    closeBookingDetailModal() {
+      this.isBookingDetailModalOpen = false;
+      this.bookingDetailData = {
+        id: null,
+        userId: "",
+        fullName: "",
+        role: "",
+        position: "",
+        scheduleDate: "",
+        notes: "",
+        locationName: "",
+        latitude: null,
+        longitude: null,
+        status: "",
+      };
+    },    /**
+     * Initialize map for booking detail modal
+     */
+    initBookingDetailMap() {
+      // Initialize map similar to map-detail-modal
+      const mapContainer = document.getElementById('booking-detail-map-container');
+      if (!mapContainer || !this.bookingDetailData.latitude || !this.bookingDetailData.longitude) {
+        console.warn("Map container or coordinates not available");
+        return;
+      }
+
+      // Check if Leaflet is available
+      if (typeof L === 'undefined') {
+        console.error("Leaflet library not loaded");
+        return;
+      }
+
+      try {
+        // Clear existing map
+        mapContainer.innerHTML = '';
+
+        // Create map
+        const map = L.map(mapContainer).setView(
+          [this.bookingDetailData.latitude, this.bookingDetailData.longitude], 
+          16
+        );
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add marker
+        const marker = L.marker([this.bookingDetailData.latitude, this.bookingDetailData.longitude])
+          .addTo(map)
+          .bindPopup(`
+            <div class="p-2">
+              <h6 class="font-semibold">${this.bookingDetailData.fullName}</h6>
+              <p class="text-sm">${this.bookingDetailData.locationName}</p>
+              <p class="text-xs text-gray-500">
+                ${this.bookingDetailData.latitude}, ${this.bookingDetailData.longitude}
+              </p>
+            </div>
+          `);
+
+        // Store map reference for cleanup
+        this.bookingDetailMap = map;
+
+        console.log("Booking detail map initialized successfully");
+      } catch (error) {
+        console.error("Error initializing booking detail map:", error);
+        mapContainer.innerHTML = `
+          <div class="flex h-full items-center justify-center">
+            <div class="text-center text-gray-500">
+              <p class="text-sm">Error loading map</p>
+              <p class="text-xs">${error.message}</p>
+            </div>
+          </div>
+        `;
+      }
     },
   };
 }

@@ -202,7 +202,6 @@
           </span>
         </div>
       </div>
-
       <!-- Position Field -->
       <div>
         <label
@@ -216,36 +215,73 @@
             name="position"
             required
             x-model="formData.id_position"
+            :disabled="!formData.id_programs || isLoadingPositions"
             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+            :class="{ 'opacity-50 cursor-not-allowed': !formData.id_programs || isLoadingPositions }"
           >
-            <option value="" disabled>Select Position</option>
-            <template
-              x-for="position in masterData.positions"
-              :key="position.id"
-            >
-              <option :value="position.id" x-text="position.name"></option>
+            <option value="" disabled x-text="positionPlaceholder"></option>
+            <template x-if="!isLoadingPositions">
+              <template
+                x-for="position in masterData.positions"
+                :key="position.id"
+              >
+                <option :value="position.id" x-text="position.name"></option>
+              </template>
             </template>
           </select>
           <span
             class="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2"
           >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2.5 4.5L6 8L9.5 4.5"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <!-- Loading spinner when fetching positions -->
+            <template x-if="isLoadingPositions">
+              <svg
+                class="h-4 w-4 animate-spin text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </template>
+            <!-- Default dropdown arrow when not loading -->
+            <template x-if="!isLoadingPositions">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.5 4.5L6 8L9.5 4.5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </template>
           </span>
         </div>
+        <!-- Position error message -->
+        <template x-if="positionErrorMessage">
+          <p
+            class="mt-1 text-xs text-red-500"
+            x-text="positionErrorMessage"
+          ></p>
+        </template>
       </div>
     </div>
   </div>

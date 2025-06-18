@@ -54,15 +54,18 @@ function userFormAlpineData() {
       latitude: "1.18546", // Default Jakarta coordinates
       longitude: "104.10202",
       radius: "100", // Default radius
-    },
-
-    // Master data options
+    }, // Master data options
     masterData: {
       roles: [],
       programs: [],
       positions: [],
       divisions: [],
     },
+
+    // Dependent dropdown state
+    isLoadingPositions: false,
+    positionErrorMessage: "",
+    positionPlaceholder: "Pilih Program terlebih dahulu",
 
     // File handling
     facePhotoFile: null,
@@ -91,12 +94,27 @@ function userFormAlpineData() {
       } else {
         this.isLoadingData = false;
         await this.initMasters();
+        // In add mode, positions start empty until program is selected
+        this.masterData.positions = [];
+        this.positionPlaceholder = "Pilih Program terlebih dahulu";
         this.initializeMap();
       }
 
       // Debug watcher for full_name
       this.$watch("formData.full_name", (value) => {
         console.log("Full name changed to:", value);
+      });
+
+      // Watch for program changes to update positions
+      this.$watch("formData.id_programs", (newProgramId, oldProgramId) => {
+        if (newProgramId !== oldProgramId && newProgramId) {
+          this.updatePositionsForProgram(newProgramId);
+        } else if (!newProgramId) {
+          // Reset positions when program is cleared
+          this.masterData.positions = [];
+          this.formData.id_position = "";
+          this.positionPlaceholder = "Pilih Program terlebih dahulu";
+        }
       });
     },
 
@@ -109,15 +127,13 @@ function userFormAlpineData() {
         this.isLoadingMasters = true;
         this.errorMessage = "";
 
-        console.log("Loading user data and masters for ID:", this.userId);
-
-        // Load user data and master data concurrently
+        console.log("Loading user data and masters for ID:", this.userId); // Load user data and master data concurrently
         const results = await Promise.allSettled([
           getUserById(this.userId),
           getRoles(),
           getPrograms(),
           getDivisions(),
-          getPositions(), // Load all positions initially
+          // Note: Don't load positions yet, wait for user data to get program
         ]);
 
         // Handle user data result
@@ -159,9 +175,7 @@ function userFormAlpineData() {
             title: "Gagal memuat data pengguna",
             message: results[0].reason.message,
           });
-        }
-
-        // Handle master data results
+        } // Handle master data results
         if (results[1].status === "fulfilled") {
           this.masterData.roles = results[1].value;
         }
@@ -171,10 +185,15 @@ function userFormAlpineData() {
         if (results[3].status === "fulfilled") {
           this.masterData.divisions = results[3].value;
         }
-        if (results[4].status === "fulfilled") {
-          this.masterData.positions = results[4].value;
-        } // After data is loaded, positions are already available
-        // No need to filter positions as they are not program-specific in this API
+
+        // Load positions based on user's program if available
+        if (this.formData.id_programs) {
+          await this.updatePositionsForProgram(this.formData.id_programs);
+        } else {
+          // No program selected, positions should be empty
+          this.masterData.positions = [];
+          this.positionPlaceholder = "Pilih Program terlebih dahulu";
+        }
 
         this.isLoadingData = false;
         this.isLoadingMasters = false;
@@ -250,31 +269,75 @@ function userFormAlpineData() {
       } finally {
         this.isLoadingMasters = false;
       }
-    } /**
-     * Handle position dropdown click
-     */,
-    handlePositionClick() {
-      // No validation needed as positions are not program-dependent
-      console.log("Position dropdown clicked");
     },
 
     /**
-     * Hide program warning
+     * Update positions dropdown based on selected program
+     * @param {string|number} programId - The selected program ID
      */
+    async updatePositionsForProgram(programId) {
+      console.log("Updating positions for program:", programId);
+
+      if (!programId) {
+        this.masterData.positions = [];
+        this.formData.id_position = "";
+        this.positionPlaceholder = "Pilih Program terlebih dahulu";
+        return;
+      }
+
+      // Set loading state
+      this.isLoadingPositions = true;
+      this.positionErrorMessage = "";
+      this.positionPlaceholder = "Memuat positions...";
+
+      // Reset current position selection
+      this.formData.id_position = "";
+
+      try {
+        // Fetch positions for the selected program
+        const positions = await getPositions(programId);
+
+        if (positions && positions.length > 0) {
+          this.masterData.positions = positions;
+          this.positionPlaceholder = "Pilih Position";
+          console.log(
+            `Loaded ${positions.length} positions for program ${programId}`,
+          );
+        } else {
+          // No positions found for this program
+          this.masterData.positions = [];
+          this.positionPlaceholder = "Tidak ada position untuk program ini";
+          console.log(`No positions found for program ${programId}`);
+        }
+      } catch (error) {
+        console.error("Error loading positions for program:", error);
+        this.masterData.positions = [];
+        this.positionErrorMessage = "Gagal memuat positions";
+        this.positionPlaceholder = "Error - Coba lagi";
+
+        // Show error notification
+        window.showAlertModal({
+          type: "error",
+          title: "Gagal memuat positions",
+          message:
+            "Terjadi kesalahan saat memuat data positions. Silakan coba lagi.",
+        });
+      } finally {
+        this.isLoadingPositions = false;
+      }
+    },
+
+    /**
+     * Handle position dropdown click
+     */
+    handlePositionClick() {
+      // No validation needed as positions are not program-dependent
+      console.log("Position dropdown clicked");
+    } /**
+     * Hide program warning
+     */,
     hideProgramWarning() {
       this.showProgramWarning = false;
-    } /**
-     * Update positions based on selected program
-     */,
-    async updatePositionsForProgram(programId, keepCurrentPosition = false) {
-      try {
-        console.log("Program selected:", programId);
-        // Since positions are not filtered by program in this API,
-        // we just log the selection for debugging
-        // No position reset needed as all positions are available
-      } catch (error) {
-        console.error("Error updating positions:", error);
-      }
     },
 
     /**
@@ -283,7 +346,7 @@ function userFormAlpineData() {
     handleFileChange(event) {
       const file = event.target.files[0];
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-      const maxSize = 2 * 1024 * 1024; // 2MB
+      const maxSize = 5 * 1024 * 1024; // 2MB
 
       if (!file) return;
 

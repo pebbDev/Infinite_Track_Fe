@@ -333,6 +333,149 @@ async function createUser(formData) {
 }
 
 /**
+ * Update data teks pengguna berdasarkan ID (PATCH request dengan JSON)
+ * @param {string|number} userId - ID pengguna
+ * @param {Object} userData - Data pengguna yang akan diupdate (tanpa file)
+ * @returns {Promise<Object>} - Promise yang resolve dengan data pengguna yang diupdate atau reject dengan error
+ */
+async function updateUserData(userId, userData) {
+  try {
+    envLog("debug", "Updating user data:", userId, userData);
+
+    // Buat copy dari userData dan hapus password jika kosong
+    const dataToSend = { ...userData };
+    if (!dataToSend.password || dataToSend.password.trim() === "") {
+      delete dataToSend.password;
+    }
+
+    // Hapus confirmPassword jika ada
+    delete dataToSend.confirmPassword;
+
+    const response = await axios.patch(
+      `${API_CONFIG.BASE_URL}/users/${userId}`,
+      dataToSend,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (response.data && response.data.success === true) {
+      envLog("debug", "Successfully updated user data:", response.data.data);
+      return response.data;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal mengupdate data pengguna";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error updating user data:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error(
+          "Anda tidak memiliki akses untuk mengupdate data pengguna.",
+        );
+      } else if (status === 404) {
+        throw new Error("Pengguna tidak ditemukan.");
+      } else if (status === 422) {
+        throw new Error(data?.message || "Data yang dikirim tidak valid.");
+      } else if (status === 500) {
+        throw new Error("Terjadi kesalahan server. Silakan coba lagi nanti.");
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal mengupdate data pengguna`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
+/**
+ * Update foto pengguna berdasarkan ID (POST request dengan FormData)
+ * @param {string|number} userId - ID pengguna
+ * @param {File} photoFile - File foto yang akan diupload
+ * @returns {Promise<Object>} - Promise yang resolve dengan data foto baru atau reject dengan error
+ */
+async function updateUserPhoto(userId, photoFile) {
+  try {
+    envLog("debug", "Updating user photo:", userId);
+
+    const formData = new FormData();
+    formData.append("face_photo", photoFile);
+
+    const response = await axios.post(
+      `${API_CONFIG.BASE_URL}/users/${userId}/photo`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+
+    if (response.data && response.data.success === true) {
+      envLog("debug", "Successfully updated user photo:", response.data.data);
+      return response.data;
+    } else {
+      const errorMessage =
+        response.data.message || "Gagal mengupdate foto pengguna";
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    envLog("error", "Error updating user photo:", error);
+
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      if (status === 401) {
+        throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
+      } else if (status === 403) {
+        throw new Error(
+          "Anda tidak memiliki akses untuk mengupdate foto pengguna.",
+        );
+      } else if (status === 404) {
+        throw new Error("Pengguna tidak ditemukan.");
+      } else if (status === 413) {
+        throw new Error("Ukuran file terlalu besar. Maksimal 10MB.");
+      } else if (status === 422) {
+        throw new Error(
+          data?.message ||
+            "Format file tidak valid. Gunakan JPEG, JPG, atau PNG.",
+        );
+      } else if (status === 500) {
+        throw new Error("Terjadi kesalahan server. Silakan coba lagi nanti.");
+      } else {
+        const message =
+          data?.message || `Error ${status}: Gagal mengupdate foto pengguna`;
+        throw new Error(message);
+      }
+    } else if (error.request) {
+      throw new Error(
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+      );
+    } else {
+      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+    }
+  }
+}
+
+/**
  * Mengambil daftar roles dari API dengan caching
  * @returns {Promise<Array>} - Promise yang resolve dengan array roles
  */
@@ -614,6 +757,8 @@ export {
   getUsers,
   getUserById,
   updateUser,
+  updateUserData,
+  updateUserPhoto,
   deleteUser,
   createUser,
   getRoles,

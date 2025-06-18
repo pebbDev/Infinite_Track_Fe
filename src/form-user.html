@@ -43,16 +43,49 @@
         <!-- ===== Main Content Start ===== -->
         <main>
           <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-            <!-- Breadcrumb Start -->
-            <div x-data="{ pageName: `Tambah User`}">
-              <include src="./partials/common/breadcrumb.html" />
-            </div>
-            <!-- Breadcrumb End -->
             <!-- ====== Tambah User Form Start -->
             <div x-data="userFormAlpineData()" x-init="init()">
+              <!-- Breadcrumb Start -->
+              <div
+                x-data="{ pageName: isEditMode ? 'Edit User' : 'Tambah User' }"
+              >
+                <include src="./partials/common/breadcrumb.html" />
+              </div>
+              <!-- Breadcrumb End --><!-- Loading State for Data in Edit Mode -->
+              <div
+                x-show="isEditMode && isLoadingData"
+                class="flex items-center justify-center py-8"
+              >
+                <div class="flex items-center space-x-2">
+                  <svg
+                    class="text-brand-500 h-5 w-5 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span class="text-gray-600 dark:text-gray-400"
+                    >Loading user data...</span
+                  >
+                </div>
+              </div>
+
               <!-- Loading State for Master Data -->
               <div
-                x-show="isLoadingMasters"
+                x-show="!isEditMode && isLoadingMasters"
                 class="flex items-center justify-center py-8"
               >
                 <div class="flex items-center space-x-2">
@@ -82,9 +115,9 @@
                 </div>
               </div>
 
-              <!-- Error Message Display -->
+              <!-- General Error Message Display -->
               <div
-                x-show="errorMessage"
+                x-show="generalErrorMessage"
                 class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
               >
                 <div class="flex">
@@ -110,7 +143,7 @@
                     </h3>
                     <div
                       class="mt-2 text-sm text-red-700 dark:text-red-300"
-                      x-text="errorMessage"
+                      x-text="generalErrorMessage"
                     ></div>
                   </div>
                 </div>
@@ -179,11 +212,10 @@
                   </button>
                 </div>
               </div>
-
               <form
-                id="addUserForm"
+                id="userForm"
                 class="space-y-6"
-                x-show="!isLoadingMasters"
+                x-show="(!isEditMode && !isLoadingMasters) || (isEditMode && !isLoadingData)"
               >
                 <!-- Include Form Fields Partial -->
                 <include src="./partials/form/form-user-fields.html" />

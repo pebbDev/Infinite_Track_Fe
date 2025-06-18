@@ -21,7 +21,6 @@ class MapPicker {
 
     this.initialized = false;
   }
-
   /**
    * Initialize the map
    */
@@ -29,6 +28,18 @@ class MapPicker {
     if (this.initialized) return;
 
     try {
+      // Check if container already has a map instance and remove it
+      const container = document.getElementById(this.containerId);
+      if (container && container._leaflet_id) {
+        // Remove existing map instance
+        if (this.map) {
+          this.map.remove();
+          this.map = null;
+        }
+        // Clear the container's leaflet id
+        delete container._leaflet_id;
+      }
+
       // Create map instance
       this.map = L.map(this.containerId).setView(
         this.options.center,

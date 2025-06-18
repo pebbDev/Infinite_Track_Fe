@@ -6,6 +6,8 @@
 import {
   getUserById,
   updateUser,
+  updateUserData,
+  updateUserPhoto,
   createUser,
   getRoles,
   getPrograms,
@@ -23,10 +25,11 @@ function userFormAlpineData() {
     // Form state
     isEditMode: false,
     userId: null,
-    isLoading: false,
+    isLoadingData: false,
     isSaving: false,
     isLoadingMasters: false,
     errorMessage: "",
+    generalErrorMessage: "",
 
     // Map related state
     mapPickerInstance: null,
@@ -39,6 +42,7 @@ function userFormAlpineData() {
     formData: {
       email: "",
       password: "",
+      confirmPassword: "",
       full_name: "",
       nip_nim: "",
       phone: "",
@@ -47,29 +51,30 @@ function userFormAlpineData() {
       id_programs: "",
       id_position: "",
       id_divisions: "",
-      latitude: "",
-      longitude: "",
+      latitude: "1.18546", // Default Jakarta coordinates
+      longitude: "104.10202",
       radius: "100", // Default radius
     },
 
     // Master data options
-    roles: [],
-    programs: [],
-    positions: [],
-    divisions: [],
+    masterData: {
+      roles: [],
+      programs: [],
+      positions: [],
+      divisions: [],
+    },
 
     // File handling
     facePhotoFile: null,
     photoPreview: null,
+    currentPhotoUrl: "",
     validationErrors: {},
 
     // Warning alert state
     showProgramWarning: false,
-
     /**
      * Inisialisasi komponen
-     */
-    async init() {
+     */ async init() {
       console.log("Initializing user form component...");
 
       // Check if we're in edit mode
@@ -77,19 +82,17 @@ function userFormAlpineData() {
       this.userId = urlParams.get("id");
       this.isEditMode = !!this.userId;
 
-      // Update page title and form behavior based on mode
+      // Update page title based on mode
       this.updatePageTitle();
 
-      // Load master data first
-      await this.initMasters();
-
-      // Load form data if in edit mode
       if (this.isEditMode) {
-        await this.loadUserData();
-      } // Initialize map after DOM is ready
-      this.$nextTick(() => {
+        this.isLoadingData = true;
+        await this.loadUserDataAndMasters();
+      } else {
+        this.isLoadingData = false;
+        await this.initMasters();
         this.initializeMap();
-      });
+      }
 
       // Debug watcher for full_name
       this.$watch("formData.full_name", (value) => {
@@ -98,76 +101,119 @@ function userFormAlpineData() {
     },
 
     /**
-     * Update page title based on mode
+     * Load user data and masters for edit mode
      */
+    async loadUserDataAndMasters() {
+      try {
+        this.isLoadingData = true;
+        this.isLoadingMasters = true;
+        this.errorMessage = "";
+
+        console.log("Loading user data and masters for ID:", this.userId);
+
+        // Load user data and master data concurrently
+        const results = await Promise.allSettled([
+          getUserById(this.userId),
+          getRoles(),
+          getPrograms(),
+          getDivisions(),
+          getPositions(), // Load all positions initially
+        ]);
+
+        // Handle user data result
+        if (results[0].status === "fulfilled") {
+          const userData = results[0].value;
+          console.log("User data loaded:", userData); // Populate form with user data
+          this.formData = {
+            email: userData.email || "",
+            password: "", // Don't populate password for security
+            confirmPassword: "",
+            full_name: userData.full_name || "",
+            nip_nim: userData.nip_nim || "",
+            phone: userData.phone || "",
+            description: userData.description || "",
+            id_roles: userData.id_roles ? String(userData.id_roles) : "",
+            id_programs: userData.id_programs
+              ? String(userData.id_programs)
+              : "",
+            id_position: userData.id_position
+              ? String(userData.id_position)
+              : "",
+            id_divisions: userData.id_divisions
+              ? String(userData.id_divisions)
+              : "",
+            latitude: userData.location?.latitude || "1.18546",
+            longitude: userData.location?.longitude || "104.10202",
+            radius: userData.location?.radius || "100",
+          };
+
+          // Set current photo URL if exists
+          if (userData.photo) {
+            this.currentPhotoUrl = `/${userData.photo}`;
+          }
+        } else {
+          console.error("Failed to load user data:", results[0].reason);
+          this.generalErrorMessage = "Gagal memuat data pengguna";
+          window.showAlertModal({
+            type: "error",
+            title: "Gagal memuat data pengguna",
+            message: results[0].reason.message,
+          });
+        }
+
+        // Handle master data results
+        if (results[1].status === "fulfilled") {
+          this.masterData.roles = results[1].value;
+        }
+        if (results[2].status === "fulfilled") {
+          this.masterData.programs = results[2].value;
+        }
+        if (results[3].status === "fulfilled") {
+          this.masterData.divisions = results[3].value;
+        }
+        if (results[4].status === "fulfilled") {
+          this.masterData.positions = results[4].value;
+        } // After data is loaded, positions are already available
+        // No need to filter positions as they are not program-specific in this API
+
+        this.isLoadingData = false;
+        this.isLoadingMasters = false;
+
+        // Initialize map after data is loaded
+        this.$nextTick(() => {
+          this.initializeMap();
+        });
+      } catch (error) {
+        console.error("Error loading user data and masters:", error);
+        this.generalErrorMessage = "Gagal memuat data";
+        this.isLoadingData = false;
+        this.isLoadingMasters = false;
+        window.showAlertModal({
+          type: "error",
+          title: "Gagal memuat data",
+          message: error.message,
+        });
+      }
+    } /**
+     * Update page title based on mode
+     */,
     updatePageTitle() {
       const titleElement = document.querySelector("title");
-      const breadcrumbElement = document.querySelector('[x-data*="pageName"]');
 
       if (this.isEditMode) {
         if (titleElement) {
           titleElement.textContent =
             "Edit User | InfiniteTrack - Tailwind CSS Admin Dashboard Template";
         }
-        if (breadcrumbElement) {
-          breadcrumbElement.setAttribute("x-data", "{ pageName: `Edit User` }");
-        }
       } else {
         if (titleElement) {
           titleElement.textContent =
             "Tambah User | InfiniteTrack - Tailwind CSS Admin Dashboard Template";
         }
-        if (breadcrumbElement) {
-          breadcrumbElement.setAttribute(
-            "x-data",
-            "{ pageName: `Tambah User` }",
-          );
-        }
       }
-    },
-
-    /**
-     * Load user data for editing
-     */
-    async loadUserData() {
-      try {
-        this.isLoading = true;
-        this.errorMessage = "";
-
-        console.log("Loading user data for ID:", this.userId);
-
-        const userData = await getUserById(this.userId);
-
-        // Populate form with user data sesuai struktur API
-        this.formData = {
-          email: userData.email || "",
-          password: "", // Don't populate password for security
-          full_name: userData.full_name || "",
-          nip_nim: userData.nip_nim || "",
-          phone: userData.phone || "",
-          description: userData.description || "",
-          id_roles: userData.id_roles || "",
-          id_programs: userData.id_programs || "",
-          id_position: userData.id_position || "",
-          id_divisions: userData.id_divisions || "",
-          latitude: userData.latitude || "",
-          longitude: userData.longitude || "",
-          radius: userData.radius || "100",
-        };
-
-        console.log("User data loaded:", this.formData);
-      } catch (error) {
-        console.error("Error loading user data:", error);
-        this.errorMessage = "Gagal memuat data pengguna";
-        this.showErrorModal("Gagal memuat data pengguna");
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    /**
-     * Load master data (roles, programs, positions, divisions)
-     */
+    } /**
+     * Load master data for add mode (roles, programs, positions, divisions)
+     */,
     async initMasters() {
       try {
         this.isLoadingMasters = true;
@@ -182,35 +228,34 @@ function userFormAlpineData() {
             getDivisions(),
           ]);
 
-        this.roles = rolesData;
-        this.programs = programsData;
-        this.positions = positionsData;
-        this.divisions = divisionsData;
+        this.masterData.roles = rolesData;
+        this.masterData.programs = programsData;
+        this.masterData.positions = positionsData;
+        this.masterData.divisions = divisionsData;
 
         console.log("Master data loaded:", {
-          roles: this.roles.length,
-          programs: this.programs.length,
-          positions: this.positions.length,
-          divisions: this.divisions.length,
+          roles: this.masterData.roles.length,
+          programs: this.masterData.programs.length,
+          positions: this.masterData.positions.length,
+          divisions: this.masterData.divisions.length,
         });
       } catch (error) {
         console.error("Error loading master data:", error);
         this.errorMessage = "Gagal memuat data master";
+        window.showAlertModal({
+          type: "error",
+          title: "Gagal memuat data master",
+          message: error.message,
+        });
       } finally {
         this.isLoadingMasters = false;
       }
-    },
-
-    /**
+    } /**
      * Handle position dropdown click
-     */
+     */,
     handlePositionClick() {
-      if (!this.formData.id_programs) {
-        this.showProgramWarning = true;
-        setTimeout(() => {
-          this.showProgramWarning = false;
-        }, 3000);
-      }
+      // No validation needed as positions are not program-dependent
+      console.log("Position dropdown clicked");
     },
 
     /**
@@ -218,29 +263,15 @@ function userFormAlpineData() {
      */
     hideProgramWarning() {
       this.showProgramWarning = false;
-    },
-
-    /**
+    } /**
      * Update positions based on selected program
-     */
-    async updatePositionsForProgram(programId) {
+     */,
+    async updatePositionsForProgram(programId, keepCurrentPosition = false) {
       try {
-        console.log("Loading positions for program:", programId);
-
-        // Reset position if program changed
-        this.formData.id_position = "";
-
-        if (programId && this.positions.length > 0) {
-          const isValidPosition = this.positions.some(
-            (pos) =>
-              pos.id_programs === parseInt(programId) &&
-              pos.id === parseInt(this.formData.id_position),
-          );
-
-          if (!isValidPosition) {
-            this.formData.id_position = "";
-          }
-        }
+        console.log("Program selected:", programId);
+        // Since positions are not filtered by program in this API,
+        // we just log the selection for debugging
+        // No position reset needed as all positions are available
       } catch (error) {
         console.error("Error updating positions:", error);
       }
@@ -278,11 +309,9 @@ function userFormAlpineData() {
         this.photoPreview = e.target.result;
       };
       reader.readAsDataURL(file);
-    },
-
-    /**
+    } /**
      * Submit form (create or update user)
-     */
+     */,
     async submitForm() {
       try {
         this.isSaving = true;
@@ -294,56 +323,22 @@ function userFormAlpineData() {
           return;
         }
 
-        // Prepare form data
-        const formData = new FormData();
-
-        // User data fields
-        const userData = {
-          email: this.formData.email,
-          full_name: this.formData.full_name,
-          nip_nim: this.formData.nip_nim,
-          phone: this.formData.phone,
-          description: this.formData.description,
-          id_roles: parseInt(this.formData.id_roles),
-          id_programs: parseInt(this.formData.id_programs),
-          id_position: parseInt(this.formData.id_position),
-          id_divisions: parseInt(this.formData.id_divisions),
-          latitude: this.formData.latitude,
-          longitude: this.formData.longitude,
-          radius: this.formData.radius,
-        };
-
-        // Add password only if provided (for create or update)
-        if (this.formData.password) {
-          userData.password = this.formData.password;
-        }
-
-        // Append user data to FormData
-        Object.keys(userData).forEach((key) => {
-          formData.append(key, userData[key]);
-        });
-
-        // Add photo if selected
-        if (this.facePhotoFile) {
-          formData.append("face_photo", this.facePhotoFile);
-        }
-
-        console.log("Submitting user data:", userData);
+        console.log("Submitting user data...");
 
         let result;
         if (this.isEditMode) {
-          result = await updateUser(this.userId, formData);
+          // Edit mode: Use separate APIs for data and photo
+          await this.updateExistingUser();
         } else {
-          result = await createUser(formData);
+          // Create mode: Use single API with FormData
+          await this.createNewUser();
         }
-
-        console.log("User saved successfully:", result);
 
         const successMessage = this.isEditMode
           ? "User berhasil diperbarui!"
           : "User berhasil ditambahkan!";
-
         this.showSuccessModal(successMessage, () => {
+          this.cleanup();
           window.location.href = "/management-user.html";
         });
       } catch (error) {
@@ -354,9 +349,88 @@ function userFormAlpineData() {
       } finally {
         this.isSaving = false;
       }
-    } /**
+    },
+
+    /**
+     * Create new user with FormData
+     */
+    async createNewUser() {
+      const formData = new FormData();
+
+      // User data fields
+      const userData = {
+        email: this.formData.email,
+        password: this.formData.password,
+        full_name: this.formData.full_name,
+        nip_nim: this.formData.nip_nim,
+        phone: this.formData.phone,
+        description: this.formData.description,
+        id_roles: parseInt(this.formData.id_roles),
+        id_programs: parseInt(this.formData.id_programs),
+        id_position: parseInt(this.formData.id_position),
+        id_divisions: parseInt(this.formData.id_divisions),
+        latitude: this.formData.latitude,
+        longitude: this.formData.longitude,
+        radius: this.formData.radius,
+      };
+
+      // Append user data to FormData
+      Object.keys(userData).forEach((key) => {
+        formData.append(key, userData[key]);
+      });
+
+      // Add photo (required for new user)
+      formData.append("face_photo", this.facePhotoFile);
+
+      console.log("Creating new user:", userData);
+      const result = await createUser(formData);
+      console.log("User created successfully:", result);
+    },
+
+    /**
+     * Update existing user with separate API calls
+     */
+    async updateExistingUser() {
+      const userData = {
+        email: this.formData.email,
+        full_name: this.formData.full_name,
+        nip_nim: this.formData.nip_nim,
+        phone: this.formData.phone,
+        description: this.formData.description,
+        id_roles: parseInt(this.formData.id_roles),
+        id_programs: parseInt(this.formData.id_programs),
+        id_position: parseInt(this.formData.id_position),
+        id_divisions: parseInt(this.formData.id_divisions),
+        latitude: this.formData.latitude,
+        longitude: this.formData.longitude,
+        radius: this.formData.radius,
+      };
+
+      // Add password only if provided
+      if (this.formData.password.trim()) {
+        userData.password = this.formData.password;
+      }
+
+      console.log("Updating user data:", userData);
+
+      // Update user data
+      const userResult = await updateUserData(this.userId, userData);
+      console.log("User data updated successfully:", userResult);
+
+      // Update photo if a new one is selected
+      if (this.facePhotoFile) {
+        console.log("Updating user photo...");
+        const photoResult = await updateUserPhoto(
+          this.userId,
+          this.facePhotoFile,
+        );
+        console.log("User photo updated successfully:", photoResult);
+      }
+    },
+
+    /**
      * Validate form data
-     */,
+     */
     validateForm() {
       const errors = [];
 
@@ -397,16 +471,37 @@ function userFormAlpineData() {
 
       if (!this.formData.id_divisions) {
         errors.push("Division harus dipilih");
-      }
+      } // Password validation
+      if (!this.isEditMode) {
+        // For new users, password is required
+        if (!this.formData.password.trim()) {
+          errors.push("Password harus diisi untuk user baru");
+        }
+        // Confirm password check for new users
+        if (this.formData.password !== this.formData.confirmPassword) {
+          errors.push("Konfirmasi password tidak cocok");
+        }
+        // Photo required for new user
+        if (!this.facePhotoFile) {
+          errors.push("Foto profil harus diupload untuk user baru");
+        }
+      } else {
+        // For existing users, password is optional
+        // But if provided, it should meet requirements
+        if (
+          this.formData.password.trim() &&
+          this.formData.password.length < 6
+        ) {
+          errors.push("Password minimal 6 karakter");
+        }
 
-      // Password required for new user
-      if (!this.isEditMode && !this.formData.password.trim()) {
-        errors.push("Password harus diisi untuk user baru");
-      }
-
-      // Photo required for new user
-      if (!this.isEditMode && !this.facePhotoFile) {
-        errors.push("Foto profil harus diupload untuk user baru");
+        // Check confirm password if password is provided
+        if (
+          this.formData.password.trim() &&
+          this.formData.password !== this.formData.confirmPassword
+        ) {
+          errors.push("Konfirmasi password tidak cocok");
+        }
       }
 
       return errors;
@@ -438,19 +533,29 @@ function userFormAlpineData() {
       if (this.mapPickerInstance) {
         this.mapPickerInstance.setPosition(1.18546, 104.10201, 100);
       }
-    },
-
-    /**
+    } /**
      * Cancel form and redirect
-     */
+     */,
     cancelForm() {
       if (
         confirm(
           "Apakah Anda yakin ingin membatalkan? Data yang belum disimpan akan hilang.",
         )
       ) {
+        this.cleanup();
         window.location.href = "/management-user.html";
       }
+    },
+
+    /**
+     * Cleanup resources before navigation
+     */
+    cleanup() {
+      if (this.mapPickerInstance) {
+        this.mapPickerInstance.destroy();
+        this.mapPickerInstance = null;
+      }
+      this.mapInitialized = false;
     },
 
     /**
@@ -496,14 +601,18 @@ function userFormAlpineData() {
         // Fallback
         alert(message);
       }
-    },
-
-    /**
+    } /**
      * Initialize map picker
-     */
+     */,
     initializeMap() {
       try {
         console.log("Initializing map picker...");
+
+        // Destroy existing map instance if it exists
+        if (this.mapPickerInstance) {
+          this.mapPickerInstance.destroy();
+          this.mapPickerInstance = null;
+        }
 
         // Create map picker instance
         this.mapPickerInstance = new MapPicker("mapContainer", {

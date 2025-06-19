@@ -5,7 +5,11 @@
 
 import axios from "axios";
 import { API_CONFIG, envLog } from "../config/env.js";
-import { validatePhotoFile, handlePhotoUploadError, PHOTO_CONFIG } from "../utils/photoValidation.js";
+import {
+  validatePhotoFile,
+  handlePhotoUploadError,
+  PHOTO_CONFIG,
+} from "../utils/photoValidation.js";
 
 // Konfigurasi axios default
 axios.defaults.withCredentials = true; // Mengizinkan pengiriman cookie
@@ -462,7 +466,9 @@ async function updateUserPhoto(userId, photoFile) {
         throw new Error("File terlalu besar. Maksimal 20MB.");
       } else if (status === 422) {
         // Gunakan error handler yang lebih spesifik
-        const specificError = handlePhotoUploadError(new Error(data?.message || ""));
+        const specificError = handlePhotoUploadError(
+          new Error(data?.message || ""),
+        );
         throw new Error(specificError);
       } else if (status === 500) {
         throw new Error("Terjadi kesalahan server. Silakan coba lagi nanti.");

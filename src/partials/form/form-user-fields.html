@@ -429,7 +429,8 @@
             </div>
             <h4 class="mb-2 font-medium text-gray-800 dark:text-white/90">
               Drop File Here
-            </h4>            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+            </h4>
+            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
               Drag and drop your PNG, JPEG, JPG, WebP images here or
               <button
                 type="button"
@@ -451,15 +452,23 @@
             x-ref="photoInput"
             @change="handleFileChange($event)"
           />
-        </div>        <!-- Photo Preview Section -->
+        </div>
+        <!-- Photo Preview Section -->
         <div
           x-show="photoPreview || (isEditMode && currentPhotoUrl) || isLoadingPhotoPreview"
           class="mt-3"
         >
           <!-- Loading state -->
-          <div x-show="isLoadingPhotoPreview" class="flex items-center space-x-2">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span class="text-sm text-gray-600 dark:text-gray-400">Loading preview...</span>
+          <div
+            x-show="isLoadingPhotoPreview"
+            class="flex items-center space-x-2"
+          >
+            <div
+              class="h-4 w-4 animate-spin rounded-full border-b-2 border-blue-600"
+            ></div>
+            <span class="text-sm text-gray-600 dark:text-gray-400"
+              >Loading preview...</span
+            >
           </div>
 
           <!-- New photo preview (from file input) -->

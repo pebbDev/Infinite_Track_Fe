@@ -73,7 +73,7 @@ function userFormAlpineData() {
     // Dependent dropdown state
     isLoadingPositions: false,
     positionErrorMessage: "",
-    positionPlaceholder: "Pilih Program terlebih dahulu",    // File handling
+    positionPlaceholder: "Pilih Program terlebih dahulu", // File handling
     facePhotoFile: null,
     photoPreview: null,
     currentPhotoUrl: "",
@@ -165,7 +165,8 @@ function userFormAlpineData() {
               : "",
             id_divisions: userData.id_divisions
               ? String(userData.id_divisions)
-              : "",            latitude: userData.location?.latitude || "1.18546",
+              : "",
+            latitude: userData.location?.latitude || "1.18546",
             longitude: userData.location?.longitude || "104.10202",
             radius: userData.location?.radius || "100",
           };
@@ -332,9 +333,9 @@ function userFormAlpineData() {
       } finally {
         this.isLoadingPositions = false;
       }
-    },    /**
+    } /**
      * Handle position dropdown click
-     */
+     */,
     handlePositionClick() {
       // No validation needed as positions are not program-dependent
       console.log("Position dropdown clicked");
@@ -345,9 +346,9 @@ function userFormAlpineData() {
      */
     hideProgramWarning() {
       this.showProgramWarning = false;
-    },/**
+    } /**
      * Handle file input change dengan validasi Cloudinary
-     */
+     */,
     async handleFileChange(event) {
       const file = event.target.files[0];
 
@@ -372,29 +373,28 @@ function userFormAlpineData() {
 
         // Buat preview menggunakan utilitas baru
         const previewUrl = await createPhotoPreview(file);
-        
+
         // Cleanup preview lama jika ada
-        if (this.photoPreview && this.photoPreview.startsWith('blob:')) {
+        if (this.photoPreview && this.photoPreview.startsWith("blob:")) {
           cleanupPhotoPreview(this.photoPreview);
         }
-        
+
         this.photoPreview = previewUrl;
         this.photoFileInfo = {
           name: file.name,
           size: formatFileSize(file.size),
-          type: file.type
+          type: file.type,
         };
 
-        console.log('Photo file selected:', {
+        console.log("Photo file selected:", {
           name: file.name,
           size: file.size,
           type: file.type,
-          preview: previewUrl
+          preview: previewUrl,
         });
-
       } catch (error) {
-        console.error('Error creating photo preview:', error);
-        this.showErrorModal('Gagal membuat preview foto: ' + error.message);
+        console.error("Error creating photo preview:", error);
+        this.showErrorModal("Gagal membuat preview foto: " + error.message);
         event.target.value = "";
         this.resetPhotoState();
       } finally {
@@ -407,10 +407,10 @@ function userFormAlpineData() {
      */
     resetPhotoState() {
       // Cleanup preview URL jika ada
-      if (this.photoPreview && this.photoPreview.startsWith('blob:')) {
+      if (this.photoPreview && this.photoPreview.startsWith("blob:")) {
         cleanupPhotoPreview(this.photoPreview);
       }
-      
+
       this.facePhotoFile = null;
       this.photoPreview = null;
       this.photoFileInfo = null;
@@ -421,13 +421,16 @@ function userFormAlpineData() {
      * Remove selected photo
      */
     removePhoto() {
-      if (confirm('Apakah Anda yakin ingin menghapus foto yang dipilih?')) {
-        const fileInput = document.querySelector('input[type="file"][accept*="image"]');
+      if (confirm("Apakah Anda yakin ingin menghapus foto yang dipilih?")) {
+        const fileInput = document.querySelector(
+          'input[type="file"][accept*="image"]',
+        );
         if (fileInput) {
           fileInput.value = "";
         }
         this.resetPhotoState();
-      }    },
+      }
+    },
 
     /**
      * Submit form (create or update user)

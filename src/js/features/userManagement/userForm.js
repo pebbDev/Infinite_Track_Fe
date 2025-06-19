@@ -15,6 +15,14 @@ import {
   getDivisions,
 } from "../../services/userService.js";
 import MapPicker from "../../components/mapPicker.js";
+import {
+  validatePhotoFile,
+  createPhotoPreview,
+  cleanupPhotoPreview,
+  formatFileSize,
+  getUserPhotoUrl,
+  isFileAPISupported,
+} from "../../utils/photoValidation.js";
 
 /**
  * Data dan metode Alpine.js untuk komponen form pengguna
@@ -65,13 +73,13 @@ function userFormAlpineData() {
     // Dependent dropdown state
     isLoadingPositions: false,
     positionErrorMessage: "",
-    positionPlaceholder: "Pilih Program terlebih dahulu",
-
-    // File handling
+    positionPlaceholder: "Pilih Program terlebih dahulu",    // File handling
     facePhotoFile: null,
     photoPreview: null,
     currentPhotoUrl: "",
     validationErrors: {},
+    isLoadingPhotoPreview: false,
+    photoFileInfo: null,
 
     // Warning alert state
     showProgramWarning: false,
@@ -157,15 +165,14 @@ function userFormAlpineData() {
               : "",
             id_divisions: userData.id_divisions
               ? String(userData.id_divisions)
-              : "",
-            latitude: userData.location?.latitude || "1.18546",
+              : "",            latitude: userData.location?.latitude || "1.18546",
             longitude: userData.location?.longitude || "104.10202",
             radius: userData.location?.radius || "100",
           };
 
-          // Set current photo URL if exists
+          // Set current photo URL if exists - gunakan getUserPhotoUrl untuk menangani Cloudinary
           if (userData.photo) {
-            this.currentPhotoUrl = `/${userData.photo}`;
+            this.currentPhotoUrl = getUserPhotoUrl(userData.photo);
           }
         } else {
           console.error("Failed to load user data:", results[0].reason);
@@ -325,56 +332,106 @@ function userFormAlpineData() {
       } finally {
         this.isLoadingPositions = false;
       }
-    },
-
-    /**
+    },    /**
      * Handle position dropdown click
      */
     handlePositionClick() {
       // No validation needed as positions are not program-dependent
       console.log("Position dropdown clicked");
-    } /**
-     * Hide program warning
-     */,
-    hideProgramWarning() {
-      this.showProgramWarning = false;
     },
 
     /**
-     * Handle file input change
+     * Hide program warning
      */
-    handleFileChange(event) {
+    hideProgramWarning() {
+      this.showProgramWarning = false;
+    },/**
+     * Handle file input change dengan validasi Cloudinary
+     */
+    async handleFileChange(event) {
       const file = event.target.files[0];
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-      const maxSize = 5 * 1024 * 1024; // 2MB
 
-      if (!file) return;
-
-      // Validate file type
-      if (!allowedTypes.includes(file.type)) {
-        alert("Hanya file gambar (PNG, JPEG, JPG) yang diperbolehkan!");
-        event.target.value = "";
+      if (!file) {
+        this.resetPhotoState();
         return;
       }
 
-      // Validate file size
-      if (file.size > maxSize) {
-        alert("Ukuran file maksimal 2MB!");
-        event.target.value = "";
+      // Validasi file menggunakan utilitas baru
+      const validation = validatePhotoFile(file);
+      if (!validation.isValid) {
+        this.showErrorModal(validation.error);
+        event.target.value = ""; // Reset input
+        this.resetPhotoState();
         return;
       }
 
-      this.facePhotoFile = file;
+      try {
+        // Set file dan loading state
+        this.facePhotoFile = file;
+        this.isLoadingPhotoPreview = true;
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.photoPreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    } /**
+        // Buat preview menggunakan utilitas baru
+        const previewUrl = await createPhotoPreview(file);
+        
+        // Cleanup preview lama jika ada
+        if (this.photoPreview && this.photoPreview.startsWith('blob:')) {
+          cleanupPhotoPreview(this.photoPreview);
+        }
+        
+        this.photoPreview = previewUrl;
+        this.photoFileInfo = {
+          name: file.name,
+          size: formatFileSize(file.size),
+          type: file.type
+        };
+
+        console.log('Photo file selected:', {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          preview: previewUrl
+        });
+
+      } catch (error) {
+        console.error('Error creating photo preview:', error);
+        this.showErrorModal('Gagal membuat preview foto: ' + error.message);
+        event.target.value = "";
+        this.resetPhotoState();
+      } finally {
+        this.isLoadingPhotoPreview = false;
+      }
+    },
+
+    /**
+     * Reset photo state
+     */
+    resetPhotoState() {
+      // Cleanup preview URL jika ada
+      if (this.photoPreview && this.photoPreview.startsWith('blob:')) {
+        cleanupPhotoPreview(this.photoPreview);
+      }
+      
+      this.facePhotoFile = null;
+      this.photoPreview = null;
+      this.photoFileInfo = null;
+      this.isLoadingPhotoPreview = false;
+    },
+
+    /**
+     * Remove selected photo
+     */
+    removePhoto() {
+      if (confirm('Apakah Anda yakin ingin menghapus foto yang dipilih?')) {
+        const fileInput = document.querySelector('input[type="file"][accept*="image"]');
+        if (fileInput) {
+          fileInput.value = "";
+        }
+        this.resetPhotoState();
+      }    },
+
+    /**
      * Submit form (create or update user)
-     */,
+     */
     async submitForm() {
       try {
         this.isSaving = true;

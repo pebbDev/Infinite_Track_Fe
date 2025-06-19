@@ -39,6 +39,7 @@ import { initAuthStore } from "./stores/authStore.js";
 import { initRoleBasedAccess } from "./utils/roleBasedAccess.js";
 import { userListAlpineData } from "./features/userManagement/userListSimple.js";
 import { userFormAlpineData } from "./features/userManagement/userForm.js";
+import { getUserPhotoUrl } from "./utils/photoValidation.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
@@ -46,6 +47,9 @@ window.Alpine = Alpine;
 // Expose Alpine.js components to window for use in HTML
 window.userListAlpineData = userListAlpineData;
 window.userFormAlpineData = userFormAlpineData;
+
+// Expose utility functions to window for use in HTML
+window.getUserPhotoUrl = getUserPhotoUrl;
 
 // Global Alpine.js state for Map Detail Modal
 Alpine.data("mapDetailModalState", () => ({

@@ -98,9 +98,8 @@
                   >
                     <div
                       class="h-20 w-20 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800"
-                    >
-                      <img
-                        :src="userProfile.photo ? `./images/${userProfile.photo.replace(/\\/g, '/')}` : './images/user/owner.jpg'"
+                    >                      <img
+                        :src="window.getUserPhotoUrl ? window.getUserPhotoUrl(userProfile.photo) : (userProfile.photo ? `./images/${userProfile.photo.replace(/\\/g, '/')}` : './images/user/owner.jpg')"
                         alt="user photo"
                         class="h-full w-full object-cover"
                       />

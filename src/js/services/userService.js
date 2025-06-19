@@ -5,6 +5,7 @@
 
 import axios from "axios";
 import { API_CONFIG, envLog } from "../config/env.js";
+import { validatePhotoFile, handlePhotoUploadError, PHOTO_CONFIG } from "../utils/photoValidation.js";
 
 // Konfigurasi axios default
 axios.defaults.withCredentials = true; // Mengizinkan pengiriman cookie
@@ -414,6 +415,12 @@ async function updateUserPhoto(userId, photoFile) {
   try {
     envLog("debug", "Updating user photo:", userId);
 
+    // Validasi file foto terlebih dahulu
+    const validation = validatePhotoFile(photoFile);
+    if (!validation.isValid) {
+      throw new Error(validation.error);
+    }
+
     const formData = new FormData();
     formData.append("face_photo", photoFile);
 
@@ -452,12 +459,11 @@ async function updateUserPhoto(userId, photoFile) {
       } else if (status === 404) {
         throw new Error("Pengguna tidak ditemukan.");
       } else if (status === 413) {
-        throw new Error("Ukuran file terlalu besar. Maksimal 10MB.");
+        throw new Error("File terlalu besar. Maksimal 20MB.");
       } else if (status === 422) {
-        throw new Error(
-          data?.message ||
-            "Format file tidak valid. Gunakan JPEG, JPG, atau PNG.",
-        );
+        // Gunakan error handler yang lebih spesifik
+        const specificError = handlePhotoUploadError(new Error(data?.message || ""));
+        throw new Error(specificError);
       } else if (status === 500) {
         throw new Error("Terjadi kesalahan server. Silakan coba lagi nanti.");
       } else {
@@ -470,7 +476,9 @@ async function updateUserPhoto(userId, photoFile) {
         "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
       );
     } else {
-      throw new Error(error.message || "Terjadi kesalahan yang tidak terduga");
+      // Gunakan error handler untuk error validation atau lainnya
+      const specificError = handlePhotoUploadError(error);
+      throw new Error(specificError);
     }
   }
 }

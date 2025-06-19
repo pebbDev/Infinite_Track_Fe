@@ -429,9 +429,8 @@
             </div>
             <h4 class="mb-2 font-medium text-gray-800 dark:text-white/90">
               Drop File Here
-            </h4>
-            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              Drag and drop your PNG, JPEG, JPG images here or
+            </h4>            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              Drag and drop your PNG, JPEG, JPG, WebP images here or
               <button
                 type="button"
                 class="text-brand-500 hover:underline"
@@ -440,35 +439,44 @@
                 browse
               </button>
             </p>
-            <p class="text-xs text-gray-400">Max: 2MB</p>
+            <p class="text-xs text-gray-400">Max: 20MB</p>
           </div>
           <input
             type="file"
             id="photo-input"
-            name="photo"
-            accept=".png,.jpeg,.jpg"
+            name="face_photo"
+            accept=".png,.jpeg,.jpg,.webp,image/png,image/jpeg,image/jpg,image/webp"
             :required="!isEditMode"
             class="hidden"
             x-ref="photoInput"
             @change="handleFileChange($event)"
           />
-        </div>
-
-        <!-- Photo Preview Section -->
+        </div>        <!-- Photo Preview Section -->
         <div
-          x-show="photoPreview || (isEditMode && currentPhotoUrl)"
+          x-show="photoPreview || (isEditMode && currentPhotoUrl) || isLoadingPhotoPreview"
           class="mt-3"
         >
+          <!-- Loading state -->
+          <div x-show="isLoadingPhotoPreview" class="flex items-center space-x-2">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span class="text-sm text-gray-600 dark:text-gray-400">Loading preview...</span>
+          </div>
+
           <!-- New photo preview (from file input) -->
-          <div x-show="photoPreview">
+          <div x-show="photoPreview && !isLoadingPhotoPreview">
             <img
               :src="photoPreview"
               class="h-20 w-20 rounded-lg object-cover"
               alt="New Photo Preview"
             />
+            <!-- File info -->
+            <div x-show="photoFileInfo" class="mt-2 text-xs text-gray-500">
+              <p x-text="photoFileInfo?.name"></p>
+              <p x-text="photoFileInfo?.size"></p>
+            </div>
             <button
               type="button"
-              @click="facePhotoFile = null; photoPreview = null; $refs.photoInput.value = ''"
+              @click="removePhoto()"
               class="mt-2 text-xs text-red-500 hover:underline"
             >
               Remove New Photo

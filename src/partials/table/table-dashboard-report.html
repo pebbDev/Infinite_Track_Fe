@@ -37,37 +37,68 @@
   </div>
 </div>
 
-<!-- Table Controls -->
+<!-- Dashboard Report Table Header -->
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+    Report Absensi
+  </h2>
+  <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+    Laporan data absensi karyawan dan analisis kedisiplinan
+  </p>
+</div>
+
+<!-- Search and Filter Controls -->
 <div
   x-show="!isLoading && !errorMessage"
-  class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  class="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900"
 >
-  <!-- Entries per page -->
-  <div class="flex items-center space-x-2">
-    <span class="text-sm text-gray-700 dark:text-gray-300">Show</span>
-    <select
-      x-model="entriesPerPage"
-      @change="onEntriesPerPageChange()"
-      class="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-    >
-      <option value="10">10</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
-    <span class="text-sm text-gray-700 dark:text-gray-300">entries</span>
-  </div>
+  <div
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <!-- Search Input -->
+    <div class="relative max-w-md flex-1">
+      <div
+        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+      >
+        <svg
+          class="h-5 w-5 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          ></path>
+        </svg>
+      </div>
+      <input
+        type="text"
+        x-model="searchQuery"
+        @input="debouncedSearch()"
+        placeholder="Cari berdasarkan nama, status, atau informasi..."
+        class="focus:ring-primary focus:border-primary block w-full rounded-md border border-gray-300 bg-white py-2 pr-3 pl-10 leading-5 placeholder-gray-500 focus:placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+      />
+    </div>
 
-  <!-- Search -->
-  <div class="flex items-center space-x-2">
-    <label class="text-sm text-gray-700 dark:text-gray-300">Search:</label>
-    <input
-      type="text"
-      x-model="searchQuery"
-      @input="onSearchChange()"
-      placeholder="Search..."
-      class="rounded border border-gray-300 px-3 py-1 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-    />
+    <!-- Entries per page -->
+    <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+        >Show:</label
+      >
+      <select
+        x-model="filters.limit"
+        @change="changeEntriesPerPage(filters.limit)"
+        class="focus:ring-primary focus:border-primary rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+      >
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+      </select>
+      <span class="text-sm text-gray-700 dark:text-gray-300">entries</span>
+    </div>
   </div>
 </div>
 
@@ -81,17 +112,6 @@
       <!-- Table Header -->
       <thead class="bg-gray-50 dark:bg-gray-800">
         <tr>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
-          >
-            <button
-              @click="changeSort('id')"
-              class="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
-            >
-              <span>User ID</span>
-              <span x-text="getSortIcon('id')" class="text-primary"></span>
-            </button>
-          </th>
           <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
@@ -139,7 +159,7 @@
           <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
-            Koordinat
+            Notes
           </th>
           <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
@@ -153,9 +173,14 @@
             </button>
           </th>
           <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+            class="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             Information
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
+          >
+            Indeks Kedisiplinan
           </th>
           <th
             class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
@@ -169,17 +194,8 @@
       <tbody
         class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
       >
-        <template
-          x-for="log in paginatedAttendanceData"
-          :key="log.id_attendance"
-        >
+        <template x-for="log in reportData" :key="log.id_attendance">
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-            <!-- User ID -->
-            <td
-              class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white"
-            >
-              <span x-text="log.id" class="font-medium"></span>
-            </td>
             <!-- Full Name -->
             <td class="px-6 py-4">
               <div class="flex items-center space-x-3">
@@ -197,7 +213,7 @@
                   ></div>
                   <div
                     class="text-sm text-gray-500 dark:text-gray-400"
-                    x-text="log.role_name"
+                    x-text="log.nim || log.nip_nim"
                   ></div>
                 </div>
               </div>
@@ -221,35 +237,22 @@
             >
               <span x-text="log.work_hour || '-'"></span>
             </td>
-            <!-- Koordinat -->
-            <td class="px-6 py-4 text-sm whitespace-nowrap">
-              <button
-                @click="viewLocation(log)"
-                :disabled="!log.location?.latitude || !log.location?.longitude"
-                :class="log.location?.latitude && log.location?.longitude ? 'hover:bg-blue-600 bg-blue-500' : 'bg-gray-400 cursor-not-allowed'"
-                class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-white transition-colors"
-              >
-                <svg
-                  class="mr-1 h-3 w-3"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-                <span
-                  x-text="log.location?.latitude && log.location?.longitude ? 'View Detail' : 'No Location'"
-                ></span>
-              </button>
+            <!-- Notes -->
+            <td
+              class="max-w-xs px-6 py-4 text-sm text-gray-900 dark:text-white"
+            >
+              <div
+                x-text="log.notes || '-'"
+                class="line-clamp-2 leading-relaxed"
+                :title="log.notes"
+              ></div>
             </td>
 
             <!-- Status -->
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 :class="getStatusBadgeClass(log.status)"
+                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                 x-text="getStatusBadgeText(log.status)"
               ></span>
             </td>
@@ -257,10 +260,40 @@
             <!-- Information -->
             <td class="px-6 py-4 text-center whitespace-nowrap">
               <span
-                :class="getInfoBadgeClass(log.information || log.work_type)"
-                x-text="getInfoBadgeText(log.information || log.work_type)"
+                :class="getInfoBadgeClass(log.location_details?.category || log.information || log.work_type)"
+                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                x-text="getInfoBadgeText(log.location_details?.category || log.information || log.work_type)"
               ></span>
             </td>
+
+            <!-- Indeks Kedisiplinan -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="space-y-1">
+                <!-- Discipline Label -->
+                <div
+                  class="text-sm font-medium text-gray-900 dark:text-white"
+                  x-text="log.discipline_label || 'Unknown'"
+                ></div>
+
+                <!-- Progress Bar -->
+                <div
+                  class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700"
+                >
+                  <div
+                    class="h-2 rounded-full transition-all duration-300"
+                    :class="getDisciplineScoreColor(log.discipline_score || 0)"
+                    :style="`width: ${Math.min(100, Math.max(0, log.discipline_score || 0))}%`"
+                  ></div>
+                </div>
+
+                <!-- Score Text -->
+                <div
+                  class="text-xs text-gray-500 dark:text-gray-400"
+                  x-text="`${log.discipline_score || 0}/100`"
+                ></div>
+              </div>
+            </td>
+
             <!-- Action -->
             <td class="px-6 py-4 text-sm whitespace-nowrap">
               <button
@@ -281,7 +314,7 @@
         </template>
 
         <!-- Empty State -->
-        <template x-if="paginatedAttendanceData.length === 0">
+        <template x-if="reportData.length === 0">
           <tr>
             <td colspan="9" class="px-6 py-12 text-center">
               <div class="flex flex-col items-center space-y-3">
@@ -312,33 +345,47 @@
 
   <!-- Pagination -->
   <div
-    x-show="!isLoading && totalPages > 1"
+    x-show="!isLoading && pagination.total_pages > 1"
     class="border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-700 dark:bg-gray-900"
   >
     <div class="flex items-center justify-between">
       <!-- Info Text -->
       <div class="text-sm text-gray-700 dark:text-gray-300">
-        <span x-text="showingInfo"></span>
+        Showing
+        <span
+          class="font-medium"
+          x-text="((pagination.current_page - 1) * pagination.per_page) + 1"
+        ></span>
+        to
+        <span
+          class="font-medium"
+          x-text="Math.min(pagination.current_page * pagination.per_page, pagination.total_records)"
+        ></span>
+        of
+        <span class="font-medium" x-text="pagination.total_records"></span>
+        entries
       </div>
 
       <!-- Pagination Controls -->
       <div class="flex items-center space-x-2">
         <!-- Previous Button -->
         <button
-          @click="previousPage()"
-          :disabled="currentPage === 1"
-          :class="currentPage === 1 ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'"
+          @click="changePage(pagination.current_page - 1)"
+          :disabled="!pagination.has_prev_page"
+          :class="pagination.has_prev_page ? 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
           class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-800"
         >
           Previous
         </button>
 
         <!-- Page Numbers -->
-        <template x-for="pageNum in getPageNumbers()" :key="pageNum">
+        <template
+          x-for="pageNum in Array.from({length: Math.min(5, pagination.total_pages)}, (_, i) => Math.max(1, pagination.current_page - 2) + i).filter(num => num <= pagination.total_pages)"
+          :key="pageNum"
+        >
           <button
-            @click="pageNum !== '...' && goToPage(pageNum)"
-            :disabled="pageNum === '...'"
-            :class="pageNum === currentPage ? 'bg-primary text-white border-primary' : pageNum === '...' ? 'cursor-not-allowed' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'"
+            @click="changePage(pageNum)"
+            :class="pageNum === pagination.current_page ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'"
             class="rounded-md border px-4 py-2 text-sm font-medium"
             x-text="pageNum"
           ></button>
@@ -346,9 +393,9 @@
 
         <!-- Next Button -->
         <button
-          @click="nextPage()"
-          :disabled="currentPage === totalPages"
-          :class="currentPage === totalPages ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'"
+          @click="changePage(pagination.current_page + 1)"
+          :disabled="!pagination.has_next_page"
+          :class="pagination.has_next_page ? 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
           class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium dark:border-gray-600 dark:bg-gray-800"
         >
           Next

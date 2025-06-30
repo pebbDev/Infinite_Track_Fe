@@ -225,7 +225,7 @@
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 :class="getStatusBadgeClass(booking.status)"
-                x-text="booking.status"
+                x-text="getStatusBadgeText(booking.status)"
               ></span>
             </td>
             <!-- Actions -->

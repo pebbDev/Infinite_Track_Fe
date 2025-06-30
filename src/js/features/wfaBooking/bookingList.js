@@ -10,6 +10,10 @@ import {
 } from "../../services/bookingService.js";
 import { formatDateTime, formatDate } from "../../utils/dateTimeFormatter.js";
 import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
+import { 
+  getBookingStatusBadgeClass, 
+  getBookingStatusBadgeText 
+} from "../../utils/badgeHelpers.js";
 
 /**
  * Alpine.js data untuk halaman booking list
@@ -590,39 +594,17 @@ Detail Booking:
     },
 
     /**
-     * Get status badge class
-     * @param {string} status - Status booking
-     * @returns {string} - CSS classes for status badge
+     * Get status badge class (using universal badge helper)
      */
     getStatusBadgeClass(status) {
-      switch (status?.toLowerCase()) {
-        case "pending":
-          return "inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
-        case "approved":
-          return "inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400";
-        case "rejected":
-          return "inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400";
-        default:
-          return "inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
-      }
+      return getBookingStatusBadgeClass(status);
     },
 
     /**
-     * Get status badge text
-     * @param {string} status - Status booking
-     * @returns {string} - Display text for status
+     * Get status badge text (using universal badge helper)
      */
     getStatusBadgeText(status) {
-      switch (status?.toLowerCase()) {
-        case "pending":
-          return "Pending";
-        case "approved":
-          return "Approved";
-        case "rejected":
-          return "Rejected";
-        default:
-          return status || "Unknown";
-      }
+      return getBookingStatusBadgeText(status);
     },
 
     /**

@@ -13,6 +13,12 @@ import {
   formatDate,
 } from "../../utils/dateTimeFormatter.js";
 import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
+import { 
+  getStatusBadgeClass, 
+  getStatusBadgeText, 
+  getInfoBadgeClass, 
+  getInfoBadgeText 
+} from "../../utils/badgeHelpers.js";
 
 /**
  * Alpine.js data untuk halaman attendance log
@@ -248,78 +254,38 @@ export function attendanceLogAlpineData() {
     },
 
     /**
-     * Get status badge class
-     * @param {string} status - Status absensi ('late', 'ontime', dll)
-     * @returns {string} - CSS classes untuk badge
+     * Get status badge class (using universal badge helper)
      */
     getStatusBadgeClass(status) {
-      switch (status?.toLowerCase()) {
-        case "late":
-          return "inline-flex items-center rounded-full bg-error-50 px-2 py-1 text-xs font-medium text-error-700 dark:bg-error-500/15 dark:text-error-400";
-        case "ontime":
-          return "inline-flex items-center rounded-full bg-success-50 px-2 py-1 text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-400";
-        default:
-          return "inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-500/15 dark:text-gray-400";
-      }
+      return getStatusBadgeClass(status);
     },
 
     /**
-     * Get status badge text
-     * @param {string} status - Status absensi
-     * @returns {string} - Text untuk badge
+     * Get status badge text (using universal badge helper)
      */
     getStatusBadgeText(status) {
-      switch (status?.toLowerCase()) {
-        case "late":
-          return "Late";
-        case "ontime":
-          return "On Time";
-        default:
-          return "Alpha";
-      }
+      return getStatusBadgeText(status);
     },
 
     /**
-     * Get information badge class
-     * @param {string} info - Information type ('wfo', 'wfh', dll)
-     * @returns {string} - CSS classes untuk badge
+     * Get information badge class (using universal badge helper)
      */
     getInfoBadgeClass(info) {
-      switch (info?.toLowerCase()) {
-        case "wfo":
-        case "work from office":
-          return "inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/15 dark:text-blue-400";
-        case "wfh":
-        case "work from home":
-          return "inline-flex items-center rounded-full bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 dark:bg-purple-500/15 dark:text-purple-400";
-        default:
-          return "inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-500/15 dark:text-gray-400";
-      }
+      return getInfoBadgeClass(info);
     },
 
     /**
-     * Get information badge text
-     * @param {string} info - Information type
-     * @returns {string} - Text untuk badge
+     * Get information badge text (using universal badge helper)
      */
     getInfoBadgeText(info) {
-      switch (info?.toLowerCase()) {
-        case "wfo":
-          return "Work From Office";
-        case "wfh":
-          return "Work From Home";
-        case "work from office":
-          return "Work From Office";
-        case "work from home":
-          return "Work From Home";
-        default:
-          return info || "Unknown";
-      }
-    } /**
+      return getInfoBadgeText(info);
+    },
+
+    /**
      * Get sort icon
      * @param {string} fieldName - Field name untuk sorting
      * @returns {string} - Icon class atau empty string
-     */,
+     */
     getSortIcon(fieldName) {
       if (this.filters.sortBy !== fieldName) {
         return ""; // Tidak ada icon jika field tidak sedang di-sort

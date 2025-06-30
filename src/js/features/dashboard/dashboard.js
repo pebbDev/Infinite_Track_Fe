@@ -58,6 +58,9 @@ export function dashboard() {
     // Raw API data untuk export
     rawApiData: null,
 
+    // Export state
+    isExporting: false,
+
     // Data properties
     summaryData: {
       summary: {
@@ -73,12 +76,12 @@ export function dashboard() {
 
     // Summary data untuk card - terpengaruh period filter (cards update when period changes)
     cardSummaryData: {
-      onTime: 0,
-      late: 0,
+      onTime: 1,
+      late: 15,
       alpha: 0,
-      wfo: 0,
-      wfh: 0,
-      wfa: 0,
+      wfo: 13,
+      wfh: 1,
+      wfa: 2,
     },
 
     // Summary statistics data untuk tabel - terpengaruh period filter
@@ -129,24 +132,24 @@ export function dashboard() {
       // Set some initial test data immediately
       this.summaryData = {
         summary: {
-          onTime: 25,
-          late: 8,
-          alpha: 2,
-          wfo: 15,
-          wfh: 12,
-          wfa: 8,
+          onTime: 1,
+          late: 15,
+          alpha: 0,
+          wfo: 13,
+          wfh: 1,
+          wfa: 2,
         },
         report: [],
       };
 
       // Initial card summary data (akan diupdate dari API)
       this.cardSummaryData = {
-        onTime: 25,
-        late: 8,
-        alpha: 2,
-        wfo: 15,
-        wfh: 12,
-        wfa: 8,
+        onTime: 1,
+        late: 15,
+        alpha: 0,
+        wfo: 13,
+        wfh: 1,
+        wfa: 2,
       };
 
       this.analyticsData = {
@@ -525,6 +528,30 @@ export function dashboard() {
       } catch (error) {
         console.error("Error generating Excel:", error);
         this.showNotification("Failed to generate Excel report", "error");
+      }
+    },
+
+    /**
+     * Export to PDF - wrapper function for stats-card-group.html
+     */
+    async exportToPDF() {
+      this.isExporting = true;
+      try {
+        await this.downloadPDF();
+      } finally {
+        this.isExporting = false;
+      }
+    },
+
+    /**
+     * Export to Excel - wrapper function for stats-card-group.html
+     */
+    async exportToExcel() {
+      this.isExporting = true;
+      try {
+        await this.downloadExcel();
+      } finally {
+        this.isExporting = false;
       }
     },
 

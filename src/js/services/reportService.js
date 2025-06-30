@@ -46,13 +46,27 @@ class ReportService {
         headers: getAuthHeaders(),
       });
 
+      console.log("API Response received:", response.data);
+
       // Return the complete response data including pagination and analytics
       return response.data;
     } catch (error) {
-      console.log("Error fetching from API, using mock data:", error.message);
+      console.error("Error fetching from API:", error.message);
 
-      // For development: Return mock data if API is not available
-      return this.getMockSummaryData(params);
+      // Check if we're in development mode
+      const isDevelopment =
+        process.env.NODE_ENV === "development" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
+      if (isDevelopment) {
+        console.warn("Development mode: Using mock data as fallback");
+        return this.getMockSummaryData(params);
+      } else {
+        // In production, throw the error instead of using mock data
+        console.error("Production mode: API call failed, no fallback data");
+        throw new Error(`Failed to fetch summary report: ${error.message}`);
+      }
     }
   }
 
@@ -190,7 +204,7 @@ class ReportService {
     let filteredData = allReportData;
     if (search && search.trim() !== "") {
       const searchLower = search.toLowerCase().trim();
-      filteredData = allReportData.filter(item => {
+      filteredData = allReportData.filter((item) => {
         return (
           item.full_name?.toLowerCase().includes(searchLower) ||
           item.nip_nim?.toLowerCase().includes(searchLower) ||

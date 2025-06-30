@@ -13,11 +13,11 @@ import {
   formatDate,
 } from "../../utils/dateTimeFormatter.js";
 import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
-import { 
-  getStatusBadgeClass, 
-  getStatusBadgeText, 
-  getInfoBadgeClass, 
-  getInfoBadgeText 
+import {
+  getStatusBadgeClass,
+  getStatusBadgeText,
+  getInfoBadgeClass,
+  getInfoBadgeText,
 } from "../../utils/badgeHelpers.js";
 
 /**

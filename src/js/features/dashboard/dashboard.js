@@ -22,7 +22,7 @@ export function dashboard() {
     error: null,
     period: "all",
 
-    // Pagination state  
+    // Pagination state
     pagination: {
       current_page: 1,
       total_pages: 1,
@@ -69,6 +69,26 @@ export function dashboard() {
         wfa: 0,
       },
       report: [],
+    },
+
+    // Summary data untuk card - terpengaruh period filter (cards update when period changes)
+    cardSummaryData: {
+      onTime: 0,
+      late: 0,
+      alpha: 0,
+      wfo: 0,
+      wfh: 0,
+      wfa: 0,
+    },
+
+    // Summary statistics data untuk tabel - terpengaruh period filter
+    summaryStatsData: {
+      total_ontime: 0,
+      total_late: 0,
+      total_alpha: 0,
+      total_wfo: 0,
+      total_wfh: 0,
+      total_wfa: 0,
     },
 
     // Analytics data (new)
@@ -119,6 +139,16 @@ export function dashboard() {
         report: [],
       };
 
+      // Initial card summary data (akan diupdate dari API)
+      this.cardSummaryData = {
+        onTime: 25,
+        late: 8,
+        alpha: 2,
+        wfo: 15,
+        wfh: 12,
+        wfa: 8,
+      };
+
       this.analyticsData = {
         discipline_index: 78.5,
         performance_trend: "improving",
@@ -131,7 +161,7 @@ export function dashboard() {
     },
 
     /**
-     * Load summary data dari API
+     * Load summary data dari API - menggunakan period filter untuk semua tampilan dashboard
      */
     async loadSummaryData() {
       this.loading = true;
@@ -141,14 +171,18 @@ export function dashboard() {
 
       try {
         console.log(
-          `Loading summary data for period: ${this.filters.period}, page: ${this.filters.page}, search: ${this.searchQuery}`,
+          `Loading dashboard data for page: ${this.filters.page}, search: ${this.searchQuery}, period: ${this.period}`,
         );
+
+        // Gunakan period filter yang dipilih user untuk semua tampilan dashboard
         const response = await getSummaryReport({
-          period: this.filters.period,
+          period: this.period, // Menggunakan period filter dari dropdown
           page: this.filters.page,
           limit: this.filters.limit,
           search: this.searchQuery,
         });
+
+        console.log(`Dashboard API call made with period='${this.period}'`);
 
         // Handle API response format dan mapping field names
         if (response && response.summary) {
@@ -161,6 +195,13 @@ export function dashboard() {
             wfh: response.summary.total_wfh || 0,
             wfa: response.summary.total_wfa || 0,
           };
+
+          // Update card summary data (terpengaruh period filter)
+          this.cardSummaryData = { ...mappedSummary };
+          console.log(
+            `✅ Card summary data updated for period '${this.period}':`,
+            this.cardSummaryData,
+          );
 
           // Extract analytics data
           this.analyticsData = response.analytics || {
@@ -195,7 +236,8 @@ export function dashboard() {
               item.work_hour ||
               this.calculateWorkHours(item.time_in, item.time_out),
             status: item.status || "Present",
-            information: item.location_details?.category || item.information || "N/A",
+            information:
+              item.location_details?.category || item.information || "N/A",
             attendance_date: item.attendance_date || null,
             nip_nim: item.nip_nim || null,
             email: item.email || null,
@@ -236,138 +278,24 @@ export function dashboard() {
           console.log("Summary data loaded successfully:", this.summaryData);
           console.log("Attendance data mapped:", this.attendanceData);
         } else {
-          // For testing: If there's no API yet, use mock data
-          this.summaryData = {
-            summary: {
-              onTime: 21,
-              late: 19,
-              alpha: 0,
-              wfo: 10,
-              wfh: 11,
-              wfa: 13,
-            },
-            report: [],
-          };
-
-          // Mock analytics data
-          this.analyticsData = {
-            discipline_index: 78.5,
-            performance_trend: "improving",
-            avg_work_hours: 8.2,
-          };
-
-          // Mock pagination data
-          this.pagination = {
-            current_page: 1,
-            total_pages: 1,
-            total_records: 2,
-            per_page: 5,
-            has_next_page: false,
-            has_prev_page: false,
-          };
-
-          // Mock raw API data for export
-          this.rawApiData = {
-            summary: {
-              total_ontime: 21,
-              total_late: 19,
-              total_alpha: 0,
-              total_wfo: 10,
-              total_wfh: 11,
-              total_wfa: 13,
-            },
-            report: {
-              data: [],
-              pagination: {
-                current_page: 1,
-                total_pages: 1,
-                total_records: 0,
-                per_page: 5,
-                has_next_page: false,
-                has_prev_page: false,
-              },
-            },
-          }; // Mock attendance data dengan struktur yang benar sesuai API
-          this.attendanceData = [
-            {
-              id_attendance: "att_001",
-              id: "F5512062",
-              full_name: "John Doe",
-              role_name: "Developer",
-              time_in: "08:00",
-              time_out: "17:00",
-              work_hour: "9 hours",
-              status: "ontime",
-              information: "Work From Office",
-              discipline_score: 92,
-              discipline_label: "Excellent",
-              location: {
-                latitude: -6.1754,
-                longitude: 106.8272,
-                radius: 100,
-                description: "Kantor Pusat",
-              },
-              location_description: "Kantor Pusat",
-              latitude: -6.1754,
-              longitude: 106.8272,
-              email: "john.doe@example.com",
-              phone_number: "081234567890",
-            },
-            {
-              id_attendance: "att_002",
-              id: "F5512063",
-              full_name: "Jane Smith",
-              role_name: "Designer",
-              time_in: "08:30",
-              time_out: "17:30",
-              work_hour: "9 hours",
-              status: "late",
-              information: "Work From Home",
-              discipline_score: 74,
-              discipline_label: "Good",
-              location: {
-                latitude: null,
-                longitude: null,
-                radius: 100,
-                description: "Location not specified",
-              },
-              location_description: "Location not specified",
-              latitude: null,
-              longitude: null,
-              email: "jane.smith@example.com",
-              phone_number: "081234567891",
-            },
-          ];
-
-          // Set reportData for table display
-          this.reportData = this.attendanceData;
-
-          console.log("Using mock data for summary and attendance");
+          // No valid response data
+          console.warn("No valid data received from API");
+          this.handleEmptyApiResponse();
         }
       } catch (error) {
         console.error("Error loading summary data:", error);
-        this.error = error.message;
-        this.errorMessage = error.message; // Fallback to default data on error
-        this.summaryData = {
-          summary: {
-            onTime: 0,
-            late: 0,
-            alpha: 0,
-            wfo: 0,
-            wfh: 0,
-            wfa: 0,
-          },
-          report: [],
-        };
+        this.loading = false;
+        this.isLoading = false;
+        this.errorMessage = error.message;
 
-        // Empty analytics data for error case
-        this.analyticsData = {
-          discipline_index: 0,
-          performance_trend: "stable",
-          avg_work_hours: 0,
-        };
+        // Clear all data and show error state - no mock data fallback
+        this.summaryData = null;
+        this.attendanceData = [];
+        this.rawApiData = null; // Critical: No mock data for export
+        this.analyticsData = null;
+        this.reportData = [];
 
-        // Reset pagination data
+        // Reset pagination
         this.pagination = {
           current_page: 1,
           total_pages: 1,
@@ -377,34 +305,52 @@ export function dashboard() {
           has_prev_page: false,
         };
 
-        // Empty raw API data for error case
-        this.rawApiData = {
-          summary: {
-            total_ontime: 0,
-            total_late: 0,
-            total_alpha: 0,
-            total_wfo: 0,
-            total_wfh: 0,
-            total_wfa: 0,
-          },
-          report: {
-            data: [],
-            pagination: {
-              current_page: 1,
-              total_pages: 1,
-              total_records: 0,
-              per_page: 5,
-              has_next_page: false,
-              has_prev_page: false,
-            },
-          },
-        };
-
-        this.attendanceData = [];
-        this.reportData = [];
+        // Show user-friendly error message
+        this.showNotification(
+          "Failed to load dashboard data. Please check your connection and try again.",
+          "error",
+        );
       } finally {
         this.loading = false;
         this.isLoading = false;
+      }
+    },
+
+    /**
+     * Load data khusus untuk export dengan period filter - ambil SEMUA data
+     */
+    async loadExportData() {
+      try {
+        console.log(`Loading export data with period: ${this.period}`);
+
+        const response = await getSummaryReport({
+          period: this.period, // Gunakan period yang dipilih user
+          page: 1, // Ambil dari halaman pertama
+          limit: 10000, // Ambil SEMUA data dengan limit besar
+          search: "", // Tidak ada search filter untuk export
+        });
+
+        if (response && response.summary) {
+          // Update rawApiData untuk export
+          const exportData = {
+            summary: response.summary,
+            report: response.report,
+          };
+
+          console.log(`Export data loaded successfully:`, {
+            period: this.period,
+            summaryStats: response.summary,
+            recordCount: response.report?.data?.length || 0,
+            totalRecords: response.report?.pagination?.total_records || 0,
+          });
+
+          return exportData;
+        } else {
+          throw new Error("No valid export data received from API");
+        }
+      } catch (error) {
+        console.error("Error loading export data:", error);
+        throw error;
       }
     },
 
@@ -430,14 +376,20 @@ export function dashboard() {
     },
 
     /**
-     * Handle period change
+     * Handle period change - mempengaruhi semua tampilan dashboard
      */
     async onPeriodChange() {
-      console.log(`Period changed to: ${this.period}`);
-      // Update filters and reset to first page
-      this.filters.period = this.period;
-      this.filters.page = 1;
+      console.log(`🔄 Period filter changed to: ${this.period}`);
+      console.log("📊 Reloading dashboard data dengan period filter baru");
+
+      // Period filter mempengaruhi SEMUA tampilan dashboard (cards, table, export)
+      // Reload data dashboard dengan period filter baru
       await this.loadSummaryData();
+
+      this.showNotification(
+        `Dashboard updated untuk period: ${this.period}`,
+        "info",
+      );
     },
 
     /**
@@ -479,34 +431,93 @@ export function dashboard() {
      */,
     async downloadPDF() {
       try {
-        console.log("Generating PDF report...");
+        console.log(`Generating PDF report with period filter: ${this.period}`);
 
-        // Gunakan raw API data jika tersedia, atau fallback ke summaryData
-        const dataForExport = this.rawApiData || this.summaryData;
-        console.log("Data being sent to PDF generator:", dataForExport);
+        // Load fresh export data dengan period filter
+        const exportData = await this.loadExportData();
 
-        generatePDFReport(dataForExport, this.period);
+        // Validasi bahwa kita memiliki data export yang valid
+        if (!exportData || !exportData.summary || !exportData.report) {
+          console.error("No valid export data available for PDF");
+          this.showNotification(
+            "Failed to load export data. Please try again.",
+            "error",
+          );
+          return;
+        }
 
-        // Show success notification (optional)
+        // Validasi struktur data
+        const isValidApiData =
+          exportData.summary &&
+          (exportData.report.data || exportData.report) &&
+          typeof exportData.summary === "object";
+
+        if (!isValidApiData) {
+          console.error("Invalid export data structure for PDF");
+          this.showNotification(
+            "Invalid data structure for PDF export",
+            "error",
+          );
+          return;
+        }
+
+        console.log(
+          "Valid export data being sent to PDF generator:",
+          exportData,
+        );
+        generatePDFReport(exportData, this.period);
+
+        // Show success notification
         this.showNotification("PDF report downloaded successfully!", "success");
       } catch (error) {
         console.error("Error generating PDF:", error);
         this.showNotification("Failed to generate PDF report", "error");
       }
-    } /**
+    },
+    /**
      * Download report as Excel
-     */,
+     */
     async downloadExcel() {
       try {
-        console.log("Generating Excel report...");
+        console.log(
+          `Generating Excel report with period filter: ${this.period}`,
+        );
 
-        // Gunakan raw API data jika tersedia, atau fallback ke summaryData
-        const dataForExport = this.rawApiData || this.summaryData;
-        console.log("Data being sent to Excel generator:", dataForExport);
+        // Load fresh export data dengan period filter
+        const exportData = await this.loadExportData();
 
-        generateExcelReport(dataForExport, this.period);
+        // Validasi bahwa kita memiliki data export yang valid
+        if (!exportData || !exportData.summary || !exportData.report) {
+          console.error("No valid export data available for Excel");
+          this.showNotification(
+            "Failed to load export data. Please try again.",
+            "error",
+          );
+          return;
+        }
 
-        // Show success notification (optional)
+        // Validasi struktur data
+        const isValidApiData =
+          exportData.summary &&
+          (exportData.report.data || exportData.report) &&
+          typeof exportData.summary === "object";
+
+        if (!isValidApiData) {
+          console.error("Invalid export data structure for Excel");
+          this.showNotification(
+            "Invalid data structure for Excel export",
+            "error",
+          );
+          return;
+        }
+
+        console.log(
+          "Valid export data being sent to Excel generator:",
+          exportData,
+        );
+        generateExcelReport(exportData, this.period);
+
+        // Show success notification
         this.showNotification(
           "Excel report downloaded successfully!",
           "success",
@@ -771,6 +782,57 @@ export function dashboard() {
       }
     },
 
+    /**
+     * Handle empty API response
+     */
+    handleEmptyApiResponse() {
+      console.warn(`API returned empty response for period: ${this.period}`);
+
+      // Reset card summary data hanya jika benar-benar error API
+      this.cardSummaryData = {
+        onTime: 0,
+        late: 0,
+        alpha: 0,
+        wfo: 0,
+        wfh: 0,
+        wfa: 0,
+      };
+
+      this.summaryData = {
+        summary: {
+          onTime: 0,
+          late: 0,
+          alpha: 0,
+          wfo: 0,
+          wfh: 0,
+          wfa: 0,
+        },
+        report: [],
+      };
+
+      this.analyticsData = {
+        discipline_index: 0,
+        performance_trend: "stable",
+        avg_work_hours: 0,
+      };
+
+      this.pagination = {
+        current_page: 1,
+        total_pages: 1,
+        total_records: 0,
+        per_page: 5,
+        has_next_page: false,
+        has_prev_page: false,
+      };
+
+      // Critical: No raw API data means no export capability
+      this.rawApiData = null;
+      this.attendanceData = [];
+      this.reportData = [];
+
+      this.showNotification("No data available from server", "info");
+    },
+
     // =================== SEARCH AND PAGINATION FUNCTIONALITY ===================
 
     /**
@@ -1014,7 +1076,9 @@ export function dashboard() {
     viewDetail(log) {
       console.log("Viewing detail for:", log);
       // You can implement a modal or redirect to detail page here
-      alert(`Viewing detail for ${log.full_name}\nStatus: ${log.status}\nInformation: ${log.information}`);
+      alert(
+        `Viewing detail for ${log.full_name}\nStatus: ${log.status}\nInformation: ${log.information}`,
+      );
     },
 
     /**

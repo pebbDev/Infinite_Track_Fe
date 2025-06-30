@@ -6,11 +6,13 @@
       name="viewport"
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />    <title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
       Summary Report | InfiniteTrack - Tailwind CSS Admin Dashboard Template
     </title>
     <script src="./js/index.js" type="module"></script>
-  </head>  <body
+  </head>
+  <body
     x-data="{ 
       page: 'ecommerce', 
       'loaded': true, 
@@ -53,7 +55,8 @@
 
         <!-- ===== Header Start ===== -->
         <include src="./partials/common/header.html" />
-        <!-- ===== Header End ===== -->        <!-- ===== Main Content Start ===== -->
+        <!-- ===== Header End ===== -->
+        <!-- ===== Main Content Start ===== -->
         <main x-data="dashboard" x-init="init()">
           <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
             <!-- Header Section -->
@@ -69,19 +72,41 @@
                 <div class="flex gap-2">
                   <button
                     @click="downloadPDF()"
-                    class="inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-center font-medium text-white hover:bg-opacity-90 lg:px-6 xl:px-6"
+                    class="hover:bg-opacity-90 inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-center font-medium text-white lg:px-6 xl:px-6"
+                    :title="`Download PDF Report (${period})`"
                   >
-                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M7 7h10a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z" />
+                    <svg
+                      class="mr-2 h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3M7 7h10a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z"
+                      />
                     </svg>
                     PDF
                   </button>
                   <button
                     @click="downloadExcel()"
-                    class="inline-flex items-center justify-center rounded-md bg-green-600 px-4 py-2 text-center font-medium text-white hover:bg-opacity-90 lg:px-6 xl:px-6"
+                    class="hover:bg-opacity-90 inline-flex items-center justify-center rounded-md bg-green-600 px-4 py-2 text-center font-medium text-white lg:px-6 xl:px-6"
+                    :title="`Download Excel Report (${period})`"
                   >
-                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M7 7h10a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z" />
+                    <svg
+                      class="mr-2 h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3M7 7h10a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z"
+                      />
                     </svg>
                     Excel
                   </button>
@@ -92,19 +117,31 @@
                   <select
                     x-model="period"
                     @change="onPeriodChange()"
-                    class="inline-flex w-full items-center justify-center rounded-md border border-stroke bg-white px-4 py-2 text-center font-medium text-black hover:bg-gray-50 dark:border-strokedark dark:bg-boxdark dark:text-white"
+                    class="border-stroke dark:border-strokedark dark:bg-boxdark inline-flex w-full items-center justify-center rounded-md border bg-white px-4 py-2 text-center font-medium text-black hover:bg-gray-50 dark:text-white"
+                    title="Filter periode untuk dashboard dan export"
                   >
-                    <template x-for="option in periodOptions" :key="option.value">
-                      <option :value="option.value" x-text="option.label"></option>
+                    <template
+                      x-for="option in periodOptions"
+                      :key="option.value"
+                    >
+                      <option
+                        :value="option.value"
+                        x-text="option.label"
+                      ></option>
                     </template>
                   </select>
                 </div>
               </div>
-            </div>            <!-- Loading State -->
+            </div>
+            <!-- Loading State -->
             <div x-show="loading" class="mb-6">
               <div class="flex items-center justify-center p-8">
-                <div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-                <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">Loading summary data...</span>
+                <div
+                  class="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"
+                ></div>
+                <span class="ml-3 text-sm text-gray-600 dark:text-gray-400"
+                  >Loading summary data...</span
+                >
               </div>
             </div>
 
@@ -113,12 +150,22 @@
               <div class="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
                 <div class="flex">
                   <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    <svg
+                      class="h-5 w-5 text-red-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+                    <h3
+                      class="text-sm font-medium text-red-800 dark:text-red-400"
+                    >
                       Error loading data
                     </h3>
                     <div class="mt-2 text-sm text-red-700 dark:text-red-300">
@@ -140,7 +187,8 @@
             <div class="grid grid-cols-12 gap-4 md:gap-6">
               <div class="col-span-12">
                 <include src="./partials/cards/stats-card-group.html" />
-              </div>              <div class="col-span-12">
+              </div>
+              <div class="col-span-12">
                 <!-- ====== Dashboard Report Table Start -->
                 <div>
                   <include src="./partials/table/table-dashboard-report.html" />
@@ -152,13 +200,15 @@
         </main>
         <!-- ===== Main Content End ===== -->
       </div>
-      <!-- ===== Content Area End ===== -->    </div>
+      <!-- ===== Content Area End ===== -->
+    </div>
     <!-- ===== Page Wrapper End ===== -->
 
     <!-- Modals -->
     <div x-data="mapDetailModalState()">
       <include src="./partials/modal/map-detail-modal.html" />
-    </div>    <div x-data="deleteModalState()">
+    </div>
+    <div x-data="deleteModalState()">
       <include src="./partials/modal/delete-confirmation-modal.html" />
     </div>
   </body>

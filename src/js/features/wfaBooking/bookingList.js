@@ -10,9 +10,9 @@ import {
 } from "../../services/bookingService.js";
 import { formatDateTime, formatDate } from "../../utils/dateTimeFormatter.js";
 import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
-import { 
-  getBookingStatusBadgeClass, 
-  getBookingStatusBadgeText 
+import {
+  getBookingStatusBadgeClass,
+  getBookingStatusBadgeText,
 } from "../../utils/badgeHelpers.js";
 
 /**

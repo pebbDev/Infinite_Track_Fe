@@ -193,3 +193,23 @@ export function getGenericBadgeClass(type, variant = "light") {
   // Add solid variant if needed in the future
   return `${baseClasses} bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80`;
 }
+/**
+ * Returns a background color class based on a suitability score.
+ * @param {number | null | undefined} score - The suitability score (0-100).
+ * @returns {string} - The Tailwind CSS background color class.
+ */
+export function getSuitabilityScoreColor(score) {
+  if (score === null || score === undefined) {
+    return "bg-gray-300 dark:bg-gray-600";
+  }
+  if (score >= 85) {
+    return "bg-success-500"; // Very Good - Green
+  }
+  if (score >= 70) {
+    return "bg-blue-500"; // Good - Blue
+  }
+  if (score >= 50) {
+    return "bg-warning-500"; // Average - Yellow
+  }
+  return "bg-error-500"; // Poor - Red
+}

@@ -51,8 +51,8 @@ Alpine.plugin(persist);
 window.Alpine = Alpine;
 
 // Register Dashboard component
-document.addEventListener('alpine:init', () => {
-  Alpine.data('dashboard', dashboard);
+document.addEventListener("alpine:init", () => {
+  Alpine.data("dashboard", dashboard);
 });
 
 // Expose Alpine.js components to window for use in HTML
@@ -262,7 +262,8 @@ Alpine.data("bookingMapModalState", () => ({
         "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
     };
 
-    return statusClasses[status?.toLowerCase()] || statusClasses.pending;  },
+    return statusClasses[status?.toLowerCase()] || statusClasses.pending;
+  },
 }));
 
 // Global Alpine.js state for Delete Modal
@@ -270,25 +271,30 @@ Alpine.data("deleteModalState", () => ({
   isDeleteModalOpen: false,
   deleteTargetId: null,
   deleteConfirmMessage: "",
-  
+
   openDeleteModal(targetId, message) {
     this.deleteTargetId = targetId;
-    this.deleteConfirmMessage = message || "Are you sure you want to delete this item?";
+    this.deleteConfirmMessage =
+      message || "Are you sure you want to delete this item?";
     this.isDeleteModalOpen = true;
   },
-  
+
   closeDeleteModal() {
     this.isDeleteModalOpen = false;
     this.deleteTargetId = null;
     this.deleteConfirmMessage = "";
   },
-  
+
   confirmDelete() {
     if (this.deleteTargetId) {
       // Find the parent component with executeDelete method
-      const dashboardComponent = document.querySelector('[x-data*="dashboard"]');
-      const attendanceComponent = document.querySelector('[x-data*="attendance"]');
-      
+      const dashboardComponent = document.querySelector(
+        '[x-data*="dashboard"]',
+      );
+      const attendanceComponent = document.querySelector(
+        '[x-data*="attendance"]',
+      );
+
       if (dashboardComponent && dashboardComponent._x_dataStack) {
         const dashboardData = dashboardComponent._x_dataStack[0];
         if (dashboardData && dashboardData.executeDelete) {
@@ -300,11 +306,11 @@ Alpine.data("deleteModalState", () => ({
           attendanceData.executeDelete(this.deleteTargetId);
         }
       } else {
-        console.warn('No component found to handle delete operation');
+        console.warn("No component found to handle delete operation");
       }
     }
     this.closeDeleteModal();
-  }
+  },
 }));
 
 // Make map detail modal functions globally available

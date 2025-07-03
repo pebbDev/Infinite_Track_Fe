@@ -13,6 +13,7 @@ import { getInitials, getAvatarColor } from "../../utils/avatarUtils.js";
 import {
   getBookingStatusBadgeClass,
   getBookingStatusBadgeText,
+  getSuitabilityScoreColor,
 } from "../../utils/badgeHelpers.js";
 
 /**
@@ -153,6 +154,8 @@ export function bookingListAlpineData() {
           created_at: booking.created_at,
           processed_at: booking.processed_at,
           approved_by: booking.approved_by,
+          suitability_score: booking.suitability_score,
+          suitability_label: booking.suitability_label,
           // Keep original data for reference
           original: booking,
         }));
@@ -213,36 +216,6 @@ export function bookingListAlpineData() {
       this.fetchBookings();
     },
 
-    /**
-     * View booking detail
-     * @param {Object} booking - Data booking item
-     */
-    viewBookingDetail(booking) {
-      // Tampilkan alert dengan detail booking untuk sementara
-      // Bisa dikembangkan menjadi modal detail yang lebih lengkap
-      const details = `
-Detail Booking:
-- ID: ${booking.id}
-- Employee: ${booking.employee_name} (${booking.employee_id})
-- Position: ${booking.employee_position || "-"}
-- Schedule: ${this.formatDate(booking.schedule_date)}
-- Notes: ${booking.notes || "-"}
-- Status: ${booking.status}
-- Location: ${booking.location_name || "No Location"}
-- Created: ${this.formatDateTime(booking.created_at)}
-      `.trim();
-
-      if (typeof window.showAlertModal === "function") {
-        window.showAlertModal({
-          type: "info",
-          title: "Detail Booking",
-          message: details,
-          buttonText: "OK",
-        });
-      } else {
-        alert(details);
-      }
-    },
 
     /**
      * Handle search input dengan debounce
@@ -639,10 +612,19 @@ Detail Booking:
      */,
     getAvatarColor(fullName) {
       return getAvatarColor(fullName);
-    } /**
+    },
+    /**
+     * Get suitability score color using utility function
+     * @param {number} score - Suitability score
+     * @returns {string} - CSS classes for progress bar
+     */
+    getSuitabilityScoreColor(score) {
+      return getSuitabilityScoreColor(score);
+    },
+    /**
      * View booking detail
      * @param {Object} booking - Booking object
-     */,
+     */
     viewBookingDetail(booking) {
       this.bookingDetailData = {
         id: booking.id,

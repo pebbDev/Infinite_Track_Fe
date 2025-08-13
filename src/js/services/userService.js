@@ -275,6 +275,56 @@ async function deleteUser(userId) {
 }
 
 /**
+ * Check if email is available (not used by other users)
+ * @param {string} email - Email to check
+ * @param {string|number} excludeUserId - User ID to exclude from check (for edit mode)
+ * @returns {Promise<boolean>} - Promise that resolves to true if email is available
+ */
+async function checkEmailAvailability(email, excludeUserId = null) {
+  try {
+    envLog("debug", "Checking email availability:", email);
+
+    // Get all users and check if email exists
+    const users = await getUsers();
+    const existingUser = users.find(
+      (user) =>
+        user.email.toLowerCase() === email.toLowerCase() &&
+        (!excludeUserId || user.id != excludeUserId),
+    );
+
+    return !existingUser; // Return true if email is available (not found)
+  } catch (error) {
+    envLog("error", "Error checking email availability:", error);
+    return true; // If we can't check, assume it's available to avoid blocking
+  }
+}
+
+/**
+ * Check if NIP/NIM is available (not used by other users)
+ * @param {string} nipNim - NIP/NIM to check
+ * @param {string|number} excludeUserId - User ID to exclude from check (for edit mode)
+ * @returns {Promise<boolean>} - Promise that resolves to true if NIP/NIM is available
+ */
+async function checkNipNimAvailability(nipNim, excludeUserId = null) {
+  try {
+    envLog("debug", "Checking NIP/NIM availability:", nipNim);
+
+    // Get all users and check if NIP/NIM exists
+    const users = await getUsers();
+    const existingUser = users.find(
+      (user) =>
+        (user.nip_nim || user.nipNim) === nipNim &&
+        (!excludeUserId || user.id != excludeUserId),
+    );
+
+    return !existingUser; // Return true if NIP/NIM is available (not found)
+  } catch (error) {
+    envLog("error", "Error checking NIP/NIM availability:", error);
+    return true; // If we can't check, assume it's available to avoid blocking
+  }
+}
+
+/**
  * Membuat pengguna baru
  * @param {FormData} formData - FormData object yang sudah berisi semua data pengguna dan file
  * @returns {Promise<Object>} - Promise yang resolve dengan data pengguna baru atau reject dengan error
@@ -318,8 +368,49 @@ async function createUser(formData) {
         throw new Error("Sesi Anda telah berakhir. Silakan login kembali.");
       } else if (status === 403) {
         throw new Error("Anda tidak memiliki akses untuk membuat pengguna.");
+      } else if (status === 409) {
+        // Conflict - Resource already exists
+        const message = data?.message || "Data sudah ada di sistem";
+        if (message.toLowerCase().includes("email")) {
+          throw new Error(
+            "Email sudah digunakan oleh user lain. Silakan gunakan email yang berbeda.",
+          );
+        } else if (
+          message.toLowerCase().includes("nip") ||
+          message.toLowerCase().includes("nim")
+        ) {
+          throw new Error(
+            "NIP/NIM sudah digunakan oleh user lain. Silakan gunakan NIP/NIM yang berbeda.",
+          );
+        } else {
+          throw new Error(`${message}. Silakan periksa data yang dimasukkan.`);
+        }
       } else if (status === 422) {
-        throw new Error(data?.message || "Data yang dikirim tidak valid.");
+        const message = data?.message || "Data yang dikirim tidak valid";
+        // Check if it's a specific validation error
+        if (
+          message.toLowerCase().includes("already exists") ||
+          message.toLowerCase().includes("sudah ada")
+        ) {
+          if (message.toLowerCase().includes("email")) {
+            throw new Error(
+              "Email sudah digunakan oleh user lain. Silakan gunakan email yang berbeda.",
+            );
+          } else if (
+            message.toLowerCase().includes("nip") ||
+            message.toLowerCase().includes("nim")
+          ) {
+            throw new Error(
+              "NIP/NIM sudah digunakan oleh user lain. Silakan gunakan NIP/NIM yang berbeda.",
+            );
+          } else {
+            throw new Error(
+              `${message}. Silakan periksa data yang dimasukkan.`,
+            );
+          }
+        } else {
+          throw new Error(message);
+        }
       } else if (status === 500) {
         throw new Error("Terjadi kesalahan server. Silakan coba lagi nanti.");
       } else {
@@ -796,6 +887,8 @@ export {
   updateUserPhoto,
   deleteUser,
   createUser,
+  checkEmailAvailability,
+  checkNipNimAvailability,
   getRoles,
   getPrograms,
   getPositions,

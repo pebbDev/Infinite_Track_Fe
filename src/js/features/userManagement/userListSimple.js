@@ -313,15 +313,33 @@ function userListAlpineData() {
     /**
      * Menangani aksi hapus pengguna - membuka modal konfirmasi
      */
-    deleteUser(userId) {
-      const user = this.users.find((u) => u.id === userId);
-      if (user) {
+    showDeleteModal(user) {
+      if (user && user.id) {
         this.userToDelete = user;
         this.isDeleteModalOpen = true;
+        this.deleteConfirmText = "";
+      } else {
+        console.error("Invalid user object passed to showDeleteModal:", user);
       }
-    } /**
+    },
+
+    /**
+     * Menangani aksi hapus pengguna - membuka modal konfirmasi (backward compatibility)
+     */
+    deleteUser(userId) {
+      const user = this.users.find((u) => u.id === userId);
+      if (user && user.id) {
+        this.userToDelete = user;
+        this.isDeleteModalOpen = true;
+        this.deleteConfirmText = "";
+      } else {
+        console.error("User not found with ID:", userId);
+      }
+    },
+
+    /**
      * Menutup modal konfirmasi delete
-     */,
+     */
     closeDeleteModal() {
       this.isDeleteModalOpen = false;
       this.userToDelete = null;
@@ -332,9 +350,16 @@ function userListAlpineData() {
      * Konfirmasi dan eksekusi delete user
      */
     async confirmDeleteUser() {
-      if (!this.userToDelete) return;
+      if (!this.userToDelete) {
+        return;
+      }
 
       this.isDeleting = true;
+
+      // Store user info before deletion for success message
+      const userFullName =
+        this.userToDelete.fullName || this.userToDelete.full_name || "Pengguna";
+
       try {
         await deleteUser(this.userToDelete.id);
 
@@ -352,12 +377,11 @@ function userListAlpineData() {
         // Tutup modal
         this.closeDeleteModal();
 
+        // Refresh user list
         await this.fetchUsers();
 
         // Tampilkan pesan sukses
-        this.showSuccessModal(
-          `Pengguna "${this.userToDelete.fullName}" berhasil dihapus.`,
-        );
+        this.showSuccessModal(`Pengguna "${userFullName}" berhasil dihapus.`);
       } catch (error) {
         console.error("Error deleting user:", error);
         this.showErrorModal(error.message);

@@ -9,6 +9,8 @@ import {
   updateUserData,
   updateUserPhoto,
   createUser,
+  checkEmailAvailability,
+  checkNipNimAvailability,
   getRoles,
   getPrograms,
   getPositions,
@@ -446,6 +448,9 @@ function userFormAlpineData() {
           return;
         }
 
+        // Check for duplicate email and NIP/NIM
+        await this.validateUniqueFields();
+
         console.log("Submitting user data...");
 
         let result;
@@ -628,6 +633,45 @@ function userFormAlpineData() {
       }
 
       return errors;
+    },
+
+    /**
+     * Validate unique fields (email and NIP/NIM)
+     */
+    async validateUniqueFields() {
+      const errors = [];
+
+      // Check email availability
+      if (this.formData.email.trim()) {
+        const isEmailAvailable = await checkEmailAvailability(
+          this.formData.email,
+          this.isEditMode ? this.userId : null,
+        );
+
+        if (!isEmailAvailable) {
+          errors.push(
+            "Email sudah digunakan oleh user lain. Silakan gunakan email yang berbeda.",
+          );
+        }
+      }
+
+      // Check NIP/NIM availability
+      if (this.formData.nip_nim.trim()) {
+        const isNipNimAvailable = await checkNipNimAvailability(
+          this.formData.nip_nim,
+          this.isEditMode ? this.userId : null,
+        );
+
+        if (!isNipNimAvailable) {
+          errors.push(
+            "NIP/NIM sudah digunakan oleh user lain. Silakan gunakan NIP/NIM yang berbeda.",
+          );
+        }
+      }
+
+      if (errors.length > 0) {
+        throw new Error(errors.join("\\n"));
+      }
     },
 
     /**

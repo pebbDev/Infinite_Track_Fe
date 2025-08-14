@@ -298,17 +298,37 @@ function isCloudinaryUrl(url) {
  */
 function getUserPhotoUrl(
   photoUrl,
-  defaultPhotoPath = "/src/images/user/default-avatar.jpg",
+  defaultPhotoPath = "./images/user/owner.jpg",
 ) {
   try {
+    // Handle absolute and special URL schemes
+    if (typeof photoUrl === "string") {
+      const trimmed = photoUrl.trim();
+      if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+        return trimmed;
+      }
+      if (trimmed.startsWith("data:") || trimmed.startsWith("blob:")) {
+        return trimmed;
+      }
+    }
+
     // Jika ada URL foto dan itu adalah URL Cloudinary yang valid, gunakan langsung
     if (photoUrl && isCloudinaryUrl(photoUrl)) {
       return photoUrl;
     }
 
-    // Jika ada URL foto tapi bukan Cloudinary (legacy), gunakan juga langsung
+    // Jika ada URL foto tapi bukan Cloudinary (legacy), normalisasi backslash
     if (photoUrl && typeof photoUrl === "string" && photoUrl.trim() !== "") {
-      return photoUrl;
+      let normalized = photoUrl.replace(/\\/g, "/");
+      // Prefix relative uploads path
+      if (/^(uploads\/?)/.test(normalized)) {
+        normalized = `./${normalized}`;
+      }
+      // Ensure it does not point to missing /src assets in production
+      if (normalized.startsWith("/src/")) {
+        return defaultPhotoPath;
+      }
+      return normalized;
     }
 
     // Fallback ke foto default

@@ -119,6 +119,8 @@ class ModalAlert {
    * @param {Function} options.onOk - Callback when OK button is clicked
    * @param {Function} options.onClose - Callback when modal is closed
    * @param {boolean} options.showClose - Show close button (default: true)
+   * @param {string} options.secondaryButtonText - Optional secondary button text (e.g., 'Cancel')
+   * @param {Function} options.onCancel - Callback when secondary button is clicked
    */
   show(options = {}) {
     const {
@@ -129,6 +131,8 @@ class ModalAlert {
       onOk,
       onClose,
       showClose = true,
+      secondaryButtonText,
+      onCancel,
     } = options;
 
     // Close any existing modal
@@ -213,14 +217,28 @@ class ModalAlert {
                 : ""
             }
 
-            <!-- Action Button -->
+            <!-- Action Buttons -->
             <div class="flex items-center justify-center w-full gap-3">
               <button 
                 id="modal-ok-btn" 
+                type="button"
                 class="flex justify-center w-full px-4 py-3 text-sm font-medium text-white rounded-lg shadow-theme-xs sm:w-auto ${config.buttonClasses}"
               >
                 ${modalButtonText}
               </button>
+              ${
+                secondaryButtonText
+                  ? `
+              <button 
+                id="modal-cancel-btn" 
+                type="button"
+                class="flex justify-center w-full px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-theme-xs sm:w-auto hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+              >
+                ${secondaryButtonText}
+              </button>
+              `
+                  : ""
+              }
             </div>
           </div>
         </div>
@@ -230,7 +248,13 @@ class ModalAlert {
     // Insert modal into DOM
     document.body.insertAdjacentHTML("beforeend", modalHTML);
     this.activeModal = document.getElementById("alert-modal"); // Setup event listeners
-    this.setupEventListeners(onOk, onClose, showClose);
+    this.setupEventListeners(
+      onOk,
+      onClose,
+      showClose,
+      onCancel,
+      Boolean(secondaryButtonText),
+    );
 
     // Show modal with animation
     requestAnimationFrame(() => {
@@ -247,16 +271,21 @@ class ModalAlert {
   /**
    * Setup event listeners for the modal
    */
-  setupEventListeners(onOk, onClose, showClose) {
+  setupEventListeners(onOk, onClose, showClose, onCancel, hasCancel) {
     if (!this.activeModal) return;
 
     const okBtn = this.activeModal.querySelector("#modal-ok-btn");
+    const cancelBtn = hasCancel
+      ? this.activeModal.querySelector("#modal-cancel-btn")
+      : null;
     const closeBtn = this.activeModal.querySelector("#modal-close-btn");
     const backdrop = this.activeModal.querySelector("#modal-backdrop");
 
     // OK button click
     if (okBtn) {
-      okBtn.addEventListener("click", () => {
+      okBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (onOk && typeof onOk === "function") {
           onOk();
         }
@@ -264,9 +293,23 @@ class ModalAlert {
       });
     }
 
+    // Cancel button click
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onCancel && typeof onCancel === "function") {
+          onCancel();
+        }
+        this.close();
+      });
+    }
+
     // Close button click
     if (closeBtn && showClose) {
-      closeBtn.addEventListener("click", () => {
+      closeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (onClose && typeof onClose === "function") {
           onClose();
         }
@@ -276,7 +319,9 @@ class ModalAlert {
 
     // Backdrop click
     if (backdrop) {
-      backdrop.addEventListener("click", () => {
+      backdrop.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (onClose && typeof onClose === "function") {
           onClose();
         }

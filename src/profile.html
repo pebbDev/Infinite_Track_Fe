@@ -22,23 +22,39 @@
       'isProfileInfoModal': false, 
       'isProfileAddressModal': false,
       'userProfile': {
-        id: 7,
-        full_name: 'Febriyadi',
-        email: 'febriyadi05@email.com',
-        role_name: 'Internship',
-        position_name: 'Lead of Social Media and Public Relation',
-        program_name: 'Program Development & Relation',
+        id: null,
+        full_name: '',
+        email: '',
+        role_name: '',
+        position_name: '',
+        program_name: '',
         division_name: null,
-        nip_nim: 'F55121082c',
-        phone: '08539507795',
-        photo: 'uploads\\face\\face-1748333090217-344943194.jpg',
-        photo_updated_at: '2025-05-27T08:04:50.000Z',
+        nip_nim: '',
+        phone: '',
+        photo: '',
+        photo_updated_at: '',
         location: {
-          latitude: -6.2088,
-          longitude: 106.8456,
-          radius: 100,
-          description: 'Rumah utama',
-          category_name: 'Work From Home'
+          latitude: null,
+          longitude: null,
+          radius: null,
+          description: '',
+          category_name: ''
+        }
+      },
+      async init() {
+        try {
+          // hydrate from storage first
+          if (window.getUserFromStorage) {
+            const stored = window.getUserFromStorage();
+            if (stored) this.userProfile = { ...this.userProfile, ...stored };
+          }
+          // fetch from API
+          if (window.AuthService?.fetchCurrentUser) {
+            const me = await window.AuthService.fetchCurrentUser();
+            if (me) this.userProfile = { ...this.userProfile, ...me };
+          }
+        } catch (e) {
+          console.warn('Failed to fetch profile:', e?.message);
         }
       }
     }"
@@ -108,27 +124,27 @@
                     <div class="order-3 xl:order-2">
                       <h4
                         class="mb-2 text-center text-lg font-semibold text-gray-800 xl:text-left dark:text-white/90"
-                        x-text="userProfile.full_name"
+                        x-text="userProfile.full_name || '-'"
                       >
-                        Musharof Chowdhury
+                        -
                       </h4>
                       <div
                         class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left"
                       >
                         <p
                           class="text-sm text-gray-500 dark:text-gray-400"
-                          x-text="userProfile.role_name"
+                          x-text="userProfile.email || '-'"
                         >
-                          Team Manager
+                          -
                         </p>
                         <div
                           class="hidden h-3.5 w-px bg-gray-300 xl:block dark:bg-gray-700"
                         ></div>
                         <p
                           class="text-sm text-gray-500 dark:text-gray-400"
-                          x-text="userProfile.position_name"
+                          x-text="userProfile.position_name || '-'"
                         >
-                          Arizona, United States
+                          -
                         </p>
                       </div>
                     </div>
@@ -256,9 +272,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.full_name"
+                          x-text="userProfile.full_name || '-'"
                         >
-                          Musharof
+                          -
                         </p>
                       </div>
 
@@ -270,9 +286,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.nip_nim"
+                          x-text="userProfile.nip_nim || '-'"
                         >
-                          Chowdhury
+                          -
                         </p>
                       </div>
 
@@ -284,9 +300,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.email"
+                          x-text="userProfile.email || '-'"
                         >
-                          randomuser@pimjo.com
+                          -
                         </p>
                       </div>
 
@@ -298,9 +314,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.phone"
+                          x-text="userProfile.phone || '-'"
                         >
-                          +09 363 398 46
+                          -
                         </p>
                       </div>
 
@@ -312,9 +328,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.role_name"
+                          x-text="userProfile.role_name || '-'"
                         >
-                          Team Manager
+                          -
                         </p>
                       </div>
 
@@ -326,9 +342,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.position_name"
+                          x-text="userProfile.position_name || '-'"
                         >
-                          Team Manager
+                          -
                         </p>
                       </div>
 
@@ -340,9 +356,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                          x-text="userProfile.program_name"
+                          x-text="userProfile.program_name || '-'"
                         >
-                          Team Manager
+                          -
                         </p>
                       </div>
                       <div x-show="userProfile.division_name">

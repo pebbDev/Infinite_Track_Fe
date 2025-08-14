@@ -46,9 +46,13 @@ import { attendanceLogAlpineData } from "./features/attendance/attendanceLog.js"
 import { bookingListAlpineData } from "./features/wfaBooking/bookingList.js";
 import { getUserPhotoUrl } from "./utils/photoValidation.js";
 import { dashboard } from "../../src/js/features/dashboard/dashboard.js";
+import { showInlineAlert } from "./utils/inlineAlert.js";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
+
+// Expose inline alert helper
+window.showInlineAlert = showInlineAlert;
 
 // Register Dashboard component
 document.addEventListener("alpine:init", () => {
@@ -530,29 +534,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const itemName = this.getAttribute("data-item-name");
 
       // Show danger modal alert for deletion confirmation
-      window.showAlertModal({
+      window.showInlineAlert({
         type: "danger",
-        title: "Konfirmasi Hapus",
         message: `Apakah Anda yakin ingin menghapus data karyawan "${itemName}" (${itemId})? Tindakan ini tidak dapat dibatalkan.`,
-        buttonText: "Ya, Hapus",
-        showClose: true,
-        onOk: function () {
-          // Handle deletion logic here
-          console.log(`Menghapus karyawan: ${itemName} (${itemId})`);
-
-          setTimeout(() => {
-            window.showAlertModal({
-              type: "success",
-              title: "Berhasil Dihapus",
-              message: `Data karyawan "${itemName}" telah berhasil dihapus dari sistem.`,
-              buttonText: "OK",
-              showClose: false,
-            });
-          }, 300);
-        },
-        onClose: function () {
-          console.log("Penghapusan dibatalkan");
-        },
       });
     });
   });
@@ -569,28 +553,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const userId = this.getAttribute("data-user-id");
       const userName = this.getAttribute("data-user-name");
 
-      window.showAlertModal({
+      window.showInlineAlert({
         type: "success",
-        title: "Konfirmasi Persetujuan Booking",
         message: `Apakah Anda yakin ingin menyetujui booking dari "${userName}" (${userId})?`,
-        buttonText: "Ya, Setujui",
-        showClose: true,
-        onOk: function () {
-          console.log(`Menyetujui booking: ${userName} (${userId})`);
-
-          setTimeout(() => {
-            window.showAlertModal({
-              type: "success",
-              title: "Booking Disetujui",
-              message: `Booking dari "${userName}" telah berhasil disetujui.`,
-              buttonText: "OK",
-              showClose: false,
-            });
-          }, 300);
-        },
-        onClose: function () {
-          console.log("Persetujuan booking dibatalkan");
-        },
       });
     });
   });
@@ -654,24 +619,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const userName = this.getAttribute("data-user-name");
 
       // Use the new delete modal instead of alert modal
-      window.showDeleteModal({
-        title: "Konfirmasi Hapus Booking",
+      window.showInlineAlert({
+        type: "danger",
         message: `Apakah Anda yakin ingin menghapus booking dari "${userName}" (${userId})? Tindakan ini tidak dapat dibatalkan.`,
-        onConfirm: function (data) {
-          console.log(`Menghapus booking: ${data.userName} (${data.userId})`);
-
-          // Show success notification using alert modal
-          setTimeout(() => {
-            window.showAlertModal({
-              type: "success",
-              title: "Booking Dihapus",
-              message: `Booking dari "${data.userName}" telah berhasil dihapus dari sistem.`,
-              buttonText: "OK",
-              showClose: false,
-            });
-          }, 300);
-        },
-        data: { userId, userName },
       });
     });
   });

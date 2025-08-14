@@ -50,7 +50,7 @@ export function dashboard() {
     entriesPerPage: 5,
     currentPage: 1,
 
-    // Modal states (matching attendance table exactly)
+    // Modal states (legacy)
     isDeleteModalOpen: false,
     deleteConfirmMessage: "",
     deleteTargetId: null,
@@ -178,11 +178,15 @@ export function dashboard() {
         );
 
         // Gunakan period filter yang dipilih user untuk semua tampilan dashboard
+        // Saat search aktif, ambil dataset lebih besar agar filter client-side akurat
+        const effectiveLimit =
+          this.searchQuery && this.searchQuery.trim()
+            ? 100
+            : this.filters.limit;
         const response = await getSummaryReport({
           period: this.period, // Menggunakan period filter dari dropdown
           page: this.filters.page,
-          limit: this.filters.limit,
-          search: this.searchQuery,
+          limit: effectiveLimit,
         });
 
         console.log(`Dashboard API call made with period='${this.period}'`);
@@ -216,15 +220,33 @@ export function dashboard() {
           // Extract report data dari nested structure
           const reportData = response.report?.data || response.report || [];
 
-          // Update pagination data
+          // Update pagination data (dukung kedua skema penamaan dari backend)
+          const p = response.report?.pagination || {};
           this.pagination = {
-            current_page: response.report?.pagination?.current_page || 1,
-            total_pages: response.report?.pagination?.total_pages || 1,
-            total_records: response.report?.pagination?.total_records || 0,
-            has_prev_page: response.report?.pagination?.has_prev_page || false,
-            has_next_page: response.report?.pagination?.has_next_page || false,
-            per_page: response.report?.pagination?.per_page || 5,
-          }; // Map report data to attendanceData format (matching exact API structure)
+            current_page: p.current_page || 1,
+            total_pages: p.total_pages || 1,
+            total_records:
+              typeof p.total_records !== "undefined"
+                ? p.total_records
+                : typeof p.total_items !== "undefined"
+                  ? p.total_items
+                  : 0,
+            has_prev_page:
+              typeof p.has_prev_page === "boolean"
+                ? p.has_prev_page
+                : p.current_page > 1,
+            has_next_page:
+              typeof p.has_next_page === "boolean"
+                ? p.has_next_page
+                : p.current_page < p.total_pages,
+            per_page:
+              typeof p.per_page !== "undefined"
+                ? p.per_page
+                : typeof p.items_per_page !== "undefined"
+                  ? p.items_per_page
+                  : effectiveLimit,
+          };
+          // Map report data to attendanceData format (matching exact API structure)
           this.attendanceData = reportData.map((item, index) => ({
             id_attendance: item.attendance_id || `attendance_${index}`,
             id:
@@ -265,8 +287,22 @@ export function dashboard() {
             ...item, // spread any additional fields
           }));
 
-          // Also set reportData for table display
-          this.reportData = this.attendanceData;
+          // Set reportData untuk tampilan tabel
+          if (this.searchQuery && this.searchQuery.trim()) {
+            // Saat searching: tampilkan hasil filter client-side dan nonaktifkan pagination server agar empty state benar
+            this.reportData = this.filteredAttendanceData;
+            const filteredCount = this.reportData.length;
+            this.pagination = {
+              current_page: 1,
+              total_pages: 1,
+              total_records: filteredCount,
+              per_page: filteredCount,
+              has_prev_page: false,
+              has_next_page: false,
+            };
+          } else {
+            this.reportData = this.attendanceData;
+          }
           this.summaryData = {
             summary: mappedSummary,
             report: reportData,
@@ -749,61 +785,59 @@ export function dashboard() {
     },
 
     /**
-     * Confirm delete dengan modal (exact same as attendance table)
+     * Confirm delete menggunakan alert modal (warning) + OK/Batal
      */
     confirmDelete(attendanceId) {
       this.deleteTargetId = attendanceId;
-      this.deleteConfirmMessage =
-        "Apakah Anda yakin ingin menghapus data absensi ini? Tindakan ini tidak dapat dibatalkan.";
-      this.isDeleteModalOpen = true;
+      if (typeof window.showAlertModal === "function") {
+        window.showAlertModal({
+          type: "warning",
+          title: "Konfirmasi Hapus Data",
+          message:
+            "Apakah Anda yakin ingin menghapus data absensi ini? Tindakan ini tidak dapat dibatalkan.",
+          buttonText: "Ya, Hapus",
+          secondaryButtonText: "Batal",
+          onOk: () => this.executeDelete(),
+        });
+      }
     },
 
     /**
-     * Execute delete attendance (dipanggil dari modal)
+     * Execute delete attendance (dipanggil via alert confirm OK)
      */
     async executeDelete() {
       if (!this.deleteTargetId) return;
 
       try {
-        // TODO: Replace with actual API call
-        // await deleteAttendance(this.deleteTargetId);
+        await deleteAttendance(this.deleteTargetId);
 
-        // For now, just remove from local data
-        this.attendanceData = this.attendanceData.filter(
-          (log) => log.id_attendance !== this.deleteTargetId,
-        );
-
-        // Tutup modal
-        this.isDeleteModalOpen = false;
+        // Reset target
         this.deleteTargetId = null;
 
-        // Tampilkan modal sukses
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
+        // Tampilkan alert inline sukses
+        if (typeof window.showInlineAlert === "function") {
+          window.showInlineAlert({
             type: "success",
             title: "Data Absensi Dihapus",
             message: "Data absensi berhasil dihapus dari sistem.",
-            buttonText: "OK",
           });
         }
 
-        // Refresh data if needed
-        // await this.loadSummaryData();
+        // Refresh data
+        await this.loadSummaryData?.();
       } catch (error) {
         console.error("Error deleting attendance:", error);
 
-        // Tutup modal
-        this.isDeleteModalOpen = false;
+        // Reset target
         this.deleteTargetId = null;
 
-        // Tampilkan modal error
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
+        // Tampilkan alert inline error
+        if (typeof window.showInlineAlert === "function") {
+          window.showInlineAlert({
             type: "danger",
             title: "Gagal Menghapus Data",
             message:
               error.message || "Terjadi kesalahan saat menghapus data absensi.",
-            buttonText: "OK",
           });
         }
       }
@@ -932,7 +966,8 @@ export function dashboard() {
      */
     onSearchChange() {
       this.currentPage = 1; // Reset to first page when searching
-      console.log("Search query changed:", this.searchQuery);
+      this.filters.page = 1;
+      // Pencarian akan di-handle oleh debouncedSearch() via @input
     },
 
     /**
@@ -1012,109 +1047,23 @@ export function dashboard() {
       }
 
       return pages;
-    }, // =================== DELETE MODAL FUNCTIONALITY ===================
-
-    /**
-     * Confirm delete dengan modal (matching attendance table exactly)
-     * @param {string} attendanceId - ID absensi yang akan dihapus
-     */
-    confirmDelete(attendanceId) {
-      this.deleteTargetId = attendanceId;
-      this.deleteConfirmMessage =
-        "Apakah Anda yakin ingin menghapus data absensi ini? Tindakan ini tidak dapat dibatalkan.";
-      this.isDeleteModalOpen = true;
-    } /**
-     * Execute delete attendance (dipanggil dari modal)
-     */,
-    async executeDelete() {
-      if (!this.deleteTargetId) return;
-
-      try {
-        await deleteAttendance(this.deleteTargetId);
-
-        // Tutup modal
-        this.isDeleteModalOpen = false;
-        this.deleteTargetId = null;
-
-        // Tampilkan modal sukses
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
-            type: "success",
-            title: "Data Absensi Dihapus",
-            message: "Data absensi berhasil dihapus dari sistem.",
-            buttonText: "OK",
-          });
-        }
-
-        // Refresh data
-        await this.loadSummaryData();
-      } catch (error) {
-        console.error("Error deleting attendance:", error);
-
-        // Tutup modal
-        this.isDeleteModalOpen = false;
-        this.deleteTargetId = null;
-
-        // Tampilkan modal error
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
-            type: "danger",
-            title: "Gagal Menghapus Data",
-            message:
-              error.message || "Terjadi kesalahan saat menghapus data absensi.",
-            buttonText: "OK",
-          });
-        }
-      }
     },
 
-    /**
-     * Close delete modal
-     */
-    closeDeleteModal() {
-      this.isDeleteModalOpen = false;
-      this.deleteTargetId = null;
-      this.deleteConfirmMessage = "";
-    },
-
-    /**
-     * Debounced search function
-     */
+    // Debounced search function
     debouncedSearch() {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => {
-        this.filters.page = 1; // Reset to first page when searching
+        this.filters.page = 1;
+        // searchQuery sudah di-bind oleh input; cukup reload data agar reportData & pagination disesuaikan
         this.loadSummaryData();
-      }, 300);
+      }, 1000);
     },
 
-    /**
-     * Update filters limit and reload data
-     */
+    // Update filters limit and reload data
     changeEntriesPerPage(newLimit) {
-      this.filters.limit = newLimit;
+      this.filters.limit = Number(newLimit) || 5;
       this.filters.page = 1; // Reset to first page
       this.loadSummaryData();
-    },
-
-    /**
-     * View detail function for attendance record
-     */
-    viewDetail(log) {
-      console.log("Viewing detail for:", log);
-      // You can implement a modal or redirect to detail page here
-      alert(
-        `Viewing detail for ${log.full_name}\nStatus: ${log.status}\nInformation: ${log.information}`,
-      );
-    },
-
-    /**
-     * Open delete modal
-     */
-    openDeleteModal(attendanceId, fullName) {
-      this.deleteTargetId = attendanceId;
-      this.deleteConfirmMessage = `Are you sure you want to delete attendance record for ${fullName}?`;
-      this.isDeleteModalOpen = true;
     },
   };
 }

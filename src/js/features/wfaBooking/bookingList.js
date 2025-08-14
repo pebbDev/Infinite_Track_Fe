@@ -216,7 +216,6 @@ export function bookingListAlpineData() {
       this.fetchBookings();
     },
 
-
     /**
      * Handle search input dengan debounce
      */
@@ -497,9 +496,17 @@ export function bookingListAlpineData() {
      */
     confirmDelete(bookingId) {
       this.deleteTargetId = bookingId;
-      this.deleteConfirmMessage =
-        "Apakah Anda yakin ingin menghapus data booking ini? Tindakan ini tidak dapat dibatalkan.";
-      this.isDeleteModalOpen = true;
+      if (typeof window.showAlertModal === "function") {
+        window.showAlertModal({
+          type: "warning",
+          title: "Konfirmasi Hapus Data",
+          message:
+            "Apakah Anda yakin ingin menghapus data booking ini? Tindakan ini tidak dapat dibatalkan.",
+          buttonText: "Ya, Hapus",
+          secondaryButtonText: "Batal",
+          onOk: () => this.executeDelete(),
+        });
+      }
     },
 
     /**
@@ -511,8 +518,6 @@ export function bookingListAlpineData() {
       try {
         const response = await deleteBooking(this.deleteTargetId);
 
-        // Tutup modal
-        this.isDeleteModalOpen = false;
         this.deleteTargetId = null;
 
         // Handle successful response
@@ -521,25 +526,23 @@ export function bookingListAlpineData() {
           response.status === "success" ||
           response.message
         ) {
-          // Tampilkan modal sukses
-          if (typeof window.showAlertModal === "function") {
-            window.showAlertModal({
+          // Tampilkan alert inline sukses
+          if (typeof window.showInlineAlert === "function") {
+            window.showInlineAlert({
               type: "success",
               title: "Data Booking Dihapus",
               message:
                 response.message ||
                 "Data booking berhasil dihapus dari sistem.",
-              buttonText: "OK",
             });
           }
         } else {
-          // Tampilkan modal sukses default jika tidak ada response message
-          if (typeof window.showAlertModal === "function") {
-            window.showAlertModal({
+          // Tampilkan alert inline sukses default jika tidak ada response message
+          if (typeof window.showInlineAlert === "function") {
+            window.showInlineAlert({
               type: "success",
               title: "Data Booking Dihapus",
               message: "Data booking berhasil dihapus dari sistem.",
-              buttonText: "OK",
             });
           }
         }
@@ -549,18 +552,15 @@ export function bookingListAlpineData() {
       } catch (error) {
         console.error("Error deleting booking:", error);
 
-        // Tutup modal
-        this.isDeleteModalOpen = false;
         this.deleteTargetId = null;
 
-        // Tampilkan modal error
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
+        // Tampilkan alert inline error
+        if (typeof window.showInlineAlert === "function") {
+          window.showInlineAlert({
             type: "danger",
             title: "Gagal Menghapus Data",
             message:
               error.message || "Terjadi kesalahan saat menghapus data booking.",
-            buttonText: "OK",
           });
         }
       }

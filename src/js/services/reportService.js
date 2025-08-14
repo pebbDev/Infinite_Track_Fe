@@ -37,8 +37,13 @@ class ReportService {
     try {
       // Attempt to call the real API
       const queryParams = { period, page, limit };
-      if (search) {
-        queryParams.search = search;
+      if (search && String(search).trim() !== "") {
+        const s = String(search).trim();
+        // include common synonyms to maximize compatibility with backend
+        queryParams.search = s;
+        queryParams.q = s;
+        queryParams.query = s;
+        queryParams.keyword = s;
       }
 
       const response = await axios.get("/api/summary", {

@@ -49,7 +49,7 @@ export function attendanceLogAlpineData() {
     // Search term untuk input
     searchTerm: "",
 
-    // Modal states
+    // Modal states (legacy)
     isDeleteModalOpen: false,
     deleteConfirmMessage: "",
     deleteTargetId: null,
@@ -100,9 +100,11 @@ export function attendanceLogAlpineData() {
       } finally {
         this.isLoading = false;
       }
-    } /**
+    },
+
+    /**
      * Handle search input dengan debounce
-     */,
+     */
     handleSearchInput() {
       // Clear timer sebelumnya
       if (this.searchTimer) {
@@ -151,19 +153,29 @@ export function attendanceLogAlpineData() {
         this.filters.page = newPage;
         this.fetchAttendance();
       }
-    } /**
-     * Confirm delete dengan modal
-     * @param {string} attendanceId - ID absensi yang akan dihapus
-     */,
-    confirmDelete(attendanceId) {
-      this.deleteTargetId = attendanceId;
-      this.deleteConfirmMessage =
-        "Apakah Anda yakin ingin menghapus data absensi ini? Tindakan ini tidak dapat dibatalkan.";
-      this.isDeleteModalOpen = true;
     },
 
     /**
-     * Execute delete attendance (dipanggil dari modal)
+     * Confirm delete menggunakan alert modal (warning) + OK/Batal
+     * @param {string} attendanceId - ID absensi yang akan dihapus
+     */
+    confirmDelete(attendanceId) {
+      this.deleteTargetId = attendanceId;
+      if (typeof window.showAlertModal === "function") {
+        window.showAlertModal({
+          type: "warning",
+          title: "Konfirmasi Hapus Data",
+          message:
+            "Apakah Anda yakin ingin menghapus data absensi ini? Tindakan ini tidak dapat dibatalkan.",
+          buttonText: "Ya, Hapus",
+          secondaryButtonText: "Batal",
+          onOk: () => this.executeDelete(),
+        });
+      }
+    },
+
+    /**
+     * Execute delete attendance (dipanggil via alert confirm OK)
      */
     async executeDelete() {
       if (!this.deleteTargetId) return;
@@ -171,17 +183,15 @@ export function attendanceLogAlpineData() {
       try {
         await deleteAttendance(this.deleteTargetId);
 
-        // Tutup modal
-        this.isDeleteModalOpen = false;
+        // Reset target
         this.deleteTargetId = null;
 
-        // Tampilkan modal sukses
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
+        // Tampilkan alert inline sukses
+        if (typeof window.showInlineAlert === "function") {
+          window.showInlineAlert({
             type: "success",
             title: "Data Absensi Dihapus",
             message: "Data absensi berhasil dihapus dari sistem.",
-            buttonText: "OK",
           });
         }
 
@@ -190,18 +200,16 @@ export function attendanceLogAlpineData() {
       } catch (error) {
         console.error("Error deleting attendance:", error);
 
-        // Tutup modal
-        this.isDeleteModalOpen = false;
+        // Reset target
         this.deleteTargetId = null;
 
-        // Tampilkan modal error
-        if (typeof window.showAlertModal === "function") {
-          window.showAlertModal({
+        // Tampilkan alert inline error
+        if (typeof window.showInlineAlert === "function") {
+          window.showInlineAlert({
             type: "danger",
             title: "Gagal Menghapus Data",
             message:
               error.message || "Terjadi kesalahan saat menghapus data absensi.",
-            buttonText: "OK",
           });
         }
       }
@@ -238,8 +246,6 @@ export function attendanceLogAlpineData() {
           alert(
             `Koordinat: ${locationPayload.latitude}, ${locationPayload.longitude}`,
           );
-        } else {
-          alert("Koordinat lokasi tidak tersedia");
         }
       }
     },

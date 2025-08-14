@@ -72,34 +72,38 @@ async function login(email, password) {
 }
 
 /**
- * Mengambil data pengguna yang sedang login
+ * Mengambil data pengguna yang sedang login (/auth/me)
  * @returns {Promise<Object>} - Promise yang resolve dengan data pengguna atau reject dengan error
  */
 async function fetchCurrentUser() {
   try {
-    // Kirim request GET ke endpoint me
-    const response = await axios.get(`${API_BASE_URL}/me`);
+    const url = `${API_CONFIG.AUTH_URL}/me`;
+    envLog("info", "GET current user:", url);
 
-    // Periksa response dari backend
-    if (response.status === 200 && response.data && response.data.data) {
-      const userData = response.data.data;
+    const response = await axios.get(url);
+
+    if (
+      response.data &&
+      (response.data.success === true || response.status === 200)
+    ) {
+      const userData = response.data.data || response.data;
 
       // Update data pengguna di localStorage
       saveUserToStorage(userData);
 
       return userData;
     } else {
-      throw new Error("Gagal mengambil data pengguna");
+      throw new Error(
+        response.data?.message || "Gagal mengambil data pengguna",
+      );
     }
   } catch (error) {
-    // Handle berbagai jenis error
     if (error.response) {
       const statusCode = error.response.status;
 
       if (statusCode === 401) {
-        // Token tidak valid atau expired
         console.error("User not authenticated");
-        removeUserFromStorage(); // Bersihkan data lokal
+        removeUserFromStorage();
         throw new Error("Sesi telah berakhir. Silakan login kembali.");
       } else {
         const errorMessage =
@@ -108,13 +112,11 @@ async function fetchCurrentUser() {
         throw new Error(errorMessage);
       }
     } else if (error.request) {
-      // Network error
       console.error("Network error during fetch user:", error.request);
       throw new Error(
         "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
       );
     } else {
-      // Error lainnya
       console.error("Fetch user error:", error.message);
       throw new Error(error.message);
     }

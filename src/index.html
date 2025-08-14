@@ -10,7 +10,6 @@
     <title>
       Summary Report | InfiniteTrack - Tailwind CSS Admin Dashboard Template
     </title>
-    <script src="./js/index.js" type="module"></script>
   </head>
   <body
     x-data="{ 
@@ -25,10 +24,7 @@
       alertType: 'success',
       alertTitle: '',
       alertMessage: '',
-      alertButtonText: 'OK',
-      ...dashboard(),
-      ...deleteModalState(),
-      ...mapDetailModalState()
+      alertButtonText: 'OK'
     }"
     x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
@@ -59,6 +55,10 @@
         <!-- ===== Main Content Start ===== -->
         <main x-data="dashboard" x-init="init()">
           <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+            <!-- Inline Alert Templates & Container -->
+            <include src="./partials/alert/alert-templates.html" />
+            <div id="alert-container"></div>
+
             <!-- Loading State -->
             <div x-show="loading" class="mb-6">
               <div class="flex items-center justify-center p-8">
@@ -134,8 +134,6 @@
     <div x-data="mapDetailModalState()">
       <include src="./partials/modal/map-detail-modal.html" />
     </div>
-    <div x-data="deleteModalState()">
-      <include src="./partials/modal/delete-confirmation-modal.html" />
-    </div>
+    <!-- Alert modal already globally managed elsewhere if needed -->
   </body>
 </html>

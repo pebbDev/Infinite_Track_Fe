@@ -40,7 +40,7 @@ const generateHTMLPlugins = () =>
   });
 
 module.exports = {
-  mode: "development",
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
   entry: "./src/js/index.js",
   devServer: {
     static: {
